@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <ListPreference
+        android:entries="@array/аccurancy_entry_number"
+        android:entryValues="@array/аccurancy_entryValues_number"
+        android:key="accurancy"
+        android:title="Точность отсечек"
+        android:summary="@string/Accurancy">
+    </ListPreference>
+
+    <CheckBoxPreference
+        android:key="cbSound"
+        android:title="Звук"
+        android:summaryOn="@string/cbSoundOn"
+        android:summaryOff="@string/cbSoundOff">
+    </CheckBoxPreference>
+
+</PreferenceScreen>

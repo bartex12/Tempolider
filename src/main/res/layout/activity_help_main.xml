@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/rect"
+    android:orientation="vertical">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/rect">
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/imageView2"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="СПРАВКА"
+            android:id="@+id/textView4"
+            android:textColor="#0707fa"
+            android:textSize="30dp"
+            android:textStyle="bold"
+            android:shadowRadius="5"
+            android:shadowDy="3"
+            android:shadowDx="3"
+            android:shadowColor="@color/colorAccent"
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"/>
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/imageView3"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentRight="true"
+            />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/scrollView">
+
+
+       <!-- //связывает все номера телефона, веб-сайты, адреса электронной
+            почты и почтовые адреса
+       android:linksClickable="true"
+        android:autoLink="all" //-->
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="fill_parent"
+            android:id="@+id/textViewHelpMain"
+            android:linksClickable="true"
+            android:autoLink="all"
+            android:overScrollMode="always"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:textSize="20dp"
+            android:text="Справка"
+            android:textStyle="normal"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:singleLine="false"/>
+    </ScrollView>
+
+</LinearLayout>

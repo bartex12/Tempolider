@@ -1,0 +1,38 @@
+
+		ГЛАВНОЕ МЕНЮ
+        MainActivity - главное меню - список программ, доступных в приложении
+        Макет - activity_main->включает app_bar_main->включает content_main, nav_header_main, list_item.
+        Меню - activity_main_drawer.xml, main.xml
+
+		
+        СЕКУНДОМЕР
+        TimeMeterActivity - секундомер с отсечками, показывает график в TimeGrafActivity
+        Макет activity_time_meter, list_rep
+        Меню timemeter
+		
+        TimeGrafActivity - график отсечек от TimeMeterActivity, передаёт данные отсечек в темполидер SetListActivity
+        Макет activity_timegraf
+        Меню timegraf
+
+		
+        ТЕМПОЛИДЕР
+        Set - класс содержимого фрагмента подхода- время отрезка, количество повторений, номер фрагмента подхода
+		
+        SetLab - синглетный класс содержит список фрагментов подхода
+		
+        TimeOfDelayPischalka - синглетный класс содержит время задержки
+		
+        SetListActivity - потомок SingleFragmentActivity, служит для создания фрагмента с отсечками SetListFragment.
+        Макет отсутствует
+        Меню отсутствует
+		
+        SingleFragmentActivity - абстрактный класс, родитель для SetListActivity описывает события на экране темполидера - задержка, старт, стоп, сброс, индикация времени и количества повторений
+        Макет activity_set_list
+        Меню pacemaker
+		
+        SetListFragment - фрагмент с отсечками управляет списком фрагментов подхода вызывает активность редактирования строки списка DetailActivity
+        Макет fragment_set_list,  list_item_set_textview
+        Меню menu_set_list_frag
+
+        barcats@inbox.ru
+        ***

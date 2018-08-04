@@ -1,0 +1,70 @@
+<resources>
+    <string name="app_name">p010_Train</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="cbSoundOn">Звук включен</string>
+    <string name="cbSoundOff">Звук выключен</string>
+    <string name="Accurancy">Количество знаков после запятой</string>
+
+    <string name="action_settings">Установки</string>
+    <string name="action_timing">Отсечки</string>
+    <string name="action_transfer">Загрузка отсечек в темполидер</string>
+    <string name="action_help_main_title">Справка</string>
+    <string name="save_data_in_file">Сохранить в файл</string>
+    <string name="show_list_of_files">Список раскладок</string>
+    <string name="change_data">Изменить раскладку</string>
+    <string name="change_temp">Изменить темп </string>
+
+    <string name="timeValue_item1">3</string>
+    <string name="repsValue_item1">5</string>
+    <string name="start_button">старт</string>
+    <string name="stop_button">стоп</string>
+    <string name="reset_button">сброс</string>
+    <string name="timeValue_item2">4</string>
+    <string name="repsValue_item2">5</string>
+    <string name="timeValue_item3">5</string>
+    <string name="timeValue_item4">6</string>
+    <string name="timeValue_item5">6</string>
+    <string name="repsValue_item3">5</string>
+    <string name="repsValue_item4">5</string>
+    <string name="repsValue_item5">5</string>
+    <string name="lebelTime">Время</string>
+    <string name="lebelCount">Количество</string>
+    <string name="new_frag">Новый фрагмент</string>
+    <string name="list_empty_tempolider">Список пуст.
+        Создайте или загрузите раскладку.</string>
+
+    <string-array name="аccurancy_entry_number">
+        <item>0.1 сек</item>
+        <item>0.01 сек</item>
+        <item>0.001 сек</item>
+    </string-array>
+
+    <string-array name="аccurancy_entryValues_number">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
+
+    <string-array name="MenuMain">
+        <item>Секундомер</item>
+        <item>Темполидер</item>
+        <item>Раскладки</item>
+    </string-array>
+
+    <string-array name="MenuSubMain">
+        <item>Oтсечки и график прохождения отрезков</item>
+        <item>Установка и воспроизведение темпа движений</item>
+        <item>Список сохранённых раскладок</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_tab_bar">TabBarActivity</string>
+    <string name="section_format">Список раскладок %1$d</string>
+    <string name="change_name">Изменить</string>
+
+
+</resources>
