@@ -75,7 +75,7 @@ public class TabBarSecFragment extends StatFrag {
                 Intent intent = new Intent(getActivity(), SetListActivity.class);
                 intent.putExtra(FileSaver.FINISH_FILE_NAME, data);
                 intent.putExtra(FileSaver.FILENAME_TYPE, type);
-                intent.putExtra(SingleFragmentActivity.FROM_ACTIVITY,LIST_OF_FILE_ACTIVITY);
+                intent.putExtra(SingleFragmentActivity.FROM_ACTIVITY, LIST_OF_FILE_ACTIVITY);
                 startActivity(intent);
                 getActivity().finish();
             }
@@ -90,7 +90,7 @@ public class TabBarSecFragment extends StatFrag {
 
         //устанавливаем адаптер списка вкладки
         setAdapterTabList(FileSaver.TYPE_TIMEMETER,
-                R.layout.activity_list_of_files_item,mListView);
+                R.layout.activity_list_of_files_item,  mListView);
 
         //объявляем о регистрации контекстного меню
         registerForContextMenu(mListView);

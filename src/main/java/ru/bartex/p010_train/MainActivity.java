@@ -134,62 +134,12 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        /*
-        //Формируем правильный список
-        ArrayList<String> temp = new ArrayList<>();
-        temp.add("Проба:123:type_timemeter");
-        //пишем правильный файл
-        writeArrayList (temp, SingleFragmentActivity.FILENAME_NAMES_OF_FILES);
-        */
-
         //читаем файл с именами файлов с раскладками
         ArrayList<String> allNamesOfFiles = readArrayList(FileSaver.FILENAME_NAMES_OF_FILES);
         //заполняем синглет-держатель имён файлов новыми данными из списка имён файлов
        //пишем имя, дату, тип и номер строки списка для каждого имени файла
         Stat.addAllFileSaverToFileSaverLabFromList(allNamesOfFiles);
         Log.d(TAG, "TabBarActivity размер   списка файлов с именами файлов = " + allNamesOfFiles.size());
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.d(TAG,"MainActivity onPause");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.d(TAG,"MainActivity onStop");
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG,"MainActivity onDestroy");
-        //получаем ссылку на экземпляр FileSaverLab
-        FileSaverLab fileSaverLab = FileSaverLab.get();
-        //получаем весь список имён файлов из FileSaverLab
-        ArrayList<String> listNamesOfFiles = fileSaverLab.getListFullNamesOfFiles();
-        //пишем список имён в файл имён в формате
-        // String.format("%s:%s:%s",name,date,type);
-        writeArrayList(listNamesOfFiles,FileSaver.FILENAME_NAMES_OF_FILES);
-        Log.d(TAG,"MainActivity onDestroy записаны имена в FILENAME_NAMES_OF_FILES");
-        //включаем звук
-        AudioManager audioManager =(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-    }
-
-    //отслеживание нажатия кнопки HOME
-    @Override
-    protected void onUserLeaveHint() {
-
-        //Toast toast = Toast.makeText(getApplicationContext(), "onUserLeaveHint", Toast.LENGTH_SHORT);
-        //toast.show();
-        //включаем звук
-        AudioManager audioManager =(AudioManager)getSystemService(Context.AUDIO_SERVICE);
-        audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
-
-        super.onUserLeaveHint();
     }
 
     @Override
@@ -241,6 +191,50 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        Log.d(TAG,"MainActivity onPause");
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        Log.d(TAG,"MainActivity onStop");
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG,"MainActivity onDestroy");
+        //получаем ссылку на экземпляр FileSaverLab
+        FileSaverLab fileSaverLab = FileSaverLab.get();
+        //получаем весь список имён файлов из FileSaverLab
+        ArrayList<String> listNamesOfFiles = fileSaverLab.getListFullNamesOfFiles();
+        //пишем список имён в файл имён в формате
+        // String.format("%s:%s:%s",name,date,type);
+        writeArrayList(listNamesOfFiles,FileSaver.FILENAME_NAMES_OF_FILES);
+        Log.d(TAG,"MainActivity onDestroy записаны имена в FILENAME_NAMES_OF_FILES");
+        //включаем звук
+        AudioManager audioManager =(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+    }
+
+    //отслеживание нажатия кнопки HOME
+    @Override
+    protected void onUserLeaveHint() {
+
+        //Toast toast = Toast.makeText(getApplicationContext(), "onUserLeaveHint", Toast.LENGTH_SHORT);
+        //toast.show();
+        //включаем звук
+        AudioManager audioManager =(AudioManager)getSystemService(Context.AUDIO_SERVICE);
+        audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
+
+        super.onUserLeaveHint();
+    }
+
+
+
     private void openQuitDialog() {
         AlertDialog.Builder quitDialog = new AlertDialog.Builder(this);
         quitDialog.setTitle("Выход: Вы уверены?");
@@ -290,7 +284,6 @@ public class MainActivity extends AppCompatActivity
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
 
-
         int id = item.getItemId();
 
         if (id == R.id.nav_timermeter) {
@@ -312,7 +305,6 @@ public class MainActivity extends AppCompatActivity
         } else if (id == R.id.nav_send) {
 
         }
-
 
         // Выделяем выбранный пункт меню в шторке
         item.setChecked(true);

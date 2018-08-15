@@ -41,9 +41,7 @@ public class TabBarActivity extends AppCompatActivity {
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
+    //ViewPager that will host the section contents.
     public ViewPager mViewPager;
 
     @Override

@@ -113,8 +113,7 @@
         android:layout_height="5dp"
         android:background="#72f5a4"
         android:layout_below="@+id/headOfList"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
+
         android:id="@+id/linearLayout3">
     </LinearLayout>
 

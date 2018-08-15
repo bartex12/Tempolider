@@ -48,6 +48,8 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         SetListFragment.OnShowTotalValuesListener, DialogSaveTempFragment.SaverFragmentListener,
         DialogSetDelay.DelayListener {
 
+    // Лайаут этого класса R.layout.activity_set_list
+
     protected abstract Fragment createFragment(String nameOfFile);
     //реализация в SetListFragment
 
