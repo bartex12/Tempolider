@@ -38,6 +38,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
+
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -74,11 +76,11 @@ public class MainActivity extends AppCompatActivity
 
 
         mListView = (ListView) findViewById(R.id.listView);
+
         //адаптер  - в onResume
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-
                 if (i == 0) {
                     Intent intent = new Intent(MainActivity.this, TimeMeterActivity.class);
                     //intent.putExtra(PersonCategoryActivity.PERSON_RESOURS_ID, position);
@@ -113,12 +115,17 @@ public class MainActivity extends AppCompatActivity
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         //прячем плавающую кнопку
-        fab.hide();
+        //fab.hide();
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                //        .setAction("Action", null).show();
+                //создаём новую запись
+                Intent intentAdd = new Intent(MainActivity.this, DetailActivity.class);
+                intentAdd.putExtra(P.FROM_MAIN, P.TO_ADD);
+                startActivity(intentAdd);
+
             }
         });
 

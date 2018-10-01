@@ -43,10 +43,10 @@ public class HelpMainActivity extends AppCompatActivity {
         tvHelp.setText(strFile);
 
         left = (ImageView)findViewById(R.id.imageView2);
-        left.setImageResource(R.drawable.help1);
+        left.setImageResource(R.drawable.help_magistr);
 
         right = (ImageView)findViewById(R.id.imageView3);
-        right.setImageResource(R.drawable.help1);
+        right.setImageResource(R.drawable.help_magistr);
     }
 
     private StringBuilder inputStreamToString(InputStream iFile) {

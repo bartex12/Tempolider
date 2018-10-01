@@ -65,6 +65,7 @@
     <string name="title_activity_tab_bar">TabBarActivity</string>
     <string name="section_format">Список раскладок %1$d</string>
     <string name="change_name">Изменить</string>
+    <string name="Help">Справка</string>
 
 
 </resources>

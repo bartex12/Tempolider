@@ -18,6 +18,8 @@ import android.widget.EditText;
 
 import java.util.UUID;
 
+import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
+
 public class DetailActivity extends AppCompatActivity {
     private EditText mTimeOfRepFrag;  //поле для времени между повторами
     private EditText mRepsFrag;  // поле для количества повторениийдля фрагмента подхода
@@ -63,9 +65,12 @@ public class DetailActivity extends AppCompatActivity {
                 Log.d(TAG, "DetailActivity onCreate mSet.getNumberOfFrag() = " + mSet.getNumberOfFrag());
             }
             //если Добавить
-            else {
-                act.setTitle("Добавить");
+            else if (extras.getInt(P.FROM_MAIN) ==P.TO_ADD){
+                act.setTitle("Создать");
+                //пока так
 
+            }else {
+                act.setTitle("Добавить");
                 Intent intentUuid =getIntent();
                 uuid = (UUID)intentUuid.getSerializableExtra(INTENT_SET_UUID);
                 mSet = setLab.getSet(uuid);
@@ -116,7 +121,11 @@ public class DetailActivity extends AppCompatActivity {
         });
 
         mTimeOfRepFrag = (EditText)findViewById(R.id.time_item_set_editText);
-        mTimeOfRepFrag.setText(Float.toString(mSet.getTimeOfRep()));
+        if (extras.getInt(P.FROM_MAIN) ==P.TO_ADD){
+            mTimeOfRepFrag.setText("0");
+        }else {
+            mTimeOfRepFrag.setText(Float.toString(mSet.getTimeOfRep()));
+        }
         mTimeOfRepFrag.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -139,7 +148,11 @@ public class DetailActivity extends AppCompatActivity {
         });
 
         mRepsFrag = (EditText)findViewById(R.id.reps_item_set_editText);
-        mRepsFrag.setText(Integer.toString(mSet.getReps()));
+        if (extras.getInt(P.FROM_MAIN) ==P.TO_ADD){
+            mRepsFrag.setText("0");
+        }else {
+            mRepsFrag.setText(Integer.toString(mSet.getReps()));
+        }
         mRepsFrag.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -163,8 +176,13 @@ public class DetailActivity extends AppCompatActivity {
 
         mNumberOfFrag = (EditText)findViewById(R.id.mark_item_set_editText);
         //записываем в поле mNumberOfFrag порядковый номер фрагмента подхода +1 (на экране - с 1)
-        Log.d(TAG, "NumberOfFrag = " + (mSet.getNumberOfFrag() + 1));
-        mNumberOfFrag.setText(Integer.toString(mSet.getNumberOfFrag() + 1));
+        //Log.d(TAG, "NumberOfFrag = " + (mSet.getNumberOfFrag() + 1));
+        if (extras.getInt(P.FROM_MAIN) ==P.TO_ADD){
+            mNumberOfFrag.setText("1");
+        }else {
+            mNumberOfFrag.setText(Integer.toString(mSet.getNumberOfFrag() + 1));
+        }
+
 
         //Устанавливаем фокус ввода в поле mTimeOfRepFrag
         mTimeOfRepFrag.requestFocus();
@@ -173,7 +191,8 @@ public class DetailActivity extends AppCompatActivity {
         imm.showSoftInput(mTimeOfRepFrag, 0);
 
         //доступность кнопки Ok в момент появления экрана редактирования (если изменить - доступна)
-        if ((mSet.getTimeOfRep()==0) &&((mSet.getReps()==0))){
+        if ((Integer.parseInt( mTimeOfRepFrag.getText().toString())==0) &&
+                ((Integer.parseInt( mRepsFrag.getText().toString())==0))){
             mButtonOk.setEnabled(false);
         }
     }

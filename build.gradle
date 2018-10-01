@@ -5,6 +5,7 @@ android {
     buildToolsVersion "26.0.2"
 
     defaultConfig {
+        android.defaultConfig.vectorDrawables.useSupportLibrary = true
         applicationId "ru.bartex.p010_train"
         minSdkVersion 15
         targetSdkVersion 26

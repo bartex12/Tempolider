@@ -54,21 +54,17 @@
        android:linksClickable="true"
         android:autoLink="all" //-->
         <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
             android:id="@+id/textViewHelpMain"
-            android:linksClickable="true"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
             android:autoLink="all"
+            android:linksClickable="true"
             android:overScrollMode="always"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:textSize="20dp"
-            android:text="Справка"
-            android:textStyle="normal"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:singleLine="false"/>
+            android:singleLine="false"
+            android:text="@string/Help"
+            android:textStyle="normal"/>
     </ScrollView>
 
 </LinearLayout>
