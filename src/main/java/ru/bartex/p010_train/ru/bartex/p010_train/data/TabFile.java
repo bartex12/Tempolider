@@ -16,9 +16,7 @@ public class TabFile {
     public final static String COLUMN_FILE_NAME_TIME = "FileNameTime";
     public final static String COLUMN_KIND_OF_SPORT = "KindOfSport";
     public final static String COLUMN_DESCRIPTION_OF_SPORT = "DescriptionOfSport";
-    public final static String COLUMN_DELAY = "Delay";
     public final static String COLUMN_TYPE_FROM = "Type_From";
-    public final static String COLUMN_LIKED = "Liked";
-
+    public final static String COLUMN_DELAY = "Delay";
 
 }

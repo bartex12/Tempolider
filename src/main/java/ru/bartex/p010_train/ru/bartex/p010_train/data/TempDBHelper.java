@@ -3,6 +3,7 @@ package ru.bartex.p010_train.ru.bartex.p010_train.data;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
@@ -19,7 +20,6 @@ import static ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile.COLUMN_FILE
 import static ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile.COLUMN_FILE_NAME_DATE;
 import static ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile.COLUMN_FILE_NAME_TIME;
 import static ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile.COLUMN_KIND_OF_SPORT;
-import static ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile.COLUMN_LIKED;
 import static ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile.COLUMN_TYPE_FROM;
 import static ru.bartex.p010_train.ru.bartex.p010_train.data.TabSet.COLUMN_SET_FILE_ID;
 import static ru.bartex.p010_train.ru.bartex.p010_train.data.TabSet.COLUMN_SET_FRAG_NUMBER;
@@ -51,9 +51,8 @@ public class TempDBHelper extends SQLiteOpenHelper {
                 + COLUMN_FILE_NAME_TIME + " TEXT NOT NULL, "
                 + COLUMN_KIND_OF_SPORT + " TEXT, "
                 + COLUMN_DESCRIPTION_OF_SPORT + " TEXT, "
-                + COLUMN_DELAY + " INTEGER NOT NULL DEFAULT 6, "
-                + COLUMN_TYPE_FROM + " INTEGER NOT NULL DEFAULT 0, "
-                + COLUMN_LIKED + " INTEGER NOT NULL DEFAULT 0);";
+                + COLUMN_TYPE_FROM + " TEXT NOT NULL DEFAULT 'type_timemeter', "
+                + COLUMN_DELAY + " INTEGER NOT NULL DEFAULT 6);";
 
         // Строка для создания таблицы TimeReps
         String SQL_CREATE_TAB_SET = "CREATE TABLE " + TabSet.TABLE_NAME + " ("
@@ -87,13 +86,10 @@ public class TempDBHelper extends SQLiteOpenHelper {
             //создаём экземпляр класса DataFile в конструкторе
             DataFile file1 = new DataFile("Подтягивание 50раз за 4мин",
                     dateFormat, timeFormat,"Подтягивание",
-                    "Подтягивание на перекладине", 6, 0,0);
+                    "Подтягивание на перекладине", P.TYPE_TIMEMETER, 6);
 
-            //добавляем запись в таблицу TabFile, используя данные DataFile
+            //добавляем запись в таблицу TabFile, используя данные DataFile и получаем id записи
             long file1_id =  this.addFile(file1);
-
-            //получаем ID добавленного файла - проще это сделать в addFile
-            //long file1_id = getIdFromFileName("Подтягивание 50раз за 4мин");
 
             //создаём экземпляр класса DataSet в конструкторе
             DataSet set1 = new DataSet(3,10,1);
@@ -128,8 +124,8 @@ public class TempDBHelper extends SQLiteOpenHelper {
                 calendar.get(Calendar.SECOND));
     }
 
-    //получаем количество файлов (подходоа) в базе
-    public int getFilesCount() {
+    //получаем количество файлов (сохранённых подходов) в базе
+     public int getFilesCount() {
         Log.i(TAG, "TempDBHelper.getSetCount ... " );
         String countQuery = "SELECT  * FROM " + TabFile.TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
@@ -168,9 +164,8 @@ public class TempDBHelper extends SQLiteOpenHelper {
         cv.put(TabFile.COLUMN_FILE_NAME_TIME, file.getFileNameTime());
         cv.put(TabFile.COLUMN_KIND_OF_SPORT, file.getKindOfSport());
         cv.put(TabFile.COLUMN_DESCRIPTION_OF_SPORT, file.getDescriptionOfSport());
+        cv.put(TabFile.COLUMN_TYPE_FROM, file.getType_From());
         cv.put(TabFile.COLUMN_DELAY, file.getDelay());
-        cv.put(TabFile.COLUMN_TYPE_FROM, file.getFileName());
-        cv.put(TabFile.COLUMN_LIKED, file.getFileName());
         // вставляем строку
         long ID = db.insert(TabFile.TABLE_NAME, null, cv);
         // закрываем соединение с базой
@@ -206,7 +201,7 @@ public class TempDBHelper extends SQLiteOpenHelper {
                 null,                  // Don't filter by row groups
                 null);                   // порядок сортировки
 
-        if (cursor != null) {
+        if ((cursor != null) && (cursor.getCount()!=0)) {
             cursor.moveToFirst();
             // Узнаем индекс каждого столбца
             int idColumnIndex = cursor.getColumnIndex(TabFile._ID);
@@ -220,6 +215,21 @@ public class TempDBHelper extends SQLiteOpenHelper {
             cursor.close();
         }
         return currentID;
+    }
+
+    /**
+     * Возвращает курсор с указанной записи
+     */
+    public Cursor getAllSetFragments(long rowId) throws SQLException {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor mCursor = db.query(true, TabSet.TABLE_NAME,
+                new String[] {TabSet.COLUMN_SET_TIME},
+                TabSet.COLUMN_SET_FILE_ID + "=" + rowId,
+                null, null, null, null, null);
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+        }
+        return mCursor;
     }
 
     //вывод в лог всех строк базы
@@ -252,9 +262,8 @@ public class TempDBHelper extends SQLiteOpenHelper {
                 TabFile.COLUMN_FILE_NAME_TIME,
                 TabFile.COLUMN_KIND_OF_SPORT,
                 TabFile.COLUMN_DESCRIPTION_OF_SPORT,
-                TabFile.COLUMN_DELAY,
                 TabFile.COLUMN_TYPE_FROM,
-                TabFile.COLUMN_LIKED};
+                TabFile.COLUMN_DELAY};
 
         // Делаем запрос
         Cursor cursorFile = db.query(
@@ -282,12 +291,10 @@ public class TempDBHelper extends SQLiteOpenHelper {
                         cursorFile.getColumnIndex(TabFile.COLUMN_KIND_OF_SPORT));
                 String current_descript = cursorFile.getString(
                         cursorFile.getColumnIndex(TabFile.COLUMN_DESCRIPTION_OF_SPORT));
+                String current_typeFrom = cursorFile.getString(
+                        cursorFile.getColumnIndex(TabFile.COLUMN_TYPE_FROM));
                 int current_delay = cursorFile.getInt(
                         cursorFile.getColumnIndex(TabFile.COLUMN_DELAY));
-                int current_typeFrom = cursorFile.getInt(
-                        cursorFile.getColumnIndex(TabFile.COLUMN_TYPE_FROM));
-                int current_liked = cursorFile.getInt(
-                        cursorFile.getColumnIndex(TabFile.COLUMN_LIKED));
                 // Выводим построчно значения каждого столбца
                 Log.d(TAG, "\n" + current_ID + " - " +
                         current_nameFile + " - " +
@@ -295,10 +302,10 @@ public class TempDBHelper extends SQLiteOpenHelper {
                         current_nameFileTime + " - " +
                         current_kindSport + " - " +
                         current_descript + " - " +
-                        current_delay + " - " +
                         current_typeFrom + " - " +
-                        current_liked);
+                        current_delay);
             }
+
             // Проходим через все ряды в таблице TabSet
             while (cursor.moveToNext()) {
                 // Используем индекс для получения строки или числа
@@ -319,6 +326,7 @@ public class TempDBHelper extends SQLiteOpenHelper {
                         current_SET_REPS + " - " +
                         current_SET_FRAG_NUMBER);
             }
+
         } finally {
             // Всегда закрываем курсор после чтения
             cursor.close();

@@ -12,9 +12,8 @@ public class DataFile implements Serializable {
     private String mFileNameTime;
     private String mKindOfSport;
     private String mDescriptionOfSport;
+    private String mType_From;
     private int mDelay = 6;
-    private int mType_From;
-    private int mLiked;
 
     public DataFile( ){
         //пустой конструктор
@@ -22,30 +21,27 @@ public class DataFile implements Serializable {
 
     //основной конструктор
     public DataFile(String FileName,String FileNameDate,String FileNameTime, String KindOfSport,
-                    String DescriptionOfSport, int Delay, int Type_From, int Liked){
+                    String DescriptionOfSport, String Type_From, int Delay){
         mFileName = FileName;
         mFileNameDate = FileNameDate;
         mFileNameTime = FileNameTime;
         mKindOfSport = KindOfSport;
         mDescriptionOfSport = DescriptionOfSport;
-        mDelay = Delay;
         mType_From = Type_From;
-        mLiked = Liked;
+        mDelay = Delay;
     }
 
     //конструктор
     public DataFile(long Person_id, String FileName, String FileNameDate,String FileNameTime,
-                    String KindOfSport, String DescriptionOfSport,
-                    int Delay, int Type_From, int Liked){
+                    String KindOfSport, String DescriptionOfSport, String Type_From, int Delay){
         mPerson_id = Person_id;
         mFileName = FileName;
         mFileNameDate = FileNameDate;
         mFileNameTime = FileNameTime;
         mKindOfSport = KindOfSport;
         mDescriptionOfSport = DescriptionOfSport;
-        mDelay = Delay;
         mType_From = Type_From;
-        mLiked = Liked;
+        mDelay = Delay;
     }
 
     public String getFileName() {
@@ -96,19 +92,12 @@ public class DataFile implements Serializable {
         mDelay = delay;
     }
 
-    public int getType_From() {
+    public String getType_From() {
         return mType_From;
     }
 
-    public void setType_From(int type_From) {
+    public void setType_From(String type_From) {
         mType_From = type_From;
     }
 
-    public int getLiked() {
-        return mLiked;
-    }
-
-    public void setLiked(int liked) {
-        mLiked = liked;
-    }
 }

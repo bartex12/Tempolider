@@ -3,6 +3,7 @@ package ru.bartex.p010_train;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.preference.PreferenceManager;
@@ -29,6 +30,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TabSet;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
+
 public class TimeGrafActivity extends AppCompatActivity {
 
     public static final String TAG ="33333";
@@ -53,8 +59,10 @@ public class TimeGrafActivity extends AppCompatActivity {
     SimpleAdapter sara;
     int accurancy; //точность отсечек - количество знаков после запятой - от MainActivity
     private SharedPreferences prefSetting;// предпочтения из PrefActivity
-    private String finishFileName = FileSaver.FINISH_FILE_NAME;
+    private String finishFileName = P.FINISH_FILE_NAME;
     private SharedPreferences prefNameOfLastFile;// предпочтения - имя последнего сохранённого файла
+
+    TempDBHelper mTempDBHelper = new TempDBHelper(this);
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,27 +85,108 @@ public class TimeGrafActivity extends AppCompatActivity {
         //получаем интент от TimeMeterActivity
         Intent intent = getIntent();
         //получаем имя файла из интента
-        finishFileName =intent.getStringExtra(FileSaver.FINISH_FILE_NAME);
+        finishFileName =intent.getStringExtra(P.FINISH_FILE_NAME);
         nameOfFile = (TextView)findViewById(R.id.textViewName_TimeGraf);
         nameOfFile.setText(finishFileName);
-        Log.d(TAG,"TimeGrafActivity finishFileName = " + finishFileName);
-        Log.d(TAG,"TimeGrafActivity REP_TIME_LIST = " + intent.getStringArrayListExtra(REP_TIME_LIST));
+        //Log.d(TAG,"TimeGrafActivity finishFileName = " + finishFileName);
+        //Log.d(TAG,"TimeGrafActivity REP_TIME_LIST = " + intent.getStringArrayListExtra(REP_TIME_LIST));
+
+        //проверяем, есть ли в базе запись с таким именем
+        long finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
+        Log.d(TAG,"TimeGrafActivity имя =" + finishFileName + "  Id = " + finishFileId );
+        Cursor cursor = mTempDBHelper.getAllSetFragments(finishFileId);
+        // Узнаем индекс каждого столбца
+        int idColumnIndex = cursor.getColumnIndex(TabSet.COLUMN_SET_TIME);
+
+
+
+
 
         if (intent.getStringArrayListExtra(REP_TIME_LIST).size()==0){
             //читаем список отсечек времени из файла в ArrayList
-            mListTiming = readArrayList(FileSaver.FILENAME_TIMEMETER);
+            mListTiming = readArrayList(P.FILENAME_TIMEMETER);
         }else {
             //читаем список отсечек времени из интента  в ArrayList
             mListTiming = intent.getStringArrayListExtra(REP_TIME_LIST);
         }
+
 
         graphPace = (GraphView) findViewById(R.id.graphPace);
         //размер массива данных для линии графика = размер списка
         pointPace1 = new DataPoint[ mListTiming.size()];
 
         //суммарное время подхода = 0
-        long time_total = 0;
+        float time_total = 0;
+        float time_now;
 
+        if (cursor.moveToFirst()) {
+            do {
+                Log.d(TAG,"TimeGrafActivity cursor.getPosition()+1 = " +
+                        cursor.getPosition()+1);
+                // Используем индекс для получения строки или числа
+                time_now = cursor.getFloat(idColumnIndex);
+                time_total += time_now;
+
+                //Делаем данные для адаптера
+                String s_item = Integer.toString(cursor.getPosition()+1);
+                String s_time;
+                String s_delta;
+
+                switch (accurancy){
+                    case 1:
+                        s_time = P.getTimeString1(time_total);
+                        s_delta = P.getTimeString1 (time_now);
+                        break;
+                    case 2:
+                        s_time = P.getTimeString2(time_total);
+                        s_delta = P.getTimeString2 (time_now);
+                        break;
+                    case 3:
+                        s_time = P.getTimeString3(time_total);
+                        s_delta = P.getTimeString3 (time_now);
+                        break;
+                    default:
+                        s_time = P.getTimeString1(time_total);
+                        s_delta = P.getTimeString1 (time_now);
+                }
+
+                //заводим данные для одной строки списка
+                Map<String, Object> m;
+                m = new HashMap<>();
+                m.put(ATTR_ITEM, s_item);
+                m.put(ATTR_TIME, s_time);
+                m.put(ATTR_DELTA, s_delta);
+                //добавляем данные в конец ArrayList
+                data.add(m);
+
+                //добавляем точку для графика, используя double time_tran
+                pointPace1[cursor.getPosition()] = new DataPoint(cursor.getPosition()+1,time_now);
+
+            } while (cursor.moveToNext());
+        }
+
+        //Log.d(TAG,"mListTimeTransfer.get(0) = " + mListTimeTransfer.get(0));
+
+        //заполняем линию графика точками
+        seriesPace = new LineGraphSeries<>(pointPace1);
+        //устснавливаем параметры кривой графика
+        setParamSeries(seriesPace);
+        //добавляем кривую на график
+        graphPace.addSeries(seriesPace);
+        //устанавливаем параметры графика
+        setParamGraph(graphPace,(mListTiming.size()));
+        //Название графика
+        graphPace.setTitle ("Длительность круга, с");
+
+        //Делаем массивы откуда-куда
+        String[] from = {ATTR_ITEM, ATTR_TIME, ATTR_DELTA};
+        int[] to = {R.id.item_list, R.id.time_list, R.id.delta_list};
+        //заполняем адаптер данными списка
+        sara = new SimpleAdapter(this, data, R.layout.list_rep, from, to);
+        //подключаем адаптер к списку
+        mListViewTiming.setAdapter(sara);
+
+     /*
         //заполняем список для вывода на экран и массив данных для линии графика
         if (mListTiming.size()>0) {
             //заполняем список экрана
@@ -156,19 +245,8 @@ public class TimeGrafActivity extends AppCompatActivity {
                 pointPace1[i] = new DataPoint(i+1,time_tran);
             }
 
-            Log.d(TAG,"mListTimeTransfer.get(0) = " + mListTimeTransfer.get(0));
 
-            //заполняем линию графика точками
-            seriesPace = new LineGraphSeries<>(pointPace1);
-            //устснавливаем параметры кривой графика
-            setParamSeries(seriesPace);
-            //добавляем кривую на график
-            graphPace.addSeries(seriesPace);
-            //устанавливаем параметры графика
-            setParamGraph(graphPace,(mListTiming.size()));
-            //Название графика
-            graphPace.setTitle ("Длительность круга, с");
-            /*
+
             if (kindOfGraf){
                 //Название графика
                 graphPace.setTitle ("Длительность итервала, с");
@@ -176,16 +254,9 @@ public class TimeGrafActivity extends AppCompatActivity {
                 //Название графика
                 graphPace.setTitle ("Темп движений, раз в мин");
             }
-             */
-        }
-        //Делаем массивы откуда-куда
-        String[] from = {ATTR_ITEM, ATTR_TIME, ATTR_DELTA};
-        int[] to = {R.id.item_list, R.id.time_list, R.id.delta_list};
-        //заполняем адаптер данными списка
-        sara = new SimpleAdapter(this, data, R.layout.list_rep, from, to);
-        //подключаем адаптер к списку
-        mListViewTiming.setAdapter(sara);
 
+       }
+    */
     }
 
     @Override

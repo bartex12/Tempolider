@@ -32,6 +32,9 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
+
 public class TimeMeterActivity extends AppCompatActivity
         implements DialogSaveSecFragment.SaverFragmentSecundomerListener {
 
@@ -73,6 +76,8 @@ public class TimeMeterActivity extends AppCompatActivity
     private SharedPreferences prefSetting;// предпочтения из PrefActivity
     private SharedPreferences prefNameOfLastFile;// предпочтения - имя последнего сохранённого файла
 
+    TempDBHelper mTempDBHelper = new TempDBHelper(this);
+
     // Метод интерфейса, в котором передаём имя,тип сохранения данных (показать или нет)
     //и пометить как избранные
     @Override
@@ -87,44 +92,67 @@ public class TimeMeterActivity extends AppCompatActivity
 
             //в противном случае
         }else{
-            //переносим данные отсечек из repTimeList в arlSave для записи в файл
-            ArrayList<String> arlSave = new ArrayList<>();
+
+            //получаем дату и время в нужном для базы данных формате
+            String dateFormat  = mTempDBHelper.getDateString();
+            String timeFormat  = mTempDBHelper.getTimeString();
+            //если строка имени пустая
+            if (nameFile.isEmpty()){
+                //имя будет "Автосохранение секундомера"
+                nameFile = P.FILENAME_OTSECHKI_SEC;
+                Log.d(TAG,"onNameAndGrafTransmit nameFile = " + nameFile);
+
+                //проверяем, есть ли в базе запись с таким именем
+                long repeatId = mTempDBHelper.getIdFromFileName (nameFile);
+                Log.d(TAG,"onNameAndGrafTransmit repeatId = " + repeatId);
+
+                //если есть, стираем её и пишем новые данные под таким именем
+                if (repeatId != -1){
+                    mTempDBHelper.deleteFileAndSets(repeatId);
+                }
+            }
+            //если имя файла не пустое или "Автосохранение секундомера"
+            //создаём экземпляр класса DataFile в конструкторе
+            DataFile file1 = new DataFile(nameFile, dateFormat, timeFormat,
+                    null,null,P.TYPE_TIMEMETER, 6);
+            //добавляем запись в таблицу TabFile, используя данные DataFile
+            long file1_id =  mTempDBHelper.addFile(file1);
+            //готовим данные фрагментов подхода
             // если индекс =0, то первое значение
-            for (int ii = 0; ii<repTimeList.size(); ii++ ) {
-                double time_now;
+            for (int j = 0; j<repTimeList.size(); j++ ) {
+                float time_now;
                 //получаем время в секундах между измерениями
                 //если первое значение, то так
-                if (ii == 0){
-                    time_now = (double) (Long.parseLong(repTimeList.get(ii)) )/1000;
+                if (j == 0){
+                    time_now = (float) (Long.parseLong(repTimeList.get(j)) )/1000;
                     //если не первое значение, то как разницу
                 }else{
-                    time_now = (double) (Long.parseLong(repTimeList.get(ii)) -
-                            Long.parseLong(repTimeList.get(ii - 1)))/1000;
+                    time_now = (float) (Long.parseLong(repTimeList.get(j)) -
+                            Long.parseLong(repTimeList.get(j - 1)))/1000;
                 }
-                String time = String.format("%s",time_now);
-                String reps = "1";
-                String number = Integer.toString(ii);
-                String trn = String.format("%s:%s:%s",time,reps,number);
-                arlSave.add(trn);
+                //создаём экземпляр класса DataSet в конструкторе
+                DataSet set = new DataSet(time_now,1,j+1);
+                //добавляем запись в таблицу TabSet, используя данные DataSet
+                mTempDBHelper.addSet(set, file1_id);
             }
 
             // 1)вызываем метод saveDataAndFilename() записи в файл данных от секундомера
             // и записи имени файла в список сохранённых файлов, получаем записанное имя файла
-            finishFileName =  saveDataAndFilename(arlSave, nameFile,
-                    FileSaver.FILENAME_OTSECHKI_SEC ,FileSaver.TYPE_TIMEMETER);
+            //finishFileName =  saveDataAndFilename(arlSave, nameFile,
+              //      FileSaver.FILENAME_OTSECHKI_SEC ,FileSaver.TYPE_TIMEMETER);
 
             //  2) сохраняем в файл  c  именем FILENAME_TIMEMETER список меток времени для каждой отсечки
             //этот файл переписывается при записи новой порции отсечек секундомера
             // Используется в TimeGrafActivity для построения графика и таблицы данных
-            writeArrayList(repTimeList,FileSaver.FILENAME_TIMEMETER );
+            writeArrayList(repTimeList,P.FILENAME_TIMEMETER ); //***
 
-            //  3) сохраняем имя файла в предпочтениях
+            //  3) сохраняем имя файла в предпочтениях (ИСПОЛЬЗУЕМ  при переходе в график с тулбара)
             //получаем файл предпочтений
             prefNameOfLastFile = getPreferences(MODE_PRIVATE);
             // получаем Editor
             SharedPreferences.Editor ed = prefNameOfLastFile.edit();
             //пишем имя последнего сохранённого файла в предпочтения
-            ed.putString(FileSaver.LAST_FILE, finishFileName);
+            ed.putString(P.LAST_FILE, nameFile);
             ed.apply();
 
             //если нужно записать и показать
@@ -134,7 +162,7 @@ public class TimeMeterActivity extends AppCompatActivity
                 //открываем экран с графиком только что записанных данных
                 Intent intentTiming = new Intent(TimeMeterActivity.this, TimeGrafActivity.class);
                 intentTiming.putStringArrayListExtra(TimeGrafActivity.REP_TIME_LIST,repTimeList);
-                intentTiming.putExtra(FileSaver.FINISH_FILE_NAME, finishFileName);
+                intentTiming.putExtra(P.FINISH_FILE_NAME, nameFile);
                 startActivity(intentTiming);
                 //если нужно только записать, а потом, возможно показать через тулбар
                 //то интент не вызываем
@@ -470,12 +498,12 @@ public class TimeMeterActivity extends AppCompatActivity
                 Log.d(TAG, "OptionsItem = action_timing");
                 //получаем из предпочтений имя файла и отправляем его в интенте
                 prefNameOfLastFile = getPreferences(MODE_PRIVATE);
-                finishFileName = prefNameOfLastFile.getString(FileSaver.LAST_FILE,
-                        FileSaver.NAME_OF_LAST_FILE_ZERO);
+                finishFileName = prefNameOfLastFile.getString(P.LAST_FILE,
+                        P.NAME_OF_LAST_FILE_ZERO);
 
                 Intent intentTiming = new Intent(this, TimeGrafActivity.class);
                 intentTiming.putStringArrayListExtra(TimeGrafActivity.REP_TIME_LIST,repTimeList);
-                intentTiming.putExtra(FileSaver.FINISH_FILE_NAME, finishFileName);
+                intentTiming.putExtra(P.FINISH_FILE_NAME, finishFileName);
                 startActivity(intentTiming);
                 return true;
         }

@@ -19,6 +19,8 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
+import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
+
 /**
  * Created by Андрей on 10.05.2018.
  */
@@ -67,7 +69,7 @@ public class DialogSaveSecFragment extends DialogFragment {
                 String nameFile = name.getText().toString();
 
                 if(dateCheckBox.isChecked()){
-                    nameFile = nameFile + "_" + FileSaver.setDateString();
+                    nameFile = nameFile + "_" + P.setDateString();
                     Log.d(TAG, "SaverFragmentSecundomer date.isChecked() Имя файла = " + nameFile);
                 }
                 //Вызываем метод интерфейса, имя файла в TimeMeterActivity
@@ -86,7 +88,7 @@ public class DialogSaveSecFragment extends DialogFragment {
                 //читаем имя файла в строке ввода
                 String nameFile = name.getText().toString();
                 if(dateCheckBox.isChecked()){
-                    nameFile = nameFile + "_" + FileSaver.setDateString();
+                    nameFile = nameFile + "_" + P.setDateString();
                 }
                 //Вызываем метод интерфейса, передаем  nameFile и showGraf в TimeMeterActivity
                 mSaverFragSectListener.onNameAndGrafTransmit(nameFile, true, false);
