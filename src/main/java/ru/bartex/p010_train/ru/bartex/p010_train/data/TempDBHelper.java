@@ -75,40 +75,57 @@ public class TempDBHelper extends SQLiteOpenHelper {
         Log.d(TAG, "Обновляемся с версии " + oldVersion + " на версию " + newVersion);
     }
 
-
     // Если записей в базе нет, вносим запись
     public void createDefaultSetIfNeed()  {
         int count = this.getFilesCount();
         if(count ==0 ) {
 
-            Calendar calendar = new GregorianCalendar();
+            //получаем дату и время в нужном для базы данных формате
+            String dateFormat  = getDateString();
+            String timeFormat  = getTimeString();
 
-            String dateFormat  = String.format("%s-%s-%s",
-                    calendar.get(Calendar.YEAR),
-                    calendar.get(Calendar.MONTH)+1,
-                    calendar.get(Calendar.DAY_OF_MONTH));
-            String timeFormat  = String.format("%s:%s:%s",
-                    calendar.get(Calendar.HOUR_OF_DAY),
-                    calendar.get(Calendar.MINUTE),
-                    calendar.get(Calendar.SECOND));
+            //создаём экземпляр класса DataFile в конструкторе
             DataFile file1 = new DataFile("Подтягивание 50раз за 4мин",
                     dateFormat, timeFormat,"Подтягивание",
                     "Подтягивание на перекладине", 6, 0,0);
-            this.addFile(file1);
 
-            long file1_id = getIdFromFileName("Подтягивание 50раз за 4мин");
+            //добавляем запись в таблицу TabFile, используя данные DataFile
+            long file1_id =  this.addFile(file1);
 
+            //получаем ID добавленного файла - проще это сделать в addFile
+            //long file1_id = getIdFromFileName("Подтягивание 50раз за 4мин");
+
+            //создаём экземпляр класса DataSet в конструкторе
             DataSet set1 = new DataSet(3,10,1);
+            //добавляем запись в таблицу TabSet, используя данные DataSet
             this.addSet(set1, file1_id);
+            // повторяем для всех фрагментов подхода
             DataSet set2 = new DataSet(4,10,2);
             this.addSet(set2, file1_id);
             DataSet set3 = new DataSet(5,10,3);
             this.addSet(set3, file1_id);
             DataSet set4 = new DataSet(6,20,4);
             this.addSet(set4, file1_id);
+
             Log.d(TAG, "MyDatabaseHelper.createDefaultPersonIfNeed ... count = " +
                     this.getFilesCount());
         }
+    }
+
+    public String getDateString() {
+        Calendar calendar = new GregorianCalendar();
+        return  String.format("%s-%s-%s",
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH)+1,
+                calendar.get(Calendar.DAY_OF_MONTH));
+    }
+
+    public String getTimeString() {
+        Calendar calendar = new GregorianCalendar();
+        return  String.format("%s:%s:%s",
+                calendar.get(Calendar.HOUR_OF_DAY),
+                calendar.get(Calendar.MINUTE),
+                calendar.get(Calendar.SECOND));
     }
 
     //получаем количество файлов (подходоа) в базе
@@ -140,7 +157,7 @@ public class TempDBHelper extends SQLiteOpenHelper {
     }
 
     //Метод для добавления нового файла с подходом в список
-    public void addFile(DataFile file) {
+    public long addFile(DataFile file) {
         Log.d(TAG, "TempDBHelper.addFile ... " + file.getFileName());
 
         SQLiteDatabase db = getWritableDatabase();
@@ -155,9 +172,10 @@ public class TempDBHelper extends SQLiteOpenHelper {
         cv.put(TabFile.COLUMN_TYPE_FROM, file.getFileName());
         cv.put(TabFile.COLUMN_LIKED, file.getFileName());
         // вставляем строку
-        db.insert(TabFile.TABLE_NAME, null, cv);
+        long ID = db.insert(TabFile.TABLE_NAME, null, cv);
         // закрываем соединение с базой
         db.close();
+        return ID;
     }
 
     //Удалить запись в таблице TabFile и все записи в таблице TabSet с id удалённой записи в TabFile

@@ -59,9 +59,10 @@ public class TimeMeterActivity extends AppCompatActivity
     int ii = 0; //порядковый номер отсечки
     private String finishFileName = FileSaver.FINISH_FILE_NAME;
 
-    ArrayList<String> repTimeList = new ArrayList<>();//список отсечек времени для записи в файл
-
-    ArrayList<Map<String, Object>> data = new ArrayList<Map<String, Object>>(); //список данных для показа на экране
+    //список отсечек времени для записи в базу, если будет нужно (в диалоге сохранения)
+    ArrayList<String> repTimeList = new ArrayList<>();
+    //список данных для показа на экране
+    ArrayList<Map<String, Object>> data = new ArrayList<>();
     SimpleAdapter sara;
     final String ATTR_ITEM = "ru.bartex.p008_complex_imit_real.item";
     final String ATTR_TIME = "ru.bartex.p008_complex_imit_real.time";
@@ -86,9 +87,8 @@ public class TimeMeterActivity extends AppCompatActivity
 
             //в противном случае
         }else{
-
             //переносим данные отсечек из repTimeList в arlSave для записи в файл
-            ArrayList<String> arlSave = new ArrayList<String>();
+            ArrayList<String> arlSave = new ArrayList<>();
             // если индекс =0, то первое значение
             for (int ii = 0; ii<repTimeList.size(); ii++ ) {
                 double time_now;
@@ -101,7 +101,7 @@ public class TimeMeterActivity extends AppCompatActivity
                     time_now = (double) (Long.parseLong(repTimeList.get(ii)) -
                             Long.parseLong(repTimeList.get(ii - 1)))/1000;
                 }
-                String time = String.format("%s",time_now);;
+                String time = String.format("%s",time_now);
                 String reps = "1";
                 String number = Integer.toString(ii);
                 String trn = String.format("%s:%s:%s",time,reps,number);
@@ -213,8 +213,8 @@ public class TimeMeterActivity extends AppCompatActivity
                 mDelta = mTimeNext - mTimeLast;
 
                 String s_item = Integer.toString(ii+1);
-                String s_time = "";
-                String s_delta = "";
+                String s_time;
+                String s_delta;
 
                 switch (accurancy){
                     case 1:
@@ -239,21 +239,20 @@ public class TimeMeterActivity extends AppCompatActivity
                 m.put(ATTR_ITEM, s_item);
                 m.put(ATTR_TIME, s_time);
                 m.put(ATTR_DELTA, s_delta);
-                //добавляем данные в начало ArrayList
+                //добавляем данные для вывода на экран в начало ArrayList
                 data.add(0,m);
-                //добавляем время отсечки в список (в конец) для записи в файл
+                //добавляем время отсечки в список (в конец) для записи в базу в диалоге сохранения
                 repTimeList.add(Long.toString(mTimeExersize));
 
                 //добавляем время отсечки  в строковом формате в список (в конец) для записи в файл
                 //repTimeList.add(s_time);  //так нельзя- потом число не прочитать
-
-
                 Log.d(TAG,"mTimeExersize = " + mTimeExersize + "  mDelta = " + mDelta);
 
                 //обновляем список на экране
                 sara.notifyDataSetChanged();
                 //увеличиваем порядковый номер отсечки
                 ii++;
+                //обновляем время на предыдущей отсечке
                 mTimeLast = mTimeNext;
             }
         });

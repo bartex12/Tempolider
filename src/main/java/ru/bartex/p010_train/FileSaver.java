@@ -82,7 +82,7 @@ public class FileSaver {
         int year = calendar.get(Calendar.YEAR);
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int min = calendar.get(Calendar.MINUTE);
-        return  String.format("%02d.%02d.%04d_%02d.%02d",
+        return  String.format("%02d.%02d.%04d_%02d:%02d",
                 date, month+1, year, hour, min);
     }
 

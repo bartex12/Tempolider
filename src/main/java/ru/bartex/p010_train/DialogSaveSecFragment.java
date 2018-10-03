@@ -51,13 +51,14 @@ public class DialogSaveSecFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
         LayoutInflater inflater =getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.save_data_in_file, null);
-        final EditText name = (EditText)view.findViewById(R.id.editTextNameOfFile);
-        final CheckBox date = (CheckBox)view.findViewById(R.id.checkBoxDate);
+        final EditText name = view.findViewById(R.id.editTextNameOfFile);
+        final CheckBox dateCheckBox = view.findViewById(R.id.checkBoxDate);
         name.requestFocus();
         name.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(view);
         builder.setTitle("Запись в файл");
 
+        //действия при нажатии кнопки "Сохранить" в диалоге сохранения данных в базу
         builder.setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -65,7 +66,7 @@ public class DialogSaveSecFragment extends DialogFragment {
                 //читаем имя файла в строке ввода
                 String nameFile = name.getText().toString();
 
-                if(date.isChecked()){
+                if(dateCheckBox.isChecked()){
                     nameFile = nameFile + "_" + FileSaver.setDateString();
                     Log.d(TAG, "SaverFragmentSecundomer date.isChecked() Имя файла = " + nameFile);
                 }
@@ -77,13 +78,14 @@ public class DialogSaveSecFragment extends DialogFragment {
             }
         });
 
+        //действия при нажатии кнопки "Сохранить и показать" в диалоге сохранения данных в базу
         builder.setNeutralButton("Сохранить и показать", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
                 //читаем имя файла в строке ввода
                 String nameFile = name.getText().toString();
-                if(date.isChecked()){
+                if(dateCheckBox.isChecked()){
                     nameFile = nameFile + "_" + FileSaver.setDateString();
                 }
                 //Вызываем метод интерфейса, передаем  nameFile и showGraf в TimeMeterActivity
@@ -94,6 +96,7 @@ public class DialogSaveSecFragment extends DialogFragment {
             }
         });
 
+        //действия при нажатии кнопки "Нет" в диалоге сохранения данных в базу
         builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
