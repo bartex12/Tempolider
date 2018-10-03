@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -68,17 +69,27 @@ public class MainActivity extends AppCompatActivity
 
     private SharedPreferences prefSetting;
 
+    //создаём базу данных, если ее не было
+    TempDBHelper mDbHelper = new TempDBHelper(this);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Log.d(TAG,"MainActivity onCreate");
 
+        //если в базе нет записей, добавляем подход из 4х фрагментов в таблицу TabSet
+        // и пишем с именем "Подтягивание 50раз за 4мин" в таблицу TabFile
+        mDbHelper.createDefaultSetIfNeed();
+        //выводим в лог все строки базы
+        mDbHelper.displayDatabaseInfo();
 
         mListView = (ListView) findViewById(R.id.listView);
-
         //адаптер  - в onResume
         mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            //0 - вызов секундомера
+            //1- вызов темполидера
+            //2  - показ списка файлов в 3х табах
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i == 0) {
@@ -121,11 +132,18 @@ public class MainActivity extends AppCompatActivity
             public void onClick(View view) {
                 //Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                 //        .setAction("Action", null).show();
+
                 //создаём новую запись
                 Intent intentAdd = new Intent(MainActivity.this, DetailActivity.class);
                 intentAdd.putExtra(P.FROM_MAIN, P.TO_ADD);
                 startActivity(intentAdd);
 
+       /*
+                //Удаление единственной записи в списке
+                long file1_id = mDbHelper.getIdFromFileName("Подтягивание 50раз за 4мин");
+                mDbHelper.deleteFileAndSets(file1_id);
+                Log.d(TAG,"Удалена запись 'Подтягивание 50раз за 4мин'");
+*/
             }
         });
 
@@ -141,12 +159,14 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+      /*
         //читаем файл с именами файлов с раскладками
         ArrayList<String> allNamesOfFiles = readArrayList(FileSaver.FILENAME_NAMES_OF_FILES);
         //заполняем синглет-держатель имён файлов новыми данными из списка имён файлов
        //пишем имя, дату, тип и номер строки списка для каждого имени файла
         Stat.addAllFileSaverToFileSaverLabFromList(allNamesOfFiles);
-        Log.d(TAG, "TabBarActivity размер   списка файлов с именами файлов = " + allNamesOfFiles.size());
+        Log.d(TAG, "MainActivity размер   списка файлов с именами файлов = " + allNamesOfFiles.size());
+    */
     }
 
     @Override
@@ -172,7 +192,7 @@ public class MainActivity extends AppCompatActivity
         //получаем размер списка
         array_size = stringListMain.length;
         //готовим данные для SimpleAdapter
-        data = new ArrayList<Map<String, Object>>(array_size);
+        data = new ArrayList<>(array_size);
         for (int i = 0; i<array_size; i++){
 
             m = new HashMap<>();
@@ -214,6 +234,7 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG,"MainActivity onDestroy");
+        /*
         //получаем ссылку на экземпляр FileSaverLab
         FileSaverLab fileSaverLab = FileSaverLab.get();
         //получаем весь список имён файлов из FileSaverLab
@@ -222,6 +243,7 @@ public class MainActivity extends AppCompatActivity
         // String.format("%s:%s:%s",name,date,type);
         writeArrayList(listNamesOfFiles,FileSaver.FILENAME_NAMES_OF_FILES);
         Log.d(TAG,"MainActivity onDestroy записаны имена в FILENAME_NAMES_OF_FILES");
+        */
         //включаем звук
         AudioManager audioManager =(AudioManager)getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
@@ -323,6 +345,7 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
+    /*
     //Записать список меток времени для каждого найденного шага   в файл
     public void writeArrayList(ArrayList<String> arrayList) {
         try {
@@ -385,5 +408,7 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
+
+    */
 
 }

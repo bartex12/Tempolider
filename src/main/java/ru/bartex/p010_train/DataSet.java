@@ -1,32 +1,23 @@
 package ru.bartex.p010_train;
 
-import java.util.UUID;
+import java.io.Serializable;
 
-/**
- * Created by Андрей on 02.05.2018.
- */
-public class Set {
+public class DataSet implements Serializable {
 
-    private String mTitle;
-    private UUID mId;
     private float mTimeOfRep;
     private int mReps;
     private int mNumberOfFrag = 0;
 
-    public Set( ){
-        mId = UUID.randomUUID();
+    public DataSet( ){
+        //пустой конструктор
     }
 
     //основной конструктор
-    public Set(float TimeOfRep, int Reps, int NumberOfFrag){
+    public DataSet(float TimeOfRep, int Reps, int NumberOfFrag){
         mTimeOfRep = TimeOfRep;
         mReps = Reps;
         mNumberOfFrag = NumberOfFrag;
     }
-
-    public UUID getId() {return mId;}
-
-    public void setId(UUID id) {mId = id;}
 
     public float getTimeOfRep() {
         return mTimeOfRep;
