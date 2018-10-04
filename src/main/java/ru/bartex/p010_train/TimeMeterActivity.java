@@ -99,7 +99,7 @@ public class TimeMeterActivity extends AppCompatActivity
             if (nameFile.isEmpty()) {
                 //имя будет "Автосохранение секундомера"
                 nameFile = P.FILENAME_OTSECHKI_SEC;
-            }
+
             Log.d(TAG, "onNameAndGrafTransmit nameFile = " + nameFile);
 
             //проверяем, есть ли в базе запись с таким именем
@@ -109,7 +109,7 @@ public class TimeMeterActivity extends AppCompatActivity
             if (repeatId != -1){
                 mTempDBHelper.deleteFileAndSets(repeatId);
             }
-
+            }
             //======Начало добавления записей в таблицы DataFile и DataSet=========//
             //если имя файла не пустое или "Автосохранение секундомера"
             //создаём экземпляр класса DataFile в конструкторе
@@ -151,7 +151,8 @@ public class TimeMeterActivity extends AppCompatActivity
             if (showGraf){
                 //открываем экран с графиком только что записанных данных
                 Intent intentTiming = new Intent(TimeMeterActivity.this, TimeGrafActivity.class);
-                intentTiming.putExtra(P.LAST_FILE, nameFile);
+                //FINISH_FILE_NAME, так как в TimeGrafActivity эта величина
+                intentTiming.putExtra(P.FINISH_FILE_NAME, nameFile);
                 startActivity(intentTiming);
             }
             //стираем список с отсечками
@@ -475,6 +476,7 @@ public class TimeMeterActivity extends AppCompatActivity
             case R.id.action_timing:
                 Log.d(TAG, "OptionsItem = action_timing");
                 //получаем из предпочтений имя файла и отправляем его в интенте
+                //если этого не делать, будет крах
                 prefNameOfLastFile = getPreferences(MODE_PRIVATE);
                 String finishFileName = prefNameOfLastFile.getString(P.LAST_FILE,
                         P.NAME_OF_LAST_FILE_ZERO);
