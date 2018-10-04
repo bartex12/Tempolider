@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity
         Log.d(TAG,"MainActivity onCreate");
 
         //если в базе нет записей, добавляем подход из 4х фрагментов в таблицу TabSet
-        // и пишем с именем "Подтягивание 50раз за 4мин" в таблицу TabFile
+        // и пишем с именем "Автосохранение секундомера" в таблицу TabFile
         mDbHelper.createDefaultSetIfNeed();
         //выводим в лог все строки базы
         mDbHelper.displayDatabaseInfo();

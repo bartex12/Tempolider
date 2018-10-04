@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
@@ -29,6 +30,8 @@ import android.widget.RadioButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.jjoe64.graphview.series.DataPoint;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -36,10 +39,16 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.UUID;
+
+import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TabSet;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 
 /**
  * Created by Андрей on 02.05.2018.
@@ -51,7 +60,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     // Лайаут этого класса R.layout.activity_set_list
 
     protected abstract Fragment createFragment(String nameOfFile);
-    //реализация в SetListFragment
+    //реализация в SetListFragment через SetListActivity и её метод createFragment(String nameOfFile)
 
     LinearLayout mNameLayout; // Layout для имени файла - на нём щелчок для вызова списка имён
 
@@ -123,6 +132,8 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     private SharedPreferences shp; //предпочтения для записи задержки общей для всех раскладок
     private int  timeOfDelay = 0; //задержка в секундах
 
+
+
     // Метод интерфейса из класса SetListFragment
     @Override
     public void  onShowTotalValues( String time, String reps){
@@ -156,7 +167,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         }else if (fromActivity == 333){
             //если данные пришли  из списка сохранённых файлов, смотрим на имя файла
             Log.d(TAG, "SingleFragmentActivity - onArrayListTransmit nameFile = " + nameFile);
-            String def = "";
+            String def;
             if (typeOfFile.equalsIgnoreCase(TYPE_TEMPOLEADER)){
                 def = FILENAME_OTSECHKI_TEMP;
             }else if (typeOfFile.equalsIgnoreCase(TYPE_TIMEMETER)){
@@ -179,7 +190,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
         shp = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor edit = shp.edit();
-        edit.putInt(KEY_DELAY, timeOfDelay);
+        edit.putInt(P.KEY_DELAY, timeOfDelay);
         edit.apply();
 
         mDelayButton.setText(String.valueOf(timeOfDelay));
@@ -209,7 +220,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
             public void onClick(View view) {
                 //если в активности нажата Старт = true , ничего не делать
                 if (start){
-                    Log.d(TAG, "SingleFragmentActivity onClick  start = " + start);
                     Toast.makeText(SingleFragmentActivity.this,
                             "Сначала нажмите Стоп", Toast.LENGTH_SHORT).show();
 
@@ -227,7 +237,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
         mDelayButton = (Button) findViewById(R.id.buttonDelay);
         shp = getPreferences(MODE_PRIVATE);
-        timeOfDelay = shp.getInt(KEY_DELAY, 5);
+        timeOfDelay = shp.getInt(P.KEY_DELAY, 6);
         mDelayButton.setText(String.valueOf(timeOfDelay));
         mDelayButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -370,16 +380,12 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         //получаем интент, он есть в любом случае
         Intent intent = getIntent();
         //считываем значение FROM_ACTIVITY из интента
-        fromActivity = intent.getIntExtra(FROM_ACTIVITY,0);
+        // MainActivity =111   TIME_GRAF_ACTIVITY = 222    TabBarActivity = 333
+        fromActivity = intent.getIntExtra(P.FROM_ACTIVITY,0);
         //получаем имя файла из интента
-        finishFileName = intent.getStringExtra(FileSaver.FINISH_FILE_NAME);
+        finishFileName = intent.getStringExtra(P.FINISH_FILE_NAME);
         Log.d(TAG, " finishFileName =  " + finishFileName);
 
-        //Перед заполнением новыми данными список должен быть очищен от старых данных
-        if (mListTimeTransfer!=null) {
-            //стираем данные от секундомера
-            mListTimeTransfer.clear();
-        }
 
         //если интент пришел от MainActivity, список должен быть очищен от старых данных
         //а SetLab должен быть обнулён, после этого нужно считать данные из файла
@@ -399,24 +405,32 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 setLab.addAllSetInSetLabFromFormatList(mListTimeTransfer);
             }
 
-            //если интент пришел от TimeMeterActivity, он принёс с собой список отсечек
+            //если интент пришел от TimeGrafActivity, он принёс с собой список отсечек
         }else if (fromActivity == 222){
-            Log.d(TAG, " fromActivity =  " + fromActivity);
+            Log.d(TAG, " SingleFragmentActivity fromActivity =  " + fromActivity);
 
-            //получаем из интента список отсечек
-            mListTimeTransfer =  intent.getStringArrayListExtra(ARRAY_STRING_TRANSFER);
             //получаем имя файла из интента
             finishFileName = intent.getStringExtra(FileSaver.FINISH_FILE_NAME);
             //выводим имя файла на экран
+            Log.d(TAG, " SingleFragmentActivity finishFileName =  " + finishFileName);
+            //finishFileName=null, если не было записи в преференсис- тогда присваиваем имя
+            //единственной записи в базе, сделанной в onCreate MainActivity
+            if (finishFileName==null){
+                finishFileName = P.FILENAME_OTSECHKI_SEC;
+            }
             mNameOfFile.setText(finishFileName);
+
+
+            //получаем из базы данных  список отсечек
+            //mListTimeTransfer =  intent.getStringArrayListExtra(ARRAY_STRING_TRANSFER);
             //mNameButton.setText(finishFileName);
-            Log.d(TAG, " finishFileName =  " + finishFileName);
             //если интент пришел со списком отсечек, то можно сделать фрагмент на его основе
-            if (mListTimeTransfer!=null){
+            //if (mListTimeTransfer!=null){
                 //заполняем SetLab и Set данными из списка отсечек секундомера из интента
-                SetLab setLab = SetLab.get();
-                setLab.fillSetFromArrayListSecundomer(mListTimeTransfer);
-        }
+              //  SetLab setLab = SetLab.get();
+               // setLab.fillSetFromArrayListSecundomer(mListTimeTransfer);
+            //}
+
             //если интент пришёл от TabBarActivity, считывание данных из SetLab идёт
             //в onResume фрагмента темполидера, а здесь только берём из интента тип файла
         }else if(fromActivity == 333) {
@@ -453,7 +467,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
         //выставляем доступность кнопок
         buttonsEnable (true,false,false);
-    };
+    }
     //**********************   конец onCreate    ************************//
 
     @Override
@@ -752,7 +766,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 }//переходим к следующему фрагменту
                 if ((mCurrentRep >= countReps) && (mCountFragment < SetLab.getSets().size() - 1)) {
                     mCountFragment++;
-                    countMilliSecond = SetLab.getSet(mCountFragment).getTimeOfRep()*1000;;
+                    countMilliSecond = SetLab.getSet(mCountFragment).getTimeOfRep()*1000;
                     countReps =  SetLab.getSet(mCountFragment).getReps();
                     Log.d(TAG, "countMilliSecond = " + countMilliSecond + "  countReps = " + countReps);
                     mTotalKvant = 0;
@@ -837,7 +851,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     //в зависимости от имени, введённого в диалоге сохранения и типа данных
     public  String saveDataAndFilename(ArrayList<String> dataSave,
                                      String nameFile, String fileNameDefoult, String typeData){
-        String finishFileName = "";
+        String finishFileName;
         //добавляем в синглет списка файлов новое имя
         //получаем ссылку на экземпляр FileSaverLab
         FileSaverLab fileSaverLab = FileSaverLab.get();

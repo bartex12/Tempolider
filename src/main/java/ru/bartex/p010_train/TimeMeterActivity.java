@@ -60,9 +60,9 @@ public class TimeMeterActivity extends AppCompatActivity
     private boolean mRestart = false; //признак повторного старта (true)
     private boolean start = false;//признак нажатия на старт
     int ii = 0; //порядковый номер отсечки
-    private String finishFileName = FileSaver.FINISH_FILE_NAME;
+    //private String finishFileName = P.FINISH_FILE_NAME;
 
-    //список отсечек времени для записи в базу, если будет нужно (в диалоге сохранения)
+    //Временный список отсечек по кругам для записи в базу, если будет нужно (в диалоге сохранения)
     ArrayList<String> repTimeList = new ArrayList<>();
     //список данных для показа на экране
     ArrayList<Map<String, Object>> data = new ArrayList<>();
@@ -92,31 +92,32 @@ public class TimeMeterActivity extends AppCompatActivity
 
             //в противном случае
         }else{
-
             //получаем дату и время в нужном для базы данных формате
             String dateFormat  = mTempDBHelper.getDateString();
             String timeFormat  = mTempDBHelper.getTimeString();
             //если строка имени пустая
-            if (nameFile.isEmpty()){
+            if (nameFile.isEmpty()) {
                 //имя будет "Автосохранение секундомера"
                 nameFile = P.FILENAME_OTSECHKI_SEC;
-                Log.d(TAG,"onNameAndGrafTransmit nameFile = " + nameFile);
-
-                //проверяем, есть ли в базе запись с таким именем
-                long repeatId = mTempDBHelper.getIdFromFileName (nameFile);
-                Log.d(TAG,"onNameAndGrafTransmit repeatId = " + repeatId);
-
-                //если есть, стираем её и пишем новые данные под таким именем
-                if (repeatId != -1){
-                    mTempDBHelper.deleteFileAndSets(repeatId);
-                }
             }
+            Log.d(TAG, "onNameAndGrafTransmit nameFile = " + nameFile);
+
+            //проверяем, есть ли в базе запись с таким именем
+            long repeatId = mTempDBHelper.getIdFromFileName (nameFile);
+            Log.d(TAG,"onNameAndGrafTransmit repeatId = " + repeatId);
+            //если есть (repeatId не равно -1), стираем её и потом пишем новые данные под таким именем
+            if (repeatId != -1){
+                mTempDBHelper.deleteFileAndSets(repeatId);
+            }
+
+            //======Начало добавления записей в таблицы DataFile и DataSet=========//
             //если имя файла не пустое или "Автосохранение секундомера"
             //создаём экземпляр класса DataFile в конструкторе
             DataFile file1 = new DataFile(nameFile, dateFormat, timeFormat,
                     null,null,P.TYPE_TIMEMETER, 6);
             //добавляем запись в таблицу TabFile, используя данные DataFile
             long file1_id =  mTempDBHelper.addFile(file1);
+
             //готовим данные фрагментов подхода
             // если индекс =0, то первое значение
             for (int j = 0; j<repTimeList.size(); j++ ) {
@@ -134,19 +135,9 @@ public class TimeMeterActivity extends AppCompatActivity
                 DataSet set = new DataSet(time_now,1,j+1);
                 //добавляем запись в таблицу TabSet, используя данные DataSet
                 mTempDBHelper.addSet(set, file1_id);
+                //======Окончание добавления записей в таблицы DataFile и DataSet=========//
             }
-
-            // 1)вызываем метод saveDataAndFilename() записи в файл данных от секундомера
-            // и записи имени файла в список сохранённых файлов, получаем записанное имя файла
-            //finishFileName =  saveDataAndFilename(arlSave, nameFile,
-              //      FileSaver.FILENAME_OTSECHKI_SEC ,FileSaver.TYPE_TIMEMETER);
-
-            //  2) сохраняем в файл  c  именем FILENAME_TIMEMETER список меток времени для каждой отсечки
-            //этот файл переписывается при записи новой порции отсечек секундомера
-            // Используется в TimeGrafActivity для построения графика и таблицы данных
-            writeArrayList(repTimeList,P.FILENAME_TIMEMETER ); //***
-
-            //  3) сохраняем имя файла в предпочтениях (ИСПОЛЬЗУЕМ  при переходе в график с тулбара)
+            // Cохраняем имя файла в предпочтениях (ИСПОЛЬЗУЕМ  при переходе в график с тулбара)
             //получаем файл предпочтений
             prefNameOfLastFile = getPreferences(MODE_PRIVATE);
             // получаем Editor
@@ -156,16 +147,12 @@ public class TimeMeterActivity extends AppCompatActivity
             ed.apply();
 
             //если нужно записать и показать
-            //то 1) пишем в список файлов и в список файлов имён, а также 2) во временный файл, а
-            //затем вызываем интент, в котором передаём список с 0 в начале
+            //вызываем интент, в котором передаём имя последнего файла в TimeGrafActivity
             if (showGraf){
                 //открываем экран с графиком только что записанных данных
                 Intent intentTiming = new Intent(TimeMeterActivity.this, TimeGrafActivity.class);
-                intentTiming.putStringArrayListExtra(TimeGrafActivity.REP_TIME_LIST,repTimeList);
-                intentTiming.putExtra(P.FINISH_FILE_NAME, nameFile);
+                intentTiming.putExtra(P.LAST_FILE, nameFile);
                 startActivity(intentTiming);
-                //если нужно только записать, а потом, возможно показать через тулбар
-                //то интент не вызываем
             }
             //стираем список с отсечками
             repTimeList.clear();
@@ -246,20 +233,20 @@ public class TimeMeterActivity extends AppCompatActivity
 
                 switch (accurancy){
                     case 1:
-                        s_time = Stat.getTimeString1(mTimeExersize);
-                        s_delta = Stat.getTimeString1 (mDelta);
+                        s_time = P.getTimeString1(mTimeExersize);
+                        s_delta = P.getTimeString1 (mDelta);
                         break;
                     case 2:
-                        s_time = Stat.getTimeString2(mTimeExersize);
-                        s_delta = Stat.getTimeString2 (mDelta);
+                        s_time = P.getTimeString2(mTimeExersize);
+                        s_delta = P.getTimeString2 (mDelta);
                         break;
                     case 3:
-                        s_time = Stat.getTimeString3(mTimeExersize);
-                        s_delta = Stat.getTimeString3 (mDelta);
+                        s_time = P.getTimeString3(mTimeExersize);
+                        s_delta = P.getTimeString3 (mDelta);
                         break;
                     default:
-                        s_time = Stat.getTimeString1(mTimeExersize);
-                        s_delta = Stat.getTimeString1 (mDelta);
+                        s_time = P.getTimeString1(mTimeExersize);
+                        s_delta = P.getTimeString1 (mDelta);
                 }
                 //заводим данные для одной строки списка
                 Map<String, Object> m;
@@ -271,9 +258,6 @@ public class TimeMeterActivity extends AppCompatActivity
                 data.add(0,m);
                 //добавляем время отсечки в список (в конец) для записи в базу в диалоге сохранения
                 repTimeList.add(Long.toString(mTimeExersize));
-
-                //добавляем время отсечки  в строковом формате в список (в конец) для записи в файл
-                //repTimeList.add(s_time);  //так нельзя- потом число не прочитать
                 Log.d(TAG,"mTimeExersize = " + mTimeExersize + "  mDelta = " + mDelta);
 
                 //обновляем список на экране
@@ -488,23 +472,23 @@ public class TimeMeterActivity extends AppCompatActivity
                 onBackPressed();
                 return true;
 
-            case R.id.action_settings:
-                Log.d(TAG, "OptionsItem = action_settings");
-                Intent intentSettings = new Intent(this, PrefActivity.class);
-                startActivity(intentSettings);
-                return true;
-
             case R.id.action_timing:
                 Log.d(TAG, "OptionsItem = action_timing");
                 //получаем из предпочтений имя файла и отправляем его в интенте
                 prefNameOfLastFile = getPreferences(MODE_PRIVATE);
-                finishFileName = prefNameOfLastFile.getString(P.LAST_FILE,
+                String finishFileName = prefNameOfLastFile.getString(P.LAST_FILE,
                         P.NAME_OF_LAST_FILE_ZERO);
-
+                Log.d(TAG, "action_timing finishFileName = " + finishFileName);
                 Intent intentTiming = new Intent(this, TimeGrafActivity.class);
                 intentTiming.putStringArrayListExtra(TimeGrafActivity.REP_TIME_LIST,repTimeList);
                 intentTiming.putExtra(P.FINISH_FILE_NAME, finishFileName);
                 startActivity(intentTiming);
+                return true;
+
+            case R.id.action_settings:
+                Log.d(TAG, "OptionsItem = action_settings");
+                Intent intentSettings = new Intent(this, PrefActivity.class);
+                startActivity(intentSettings);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -521,7 +505,7 @@ public class TimeMeterActivity extends AppCompatActivity
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    String time = Stat.getTimeString1(mTotalTime);
+                    String time = P.getTimeString1(mTotalTime);
                     //показ текущ времени
                     mCurrentTime.setText(time);
                 }
@@ -534,100 +518,5 @@ public class TimeMeterActivity extends AppCompatActivity
     private void openSaveInFileDialogFragment() {
         DialogFragment dialogFragment = new DialogSaveSecFragment();
         dialogFragment.show(getSupportFragmentManager(),"SavePickerSecundomer");
-    }
-
-    //запись данных в файл и запись имени файла в список сохранённых файлов
-    //в зависимости от имени, введённого в диалоге сохранения и типа данных
-
-    public  String saveDataAndFilename(ArrayList<String> dataSave,
-                                     String nameFile, String fileNameDefoult,
-                                     String typeData){
-
-        String finishFileName = "";
-        //добавляем в синглет списка файлов новое имя
-        //получаем ссылку на экземпляр FileSaverLab
-        FileSaverLab fileSaverLab = FileSaverLab.get();
-        FileSaver fileSaver = new FileSaver();
-        //получаем список данных о сохранённых файлов
-        List<FileSaver> listOfFiles = fileSaverLab.getFileSavers();
-        Log.d(TAG, "TimeMeterActivity saveDataAndFilename " +
-                " Разммер списка файлов = " + listOfFiles.size() );
-        //если имя файла- пустая строка, то пишем отсечки в файл
-        // с именем по умолчанию fileNameDefoult, а в синглет ничего не добавляем если
-        // запись с именем fileNameDefoult уже была
-        if (nameFile.isEmpty()) {
-            finishFileName = fileNameDefoult;
-            //пишем отсечки dataSave в файл с именем fileNameDefoult
-            writeArrayList(dataSave, fileNameDefoult);
-            //проверяем, не повторяется ли запись с именем fileNameDefoult
-            boolean notFirst = false;
-            for (FileSaver fs: listOfFiles){
-                String name = fs.getTitle();
-                if (name.equalsIgnoreCase(fileNameDefoult)){
-                    notFirst = true;
-                }
-            }
-            //если запись с таким именем уже есть, пропускаем запись имени файла (сам файл записали уже)
-            if (notFirst){
-                Log.d(TAG, "TimeMeterActivity saveDataAndFilename Пропускаем запись имени файла ");
-            }else{
-                //если записи с таким именем нет, пишем имя файла в файл
-                //даём имя по умолчанию
-                fileSaver.setTitle(fileNameDefoult);
-                fileSaver.setTipe(typeData);  //даём тип файлу
-                fileSaver.setDate(); //пишем текущую дату и время, их можно прочитать где-то
-                //добавляем данные файла в список-хранитель данных
-                fileSaverLab.addFileSaver(fileSaver,0);
-                //получаем весь список имён файлов из FileSaverLab
-                ArrayList<String> listNamesOfFiles = fileSaverLab.getListFullNamesOfFiles();
-                Log.d(TAG, "TimeMeterActivity saveDataAndFilename " +
-                        "После Записи В listNamesOfFiles строк =  " + listNamesOfFiles.size());
-                //пишем список имён в файл имён
-                writeArrayList(listNamesOfFiles,FileSaver.FILENAME_NAMES_OF_FILES);
-            }
-            //если имя файла-  НЕ пустая строка, то пишем отсечки в файл
-            // с именем nameFile, а в синглет  добавляем FileSaver с данными о файле
-        } else {
-            finishFileName = nameFile;
-            //пишем отсечки dataSave в файл с именем nameFile
-            writeArrayList(dataSave, nameFile);
-            //даём имя, считанное из строки
-            fileSaver.setTitle(nameFile);
-            fileSaver.setTipe(typeData);  //даём тип файлу
-            fileSaver.setDate(); //ишем текущую дату и время, их можно прочитать где-то
-            //добавляем данные файла в список-хранитель данных
-            fileSaverLab.addFileSaver(fileSaver);
-
-            //получаем весь список имён файлов из FileSaverLab
-            ArrayList<String> listNamesOfFiles = fileSaverLab.getListFullNamesOfFiles();
-            Log.d(TAG, "TimeMeterActivity saveDataAndFilename " +
-                    "В listNamesOfFiles строк =  " + listNamesOfFiles.size());
-            //пишем список имён в файл имён
-            writeArrayList(listNamesOfFiles,FileSaver.FILENAME_NAMES_OF_FILES);
-        }
-        Log.d(TAG, "TimeMeterActivity saveDataAndFilename " +
-                "В списке FileSaverLab сохранённых файлов  Количество файлов = " +
-                fileSaverLab.getFileSavers().size());
-
-        return finishFileName;
-    }
-
-    //Записать список имён с данными  в файл
-    private void writeArrayList(ArrayList<String> arrayList, String fileName) {
-        try {
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                    openFileOutput(fileName, MODE_PRIVATE)));
-            for (String line : arrayList) {
-                //функция write не работает для CharSequence, поэтому String
-                bw.write(line);
-                // тут мог бы быть пробел если надо в одну строку
-                //сли не включать эту строку, то в файле будет всего одна строчка, а нужен массив
-                bw.write(System.getProperty("line.separator"));
-            }
-            Log.d(TAG, "TimeMeterActivity writeArrayList Файл ArrayList записан ");
-            bw.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
     }
 }

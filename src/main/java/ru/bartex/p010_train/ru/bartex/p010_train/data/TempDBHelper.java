@@ -84,7 +84,7 @@ public class TempDBHelper extends SQLiteOpenHelper {
             String timeFormat  = getTimeString();
 
             //создаём экземпляр класса DataFile в конструкторе
-            DataFile file1 = new DataFile("Подтягивание 50раз за 4мин",
+            DataFile file1 = new DataFile(P.FILENAME_OTSECHKI_SEC,
                     dateFormat, timeFormat,"Подтягивание",
                     "Подтягивание на перекладине", P.TYPE_TIMEMETER, 6);
 
@@ -92,15 +92,15 @@ public class TempDBHelper extends SQLiteOpenHelper {
             long file1_id =  this.addFile(file1);
 
             //создаём экземпляр класса DataSet в конструкторе
-            DataSet set1 = new DataSet(3,10,1);
+            DataSet set1 = new DataSet(1,1,1);
             //добавляем запись в таблицу TabSet, используя данные DataSet
             this.addSet(set1, file1_id);
             // повторяем для всех фрагментов подхода
-            DataSet set2 = new DataSet(4,10,2);
+            DataSet set2 = new DataSet(2,1,2);
             this.addSet(set2, file1_id);
-            DataSet set3 = new DataSet(5,10,3);
+            DataSet set3 = new DataSet(3,1,3);
             this.addSet(set3, file1_id);
-            DataSet set4 = new DataSet(6,20,4);
+            DataSet set4 = new DataSet(4,1,4);
             this.addSet(set4, file1_id);
 
             Log.d(TAG, "MyDatabaseHelper.createDefaultPersonIfNeed ... count = " +
@@ -223,9 +223,23 @@ public class TempDBHelper extends SQLiteOpenHelper {
     public Cursor getAllSetFragments(long rowId) throws SQLException {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor mCursor = db.query(true, TabSet.TABLE_NAME,
-                new String[] {TabSet.COLUMN_SET_TIME},
+                new String[] {TabSet.COLUMN_SET_TIME, TabSet.COLUMN_SET_REPS,TabSet.COLUMN_SET_FRAG_NUMBER },
                 TabSet.COLUMN_SET_FILE_ID + "=" + rowId,
                 null, null, null, null, null);
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+        }
+        return mCursor;
+    }
+
+    /**
+     * Возвращает курсор с указанной записи
+     */
+    public Cursor getAllSetFragmentsRaw(long rowId) throws SQLException {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "select " + TabSet.COLUMN_SET_TIME + " from " + TabSet.TABLE_NAME +
+        " where " + TabSet.COLUMN_SET_FILE_ID + " = ? ";
+        Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(rowId)});
         if (mCursor != null) {
             mCursor.moveToFirst();
         }

@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -28,6 +29,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TabSet;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -63,6 +67,8 @@ public class SetListFragment extends Fragment {
 
     private static final String ARG_NAME_OF_FILE = "NameOfFile";
     private String finishFileName = FileSaver.FINISH_FILE_NAME;
+
+    TempDBHelper mTempDBHelper;
 
 
     public interface OnShowTotalValuesListener {
@@ -109,6 +115,12 @@ public class SetListFragment extends Fragment {
         finishFileName = getArguments().getString(ARG_NAME_OF_FILE);
         //для фрагментов требуется так разрешить появление меню
         setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        mTempDBHelper = new TempDBHelper(getActivity());
     }
 
     @Override
@@ -167,7 +179,7 @@ public class SetListFragment extends Fragment {
         //если здесь не обновлять, то список не обновляется при возврате из DetailActivity
         updateAdapter();
         //вычисляем и показываем общее время выполнения подхода и количество повторов в подходе
-        calculateAndShowTotalValues();
+        //calculateAndShowTotalValues();
     }
     
     //создаём контекстное меню для списка (сначала регистрация нужна в onCreateView)
@@ -275,41 +287,60 @@ public class SetListFragment extends Fragment {
     public void updateAdapter() {
         Log.d(TAG, "SetListFragment: updateAdapter() ");
         //получаем экземпляр SetLab
-        mSetLab = SetLab.get();
+        //mSetLab = SetLab.get();
         //получаем список объектов класса Set
-        mSets =  mSetLab.getSets();
+        //mSets =  mSetLab.getSets();
         //получаем размер списка
-        array_size = mSets.size();
-        //готовим данные для SimpleAdapter
-        data = new ArrayList<Map<String, Object>>(array_size);
-        for (int i = 0; i < array_size; i++) {
-            mSet = mSets.get(i);
-            float time  = mSet.getTimeOfRep();
-            String timeFormat = String.format("%.2f",time);
-            m = new HashMap<>();
-            m.put(ATTR_TIME, timeFormat);
-            m.put(ATTR_REP, mSet.getReps());
-            m.put(ATTR_NUMBER, mSet.getNumberOfFrag()+1); //чтобы начинался список  с 1, а не с 0
-            data.add(m);
-        }
-        String[] from = {ATTR_TIME, ATTR_REP, ATTR_NUMBER};
-        int[] to = {R.id.time_item_set_textview, R.id.reps_item_set_textview,
-                R.id.mark_item_set_textview};
-        //заводим данные в адаптер и присваиваем его встроенному списку ListFragment
-        sara = new SimpleAdapter(getContext(), data, R.layout.list_item_set_textview, from, to);
-        //устанавливаем свой биндер
-        sara.setViewBinder(new MyViewBinder());
-        mListView.setAdapter(sara);
-        //setListAdapter(sara);
-        //Чтобы сделать что-то при щелчке на галке, нужно расширить адаптер и сделать
-        // слушатель внутри View на флажок
+        //array_size = mSets.size();
+
+
+
+            //получаем id записи с таким именем
+            long finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
+            Log.d(TAG,"SetListFragment  имя =" + finishFileName + "  Id = " + finishFileId );
+
+            //получаем курсор с данными подхода с id = finishFileId
+            Cursor cursor = mTempDBHelper.getAllSetFragments(finishFileId);
+            //Список с данными для адаптера
+            data = new ArrayList<Map<String, Object>>(cursor.getCount());
+            //проходим по курсору и берём данные
+            if (cursor.moveToFirst()) {
+                do {
+                    float time  = cursor.getFloat(cursor.getColumnIndex(TabSet.COLUMN_SET_TIME));
+                    String timeFormat = String.format("%.2f",time);
+                    int reps_now = cursor.getInt(cursor.getColumnIndex(TabSet.COLUMN_SET_REPS));
+                    int number_now = cursor.getInt(cursor.getColumnIndex(TabSet.COLUMN_SET_FRAG_NUMBER));
+
+                    Log.d(TAG,"SetListFragment time_now = " + timeFormat +
+                            "  reps_now = " + reps_now + "  number_now = " + number_now);
+
+                    m = new HashMap<>();
+                    m.put(ATTR_TIME, timeFormat);
+                    m.put(ATTR_REP, reps_now);
+                    m.put(ATTR_NUMBER, number_now);
+                    data.add(m);
+
+                } while (cursor.moveToNext());
+
+                String[] from = {ATTR_TIME, ATTR_REP, ATTR_NUMBER};
+                int[] to = {R.id.time_item_set_textview, R.id.reps_item_set_textview,
+                        R.id.mark_item_set_textview};
+                //заводим данные в адаптер и присваиваем его встроенному списку ListFragment
+                sara = new SimpleAdapter(getContext(), data, R.layout.list_item_set_textview, from, to);
+                //устанавливаем свой биндер
+                sara.setViewBinder(new MyViewBinder());
+                mListView.setAdapter(sara);
+                //setListAdapter(sara);
+                //Чтобы сделать что-то при щелчке на галке, нужно расширить адаптер и сделать
+                // слушатель внутри View на флажок
+            }
     }
 
     // класс для изменения цвета элемента строки - маркера номера фрагмента подхода
     private class MyViewBinder implements SimpleAdapter.ViewBinder{
         @Override
         public boolean setViewValue(View view, Object o, String s) {
-            int i = 0;
+            int i;
             switch (view.getId()) {
                 case R.id.mark_item_set_textview:
                     i = ((Integer) o).intValue();
