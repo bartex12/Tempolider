@@ -1,7 +1,9 @@
 package ru.bartex.p010_train;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.database.sqlite.SQLiteDatabase;
 import android.media.AudioManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -19,6 +21,9 @@ import android.widget.EditText;
 import java.util.UUID;
 
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TabSet;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 
 public class DetailActivity extends AppCompatActivity {
     private EditText mTimeOfRepFrag;  //поле для времени между повторами
@@ -32,10 +37,13 @@ public class DetailActivity extends AppCompatActivity {
     public static final String INTENT_SET_UUID = "DetailActivity.intent_set_uuid";
     public static final String POSITION = "positionDetailActivity";
     static final String DETAIL_REQUEST = "DetailActivity.change_request";
+    static final String DETAIL_DATA_SET = "DetailActivity.DATA_SET";
 
     UUID uuid;
     int position =0;
     Bundle extras;
+    DataSet mDataSet;
+    TempDBHelper mDBHelper = new TempDBHelper(this);
 
     //редактируемая запись появляется в списке, только если нажата кнопка Принять
     //кнопка Назад в панели инструментов, кнопка отмена и кнопка Обратно на телефоне - отменяют
@@ -52,17 +60,17 @@ public class DetailActivity extends AppCompatActivity {
         act.setDisplayHomeAsUpEnabled(true );
         act.setHomeButtonEnabled(true);
 
-        SetLab setLab = SetLab.get();
+       // SetLab setLab = SetLab.get();
         //получаем extras из интента
         extras = getIntent().getExtras();
         if(extras != null) {
             //если Изменить
             act.setTitle("Изменить");
             if (extras.getInt(DETAIL_REQUEST) == 111) {
-                position = extras.getInt(POSITION);
-                mSet = setLab.getSet(position);
-                Log.d(TAG, "DetailActivity onCreate position) = " + position);
-                Log.d(TAG, "DetailActivity onCreate mSet.getNumberOfFrag() = " + mSet.getNumberOfFrag());
+                //position = extras.getInt(POSITION);
+                mDataSet = (DataSet) extras.getSerializable(DETAIL_DATA_SET);
+                //Log.d(TAG, "DetailActivity onCreate position) = " + position);
+                Log.d(TAG, "DetailActivity onCreate mDataSet № = " + mDataSet.getNumberOfFrag());
             }
             //если Добавить
             else if (extras.getInt(P.FROM_MAIN) ==P.TO_ADD){
@@ -73,7 +81,7 @@ public class DetailActivity extends AppCompatActivity {
                 act.setTitle("Добавить");
                 Intent intentUuid =getIntent();
                 uuid = (UUID)intentUuid.getSerializableExtra(INTENT_SET_UUID);
-                mSet = setLab.getSet(uuid);
+                //mSet = setLab.getSet(uuid);
                 Log.d(TAG, "DetailActivity onCreate uuid = " + uuid);
                 Log.d(TAG, "DetailActivity onCreate mSet.getNumberOfFrag() = " + mSet.getNumberOfFrag());
             }
@@ -84,10 +92,9 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if ((mSet.getTimeOfRep()==0) &&((mSet.getReps()==0))){
-                    int number = mSet.getNumberOfFrag();
-                    SetLab.removeSet(number);
-                }
+                //обновляем фрагмент подхода в базе данных
+                mDBHelper.updateSetFragment(mDataSet);
+
                 //прячем экранную клавиатуру
                 takeOffSoftInput();
                 //завершаем
@@ -109,8 +116,8 @@ public class DetailActivity extends AppCompatActivity {
                         finish();
                         //если Добавить
                     } else {
-                        int number = mSet.getNumberOfFrag();
-                        SetLab.removeSet(number);
+                        //int number = mSet.getNumberOfFrag();
+                        //SetLab.removeSet(number);
                         //прячем экранную клавиатуру
                         takeOffSoftInput();
                         //завершаем
@@ -124,7 +131,7 @@ public class DetailActivity extends AppCompatActivity {
         if (extras.getInt(P.FROM_MAIN) ==P.TO_ADD){
             mTimeOfRepFrag.setText("0");
         }else {
-            mTimeOfRepFrag.setText(Float.toString(mSet.getTimeOfRep()));
+            mTimeOfRepFrag.setText(Float.toString(mDataSet.getTimeOfRep()));
         }
         mTimeOfRepFrag.addTextChangedListener(new TextWatcher() {
             @Override
@@ -136,11 +143,11 @@ public class DetailActivity extends AppCompatActivity {
                 //получаем float миллисекунд для времени между повторами из строчки mTimeOfRepFrag
                 float ft = getСountMilliSecond(mTimeOfRepFrag);
                 //и присваиваем его переменной mTimeOfRep класса Set
-                mSet.setTimeOfRep(ft);
+                mDataSet.setTimeOfRep(ft);
                 //доступность кнопки Ok, если оба значения ненулевые
-                mButtonOk.setEnabled(((mSet.getTimeOfRep()!=0))&&((mSet.getReps()!=0)));
+                mButtonOk.setEnabled(((mDataSet.getTimeOfRep()!=0))&&((mDataSet.getReps()!=0)));
 
-                Log.d(TAG, "countMilliSecond = " + mSet.getTimeOfRep());
+                Log.d(TAG, "countSecond = " + mDataSet.getTimeOfRep());
             }
 
             @Override
@@ -151,7 +158,7 @@ public class DetailActivity extends AppCompatActivity {
         if (extras.getInt(P.FROM_MAIN) ==P.TO_ADD){
             mRepsFrag.setText("0");
         }else {
-            mRepsFrag.setText(Integer.toString(mSet.getReps()));
+            mRepsFrag.setText(Integer.toString(mDataSet.getReps()));
         }
         mRepsFrag.addTextChangedListener(new TextWatcher() {
             @Override
@@ -163,11 +170,11 @@ public class DetailActivity extends AppCompatActivity {
                 //получаем int количество повторений для фрагмента из строчки mRepsFrag
                 int ir = getСountReps(mRepsFrag);
                 //и присваиваем его переменной mReps класса Set
-                mSet.setReps(ir);
+                mDataSet.setReps(ir);
                 //доступность кнопки Ok, если оба значения ненулевые
-                mButtonOk.setEnabled(((mSet.getTimeOfRep()!=0))&&((mSet.getReps()!=0)));
+                mButtonOk.setEnabled(((mDataSet.getTimeOfRep()!=0))&&((mDataSet.getReps()!=0)));
 
-                Log.d(TAG, "countReps = " + mSet.getReps());
+                Log.d(TAG, "countReps = " + mDataSet.getReps());
             }
 
             @Override
@@ -179,8 +186,10 @@ public class DetailActivity extends AppCompatActivity {
         //Log.d(TAG, "NumberOfFrag = " + (mSet.getNumberOfFrag() + 1));
         if (extras.getInt(P.FROM_MAIN) ==P.TO_ADD){
             mNumberOfFrag.setText("1");
+        }else if (extras.getInt(DETAIL_REQUEST) == 111){
+            mNumberOfFrag.setText(Integer.toString(mDataSet.getNumberOfFrag()));
         }else {
-            mNumberOfFrag.setText(Integer.toString(mSet.getNumberOfFrag() + 1));
+            mNumberOfFrag.setText(Integer.toString(mDataSet.getNumberOfFrag() + 1));
         }
 
 
@@ -191,7 +200,7 @@ public class DetailActivity extends AppCompatActivity {
         imm.showSoftInput(mTimeOfRepFrag, 0);
 
         //доступность кнопки Ok в момент появления экрана редактирования (если изменить - доступна)
-        if ((Integer.parseInt( mTimeOfRepFrag.getText().toString())==0) &&
+        if ((Float.parseFloat( mTimeOfRepFrag.getText().toString())==0) &&
                 ((Integer.parseInt( mRepsFrag.getText().toString())==0))){
             mButtonOk.setEnabled(false);
         }

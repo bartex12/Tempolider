@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
@@ -25,8 +26,11 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -101,6 +105,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     private int mTotalReps = 0;  //общее количество повторений в подходе
     private int mCurrentTotalReps = 0; //суммарное текущее количество повторений
     private int mCountFragment = 0;  //номер фрагмента подхода
+    private int mTotalCountFragment = 0;  //количество фрагментов в подходе
 
     private boolean workOn = false; //признак начала работы
     private boolean end = false; //признак окончания подхода
@@ -124,7 +129,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     int fromActivity; //код -откуда пришли данные 111 --Main, 222-TimeMeterActivity, 333-ListOfFilesActivity
     private String typeOfFile;  //тип файла из ListOfFileActivity
     private String date;  //дата из ListOfFileActivity
-    private String finishFileName = FileSaver.FINISH_FILE_NAME; //имя файла с раскладкой
+    private String finishFileName = P.FINISH_FILE_NAME; //имя файла с раскладкой
 
     int accurancy; //точность отсечек - количество знаков после запятой - от MainActivity
     boolean sound = true; // включение / выключение звука
@@ -132,7 +137,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     private SharedPreferences shp; //предпочтения для записи задержки общей для всех раскладок
     private int  timeOfDelay = 0; //задержка в секундах
 
-
+    TempDBHelper mTempDBHelper = new TempDBHelper(this);
+    long fileId; //id файла, загруженного в темполидер
+    //Временный список отсечек по кругам для записи в базу, если будет нужно (в диалоге сохранения)
+    ArrayList<String> repTimeList = new ArrayList<>();
 
     // Метод интерфейса из класса SetListFragment
     @Override
@@ -142,24 +150,25 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         mRepsLabel.setText(reps);
     }
 
-    // Метод интерфейса из класса SaverFragment(класс сделан для диалога сохранения файла)
-    //dataSave список отсечек секундомера или раскладок темполидера
+
     //nameFile - имя файла для записи в список сохранённых файлов
-    //like - флаг : добавить в избранные или нет
     @Override
-    public void onArrayListTransmit(ArrayList<String> dataSave, String nameFile) {
+    public void onArrayListTransmit(String nameFile) {
 
         if (fromActivity ==111) {
+            Log.d(TAG, "SingleFragmentActivity - onArrayListTransmit fromActivity = " +
+                    fromActivity);
             //Если данные пришли из MainActivity,
-            finishFileName = saveDataAndFilename(dataSave, nameFile,
-                    FILENAME_OTSECHKI_TEMP , SingleFragmentActivity.TYPE_TEMPOLEADER);
-            Log.d(TAG, "SingleFragmentActivity - onArrayListTransmit ii = " + fromActivity);
+            finishFileName = saveDataAndFilename(nameFile,
+                    P.FILENAME_OTSECHKI_TEMP , P.TYPE_TEMPOLEADER);
             //выводим имя файла на экран
             mNameOfFile.setText(finishFileName);
 
+        //если данные пришли  от секундомера - отсечки
         } else if (fromActivity == 222) {
-            //если данные пришли  от секундомера - отсечки
-            finishFileName = saveDataAndFilename(dataSave, nameFile,
+            Log.d(TAG, "SingleFragmentActivity - onArrayListTransmit fromActivity = " +
+                    fromActivity);
+            finishFileName = saveDataAndFilename(nameFile,
                     FILENAME_OTSECHKI_SEC , SingleFragmentActivity.TYPE_TIMEMETER);
             //выводим имя файла на экран
             mNameOfFile.setText(finishFileName);
@@ -176,7 +185,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 def = FILENAME_OTSECHKI_SEC;
             }
             //и устанавливаем соответствующие параметры
-            finishFileName = saveDataAndFilename(dataSave, nameFile, def , typeOfFile);
+            finishFileName = saveDataAndFilename(nameFile, def , typeOfFile);
             //выводим имя файла на экран
             mNameOfFile.setText(finishFileName);
         }
@@ -280,20 +289,21 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 //Получаем время задержки в мс
                 countMillisDelay = timeOfDelay*1000;
 
+               // рассчитываем время между повторениями и количество повторений
+                //   для первого фрагмента подхода до начала работы таймера
+
                 //получаем время между повторениями mCountFragment = 0 фрагмента подхода
-                countMilliSecond = SetLab.getSet(mCountFragment).getTimeOfRep()*1000;
+                countMilliSecond = mTempDBHelper.
+                        getTimeOfRepInPosition(fileId, mCountFragment)*1000;
+                Log.d(TAG, "Время между повторениями = " + countMilliSecond);
 
                 //получаем количество повторений для mCountFragment = 0 фрагмента подхода
-                countReps =  SetLab.getSet(mCountFragment).getReps();
+                countReps = mTempDBHelper.getRepsInPosition(fileId, mCountFragment);
+                Log.d(TAG, "Количество повторений во фрагменте подхода = " + countReps);
 
-                //посчитаем общее врямя выполнения подхода в секундах
-                mTimeOfSet = SetLab.countSetTime();
-
-                //посчитаем общее количество повторений в подходе
-                mTotalReps = SetLab.countTotalReps();
-
-                //покажем общее время подхода и общее число повторений в подходе
-                showTotalValues(mTimeOfSet,mTotalReps, mKvant);
+                //получаем количество фрагментов в выполняемом подходе. Если было удаление или добавление
+                //фрагмента подхода, нужно пересчитывать каждый раз
+                mTotalCountFragment = mTempDBHelper.getSetFragmentsCount(fileId);
 
                 //Покажем таймер задержки
                 mtextViewCountDown.setText(String.valueOf(timeOfDelay));
@@ -381,11 +391,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         Intent intent = getIntent();
         //считываем значение FROM_ACTIVITY из интента
         // MainActivity =111   TIME_GRAF_ACTIVITY = 222    TabBarActivity = 333
-        fromActivity = intent.getIntExtra(P.FROM_ACTIVITY,0);
-        //получаем имя файла из интента
-        finishFileName = intent.getStringExtra(P.FINISH_FILE_NAME);
-        Log.d(TAG, " finishFileName =  " + finishFileName);
-
+        fromActivity = intent.getIntExtra(P.FROM_ACTIVITY,111);
 
         //если интент пришел от MainActivity, список должен быть очищен от старых данных
         //а SetLab должен быть обнулён, после этого нужно считать данные из файла
@@ -393,43 +399,66 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         if (fromActivity == 111){
             Log.d(TAG, " fromActivity =  " + fromActivity);
 
-            //читаем сохранённый файл с ОТСЕЧКАМИ
-            mListTimeTransfer = readArrayList(FileSaver.FILENAME_OTSECHKI_TEMP);
-            //выводим имя файла на экран
-            mNameOfFile.setText(FileSaver.FILENAME_OTSECHKI_TEMP);
-            //mNameButton.setText(FileSaver.FILENAME_OTSECHKI_TEMP);
+            //плучаем имя последнего файла темполидера из преференсис (запись в onDestroy )
+            shp = getPreferences(MODE_PRIVATE);
+            //имя файла  = null, если не было записи в преференсис-это возможно при первом запуске
+            // тогда присваиваем имя записи в базе, сделанной в onCreate MainActivity
+            finishFileName = shp.getString(P.KEY_FILENAME,P.FILENAME_OTSECHKI_TEMP);
+            Log.d(TAG, " fromActivity =  " + fromActivity +" mNameOfFile = " + finishFileName);
 
-            if (mListTimeTransfer!=null) {
-                //заполняем синглет-держатель отсечек новыми данными из списка отсечек
-                SetLab setLab = SetLab.get();
-                setLab.addAllSetInSetLabFromFormatList(mListTimeTransfer);
-            }
+            //выводим имя файла на экран
+            mNameOfFile.setText(finishFileName);
+
+            //получаем id  файла с раскладкой по его имени finishFileName из интента
+            fileId = mTempDBHelper.getIdFromFileName(finishFileName);
+
+            //получаем количество фрагментов в выполняемом подходе если было удаление или добавление
+            //фрагмента подхода, нужно пересчитывать каждый раз - это по кнопке Старт
+            mTotalCountFragment = mTempDBHelper.getSetFragmentsCount(fileId);
+
+            //посчитаем общее врямя выполнения подхода в секундах
+            mTimeOfSet = mTempDBHelper.getSumOfTimeSet(fileId);
+            Log.d(TAG, "Суммарное время подхода  = " + mTimeOfSet);
+
+            //посчитаем общее количество повторений в подходе
+            mTotalReps = mTempDBHelper.getSumOfRepsSet(fileId);
+            Log.d(TAG, "Суммарное количество повторений  = " + mTotalReps);
+
+            //покажем общее время подхода и общее число повторений в подходе
+            showTotalValues(mTimeOfSet,mTotalReps, mKvant);
 
             //если интент пришел от TimeGrafActivity, он принёс с собой список отсечек
         }else if (fromActivity == 222){
             Log.d(TAG, " SingleFragmentActivity fromActivity =  " + fromActivity);
-
             //получаем имя файла из интента
-            finishFileName = intent.getStringExtra(FileSaver.FINISH_FILE_NAME);
-            //выводим имя файла на экран
-            Log.d(TAG, " SingleFragmentActivity finishFileName =  " + finishFileName);
+            finishFileName = intent.getStringExtra(P.FINISH_FILE_NAME);
             //finishFileName=null, если не было записи в преференсис- тогда присваиваем имя
             //единственной записи в базе, сделанной в onCreate MainActivity
             if (finishFileName==null){
                 finishFileName = P.FILENAME_OTSECHKI_SEC;
             }
+            //выводим имя файла на экран
+            Log.d(TAG, " SingleFragmentActivity finishFileName =  " + finishFileName);
+
             mNameOfFile.setText(finishFileName);
 
+            //получаем id  файла с раскладкой по его имени finishFileName из интента
+            fileId = mTempDBHelper.getIdFromFileName(finishFileName);
 
-            //получаем из базы данных  список отсечек
-            //mListTimeTransfer =  intent.getStringArrayListExtra(ARRAY_STRING_TRANSFER);
-            //mNameButton.setText(finishFileName);
-            //если интент пришел со списком отсечек, то можно сделать фрагмент на его основе
-            //if (mListTimeTransfer!=null){
-                //заполняем SetLab и Set данными из списка отсечек секундомера из интента
-              //  SetLab setLab = SetLab.get();
-               // setLab.fillSetFromArrayListSecundomer(mListTimeTransfer);
-            //}
+            //получаем количество фрагментов в выполняемом подходе если было удаление или добавление
+            //фрагмента подхода, нужно пересчитывать каждый раз - это по кнопке Старт
+            mTotalCountFragment = mTempDBHelper.getSetFragmentsCount(fileId);
+
+            //посчитаем общее врямя выполнения подхода в секундах
+            mTimeOfSet = mTempDBHelper.getSumOfTimeSet(fileId);
+            Log.d(TAG, "Суммарное время подхода  = " + mTimeOfSet);
+
+            //посчитаем общее количество повторений в подходе
+            mTotalReps = mTempDBHelper.getSumOfRepsSet(fileId);
+            Log.d(TAG, "Суммарное количество повторений  = " + mTotalReps);
+
+            //покажем общее время подхода и общее число повторений в подходе
+            showTotalValues(mTimeOfSet,mTotalReps, mKvant);
 
             //если интент пришёл от TabBarActivity, считывание данных из SetLab идёт
             //в onResume фрагмента темполидера, а здесь только берём из интента тип файла
@@ -522,6 +551,13 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     @Override
     protected void onDestroy() {
         super.onDestroy();
+
+        //записываем последнее имя файла на экране в преференсис активности
+        shp = getPreferences(MODE_PRIVATE);
+        SharedPreferences.Editor edit = shp.edit();
+        edit.putString(P.KEY_FILENAME, finishFileName);
+        edit.apply();
+
         Log.d(TAG, "SingleFragmentActivity - onDestroy");
         //**************** сохраняем  в файл список файлов с раскладками *********
         //получаем список имён файлов из FileSaverLab
@@ -587,15 +623,15 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
             case R.id.menu_item_new_frag:
                 //при выборе плюсика на панели инструментов передаём uuid нового фрагмента подхода  newSet
                 //в фрагмент детализации SetDetailFragment в интенте
-                Set newSet = new Set();
-                SetLab setLab = SetLab.get();
-                newSet.setNumberOfFrag(setLab.getSets().size());
-                setLab.addSet(newSet);
-                UUID uuid = newSet.getId();
+                //Set newSet = new Set();
+                //SetLab setLab = SetLab.get();
+                //newSet.setNumberOfFrag(setLab.getSets().size());
+                //setLab.addSet(newSet);
+                //UUID uuid = newSet.getId();
 
                 //вызываем DetailActivity и передаём туда UUID
                 Intent intentDetail = new Intent(getBaseContext(), DetailActivity.class);
-                intentDetail.putExtra(DetailActivity.INTENT_SET_UUID,uuid);
+                intentDetail.putExtra(DetailActivity.INTENT_SET_UUID,0);
                 startActivity(intentDetail);
                 return true;
 
@@ -626,11 +662,11 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 String name = mNameOfFile.getText().toString();
                 Intent intent = new Intent(this, ChangeTempActivity.class);
                 //передаём позицию списка, на которой сделано нажатие: так как с тулбара, передаём 0
-                intent.putExtra(ChangeTempActivity.POSITION, 0);
+                intent.putExtra(P.CHANGE_TEMP_POSITION, 0);
                 //передаём имя файла
-                intent.putExtra(ChangeTempActivity.NAME_OF_FILE, name);
+                intent.putExtra(P.CHANGE_TEMP_NAME_OF_FILE, name);
                 //передаём request_code
-                intent.putExtra(ChangeTempActivity.CHANGE_REQUEST, request_code);
+                intent.putExtra(P.CHANGE_TEMP_CHANGE_REQUEST, request_code);
                 startActivity(intent);
                 return true;
         }
@@ -662,10 +698,12 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         int decim = (int)((millisTime%1000)/kvant);
 
         // общее время подхода
-        String time = String.format("Время  %d:%02d.%d",minut,second,decim);
+        String timeTotal = String.format("Время  %d:%02d.%d",minut,second,decim);
         // общее количество повторений в подходе
-        String reps = String.format("Количество  %02d", totalReps);
-        onShowTotalValues(time,reps);
+        String repsTotal = String.format("Количество  %02d", totalReps);
+        //onShowTotalValues(time,reps);
+        mTimeLabel.setText(timeTotal);
+        mRepsLabel.setText(repsTotal);
     }
 
     // показать изменения в пользовательском потоке
@@ -764,16 +802,17 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                     mTotalKvant = 0;  //при этом обнуляя текущее время между повторами
                     mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 200);
                 }//переходим к следующему фрагменту
-                if ((mCurrentRep >= countReps) && (mCountFragment < SetLab.getSets().size() - 1)) {
+                if ((mCurrentRep >= countReps) && (mCountFragment < mTotalCountFragment - 1)) {
                     mCountFragment++;
-                    countMilliSecond = SetLab.getSet(mCountFragment).getTimeOfRep()*1000;
-                    countReps =  SetLab.getSet(mCountFragment).getReps();
+                    countMilliSecond = mTempDBHelper.
+                            getTimeOfRepInPosition(fileId, mCountFragment)*1000;
+                    countReps = mTempDBHelper.getRepsInPosition(fileId, mCountFragment);
                     Log.d(TAG, "countMilliSecond = " + countMilliSecond + "  countReps = " + countReps);
                     mTotalKvant = 0;
                     mCurrentRep = 0;
                 }
                 //если в последнем фрагменте - прекращаем выполнение
-                if ((mCurrentRep >= countReps) && (mCountFragment >= SetLab.getSets().size() - 1)) {
+                if ((mCurrentRep >= countReps) && (mCountFragment >= mTotalCountFragment - 1)) {
                     if (mTimer != null) mTimer.cancel();
                     Log.d(TAG, "mTimer.cancel");
                     mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 500);
@@ -849,74 +888,70 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
     //запись данных в файл и запись имени файла в список сохранённых файлов
     //в зависимости от имени, введённого в диалоге сохранения и типа данных
-    public  String saveDataAndFilename(ArrayList<String> dataSave,
-                                     String nameFile, String fileNameDefoult, String typeData){
+    public  String saveDataAndFilename(String nameFile, String fileNameDefoult, String typeData){
+
         String finishFileName;
-        //добавляем в синглет списка файлов новое имя
-        //получаем ссылку на экземпляр FileSaverLab
-        FileSaverLab fileSaverLab = FileSaverLab.get();
-        FileSaver fileSaver = new FileSaver();
-        //получаем список данных о сохранённых файлов
-        List<FileSaver> listOfFiles = fileSaverLab.getFileSavers();
-        //если имя файла- пустая строка, то пишем отсечки в файл
-        // с именем по умолчанию fileNameDefoult, а в синглет ничего не добавляем если
-        // запись с именем fileNameDefoult уже была
+        //получаем дату и время в нужном для базы данных формате
+        String dateFormat  = mTempDBHelper.getDateString();
+        String timeFormat  = mTempDBHelper.getTimeString();
+
+        //если строка имени пустая
         if (nameFile.isEmpty()) {
+            //имя будет fileNameDefoult
             finishFileName = fileNameDefoult;
-            //пишем отсечки dataSave в файл с именем fileNameDefoult
-            writeArrayList(dataSave, fileNameDefoult);
-            //s = fileNameDefoult;
-            //проверяем, не повторяется ли запись с именем fileNameDefoult
-            boolean notFirst = false;
-            for (FileSaver fs: listOfFiles){
-                String name = fs.getTitle();
-                if (name.equalsIgnoreCase(fileNameDefoult)){
-                    notFirst = true;
-                }
-            }
-            //если запись с таким именем уже есть, пропускаем запись имени файла (сам файл записали уже)
-            if (notFirst){
-                Log.d(TAG, "SingleFragmentActivity saveDataAndFilename  notFirst " +
-                        "Пропускаем запись имени файла ");
-            }else{
-                //если записи с таким именем нет, пишем имя файла в файл
-                //даём имя по умолчанию
-                fileSaver.setTitle(fileNameDefoult);
-                fileSaver.setTipe(typeData);  //даём тип файлу
-                fileSaver.setDate(); //пишем текущую дату и время, их можно прочитать где-то
-                //добавляем данные файла в список-хранитель данных
-                fileSaverLab.addFileSaver(fileSaver,0);
+            Log.d(TAG, "saveDataAndFilename nameFile = " + nameFile);
 
-                //получаем весь список имён файлов из FileSaverLab
-                ArrayList<String> listNamesOfFiles = getListNamesOfFiles();
-                //пишем список имён в файл имён
-                writeArrayList(listNamesOfFiles,FILENAME_NAMES_OF_FILES);
-                Log.d(TAG, "SingleFragmentActivity saveDataAndFilename " +
-                        "В listNamesOfFiles строк =  " + listNamesOfFiles.size());
+            //проверяем, есть ли в базе запись с таким именем
+            long repeatId = mTempDBHelper.getIdFromFileName (finishFileName);
+            Log.d(TAG,"saveDataAndFilename repeatId = " + repeatId);
+            //если есть (repeatId не равно -1), стираем её и потом пишем новые данные под таким именем
+            if (repeatId != -1){
+                mTempDBHelper.deleteFileAndSets(repeatId);
             }
-            //если имя файла-  НЕ пустая строка, то пишем отсечки в файл
-            // с именем nameFile, а в синглет  добавляем FileSaver с данными о файле
-        } else {
+        }else {
             finishFileName = nameFile;
-            //пишем отсечки dataSave в файл с именем nameFile
-            writeArrayList(dataSave, nameFile);
-            //s = nameFile;
-            //даём имя, считанное из строки
-            fileSaver.setTitle(nameFile);
-            fileSaver.setTipe(typeData);  //даём тип файлу
-            fileSaver.setDate(); //пишем текущую дату и время, их можно прочитать где-то
-            //добавляем данные файла в список-хранитель данных
-            fileSaverLab.addFileSaver(fileSaver);
-
-            //получаем весь список имён файлов из FileSaverLab
-            ArrayList<String> listNamesOfFiles = getListNamesOfFiles();
-            //пишем список имён в файл имён
-            writeArrayList(listNamesOfFiles,FILENAME_NAMES_OF_FILES);
-            Log.d(TAG, "SingleFragmentActivity saveDataAndFilename " +
-                  "В listNamesOfFiles строк =  " + listNamesOfFiles.size());
         }
-        Log.d(TAG, "SingleFragmentActivity saveDataAndFilename В списке FileSaverLab файлов" +
-                "  Количество файлов = " + fileSaverLab.getFileSavers().size());
+        Log.d(TAG, "saveDataAndFilename finishFileName = " + finishFileName);
+        //======Начало добавления записей в таблицы DataFile и DataSet=========//
+        //если имя файла не пустое или fileNameDefoult
+        //создаём экземпляр класса DataFile в конструкторе
+        DataFile file1 = new DataFile(finishFileName, dateFormat, timeFormat,
+                null,null, typeData, 6);
+        //добавляем запись в таблицу TabFile, используя данные DataFile
+        long file1_id =  mTempDBHelper.addFile(file1);
+
+        //находим фрагмент по id контейнера
+        SetListFragment fr = (SetListFragment)getSupportFragmentManager().
+                findFragmentById(R.id.fragment_container);
+        ListView listviewFrag = fr.mListView;
+        //меняем задний фон строк списка
+        //listviewFrag.setBackgroundColor(Color.RED);
+
+        //получаем адаптер списка для доступа к значениям фрагментов подхода
+        ListAdapter sara = listviewFrag.getAdapter();
+
+        //готовим данные фрагментов подхода
+        // если индекс =0, то первое значение
+        for (int j = 0; j < sara.getCount(); j++ ) {
+            float time_now;
+            int reps_now;
+            int number_now;
+             HashMap<String,Object> map = ( HashMap<String,Object>)sara.getItem(j);
+            //TextView tvTime = view.findViewById(R.id.time_item_set_textview);
+            //TextView tvReps = view.findViewById(R.id.reps_item_set_textview);
+            //TextView tvNumber = view.findViewById(R.id.mark_item_set_textview);
+            time_now = Float.parseFloat((map.get(P.ATTR_TIME).toString()));
+            reps_now = (int)map.get(P.ATTR_REP);
+            number_now = (int)map.get(P.ATTR_NUMBER);
+
+            //создаём экземпляр класса DataSet в конструкторе
+            DataSet set = new DataSet(time_now,reps_now,number_now);
+            //добавляем запись в таблицу TabSet, используя данные DataSet
+            mTempDBHelper.addSet(set, file1_id);
+            Log.d(TAG, "SingleFragmentActivity saveDataAndFilename записан файл = " +
+                    finishFileName + "  Количество фрагментов = " + sara.getCount());
+            //======Окончание добавления записей в таблицы DataFile и DataSet=========//
+            }
 
         return finishFileName;
     }

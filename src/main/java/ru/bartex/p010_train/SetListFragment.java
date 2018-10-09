@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TabSet;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 
@@ -46,10 +47,6 @@ public class SetListFragment extends Fragment {
 
     static final int request_code = 111;
 
-    Set mSet;
-    SetLab mSetLab;
-    List<Set> mSets;
-    int array_size;
     ArrayList<Map<String, Object>> data;
     Map<String,Object> m;
     SimpleAdapter sara;
@@ -57,16 +54,12 @@ public class SetListFragment extends Fragment {
 
     private float mTimeOfSet = 0;   //общее время выполнения подхода в секундах
     private int mTotalReps = 0;  //общее количество повторений в подходе
-    //private final long mKvant = 100;//время в мс между срабатываниями TimerTask
+
     private int mCountFragment = 0;  //номер фрагмента подхода
     boolean end = false;  //признак окончания работы
 
-    final String ATTR_TIME = "time";
-    final String ATTR_REP = "rep";
-    final String ATTR_NUMBER = "number";
-
-    private static final String ARG_NAME_OF_FILE = "NameOfFile";
-    private String finishFileName = FileSaver.FINISH_FILE_NAME;
+    private String finishFileName;
+    long finishFileId;
 
     TempDBHelper mTempDBHelper;
 
@@ -79,7 +72,7 @@ public class SetListFragment extends Fragment {
 
     public static SetListFragment newInstance(String nameOfFile){
         Bundle args = new Bundle();
-        args.putString(ARG_NAME_OF_FILE,nameOfFile);
+        args.putString(P.ARG_NAME_OF_FILE,nameOfFile);
         SetListFragment fragment = new SetListFragment();
         fragment.setArguments(args);
         return fragment;
@@ -112,7 +105,7 @@ public class SetListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "SetListFragment: onCreate  ");
 
-        finishFileName = getArguments().getString(ARG_NAME_OF_FILE);
+        finishFileName = getArguments().getString(P.ARG_NAME_OF_FILE);
         //для фрагментов требуется так разрешить появление меню
         setHasOptionsMenu(true);
     }
@@ -220,16 +213,23 @@ public class SetListFragment extends Fragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
 
-                        // находим позицию строки, на которую сделано нажатие
-                        int pos = acmi.position;
-                        //получаем список
-                        mSets = SetLab.getSets();
-                        // удаляем нажатую строку
-                        mSets = SetLab.removeSet(pos);
+                        //id файла с именем finishFileName
+                        finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
+
+                        //удаляем строку с номером (acmi.position+1), относящуюся к файлу с id =finishFileId
+                        mTempDBHelper.deleteSet(finishFileId, (acmi.position+1));
+
+                        Log.d(TAG,"SetListFragment CM_DELETE_ID  имя =" + finishFileName +
+                                "  Id = " + finishFileId +
+                                "  acmi.position+1 = " + (acmi.position+1) +
+                                "  acmi.id = " + acmi.id);
+
                         //пересчитывваем номера фрагментов подхода
-                        SetLab.reRangeSet(pos);
+                        mTempDBHelper.rerangeSetFragments(finishFileId);
+
                         //обновляем данные списка фрагмента активности
                         updateAdapter();
+
                         //вычисляем и показываем общее время выполнения подхода и количество повторов в подходе
                         calculateAndShowTotalValues();
                     }
@@ -241,11 +241,17 @@ public class SetListFragment extends Fragment {
                 //если выбран пункт Изменить запись
             } else if (item.getItemId() == CHANGE_ID) {
 
+                //id файла с именем finishFileName
+                finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
+
+                DataSet dataSet = mTempDBHelper.getAllSetData(finishFileId, acmi.position);
+
                 Intent intent = new Intent(getContext(), DetailActivity.class);
-                intent.putExtra(DetailActivity.POSITION, acmi.position);
+                intent.putExtra(DetailActivity.DETAIL_DATA_SET, dataSet);
                 intent.putExtra(DetailActivity.DETAIL_REQUEST, request_code);
-                Log.d(TAG, "SetListFragment CM_CHANGE_ID acmi.position = " + acmi.position);
-                startActivity(intent);
+                Log.d(TAG, "SetListFragment CM_CHANGE_ID acmi.position = " + acmi.position+
+                                "  acmi.id = " + acmi.id);
+               startActivity(intent);
                 return true;
 
             } else if (item.getItemId() == CHANGE_TEMP_ID) {
@@ -286,54 +292,50 @@ public class SetListFragment extends Fragment {
 
     public void updateAdapter() {
         Log.d(TAG, "SetListFragment: updateAdapter() ");
-        //получаем экземпляр SetLab
-        //mSetLab = SetLab.get();
-        //получаем список объектов класса Set
-        //mSets =  mSetLab.getSets();
-        //получаем размер списка
-        //array_size = mSets.size();
-
-
-
             //получаем id записи с таким именем
             long finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
             Log.d(TAG,"SetListFragment  имя =" + finishFileName + "  Id = " + finishFileId );
 
             //получаем курсор с данными подхода с id = finishFileId
             Cursor cursor = mTempDBHelper.getAllSetFragments(finishFileId);
+            Log.d(TAG, "SetListFragment: updateAdapter() cursor.getCount() = " + cursor.getCount());
+
             //Список с данными для адаптера
             data = new ArrayList<Map<String, Object>>(cursor.getCount());
             //проходим по курсору и берём данные
             if (cursor.moveToFirst()) {
                 do {
                     float time  = cursor.getFloat(cursor.getColumnIndex(TabSet.COLUMN_SET_TIME));
-                    String timeFormat = String.format("%.2f",time);
+                    //пока не используем, так как появляется запятая вместо точки
+                    //String timeFormat = String.format("%.2f",time);
                     int reps_now = cursor.getInt(cursor.getColumnIndex(TabSet.COLUMN_SET_REPS));
                     int number_now = cursor.getInt(cursor.getColumnIndex(TabSet.COLUMN_SET_FRAG_NUMBER));
 
-                    Log.d(TAG,"SetListFragment time_now = " + timeFormat +
+                    Log.d(TAG,"SetListFragment time_now = " + time +
                             "  reps_now = " + reps_now + "  number_now = " + number_now);
 
                     m = new HashMap<>();
-                    m.put(ATTR_TIME, timeFormat);
-                    m.put(ATTR_REP, reps_now);
-                    m.put(ATTR_NUMBER, number_now);
+                    //m.put(P.ATTR_TIME, timeFormat);
+                    m.put(P.ATTR_TIME, time);
+                    m.put(P.ATTR_REP, reps_now);
+                    m.put(P.ATTR_NUMBER, number_now);
                     data.add(m);
 
                 } while (cursor.moveToNext());
-
-                String[] from = {ATTR_TIME, ATTR_REP, ATTR_NUMBER};
-                int[] to = {R.id.time_item_set_textview, R.id.reps_item_set_textview,
-                        R.id.mark_item_set_textview};
-                //заводим данные в адаптер и присваиваем его встроенному списку ListFragment
-                sara = new SimpleAdapter(getContext(), data, R.layout.list_item_set_textview, from, to);
-                //устанавливаем свой биндер
-                sara.setViewBinder(new MyViewBinder());
-                mListView.setAdapter(sara);
-                //setListAdapter(sara);
-                //Чтобы сделать что-то при щелчке на галке, нужно расширить адаптер и сделать
-                // слушатель внутри View на флажок
+            }else {
+                data.clear();
             }
+        String[] from = {P.ATTR_TIME, P.ATTR_REP, P.ATTR_NUMBER};
+        int[] to = {R.id.time_item_set_textview, R.id.reps_item_set_textview,
+                R.id.mark_item_set_textview};
+        //заводим данные в адаптер и присваиваем его встроенному списку ListFragment
+        sara = new SimpleAdapter(getContext(), data, R.layout.list_item_set_textview, from, to);
+        //устанавливаем свой биндер
+        sara.setViewBinder(new MyViewBinder());
+        mListView.setAdapter(sara);
+        //setListAdapter(sara);
+        //Чтобы сделать что-то при щелчке на галке, нужно расширить адаптер и сделать
+        // слушатель внутри View на флажок
     }
 
     // класс для изменения цвета элемента строки - маркера номера фрагмента подхода
@@ -360,9 +362,13 @@ public class SetListFragment extends Fragment {
     private void calculateAndShowTotalValues(){
 
         //посчитаем общее врямя выполнения подхода в секундах
-        mTimeOfSet = SetLab.countSetTime();
+        mTimeOfSet = mTempDBHelper.getSumOfTimeSet(finishFileId);
+        Log.d(TAG, "Суммарное время подхода  = " + mTimeOfSet);
+
         //посчитаем общее количество повторений в подходе
-        mTotalReps = SetLab.countTotalReps();
+        mTotalReps = mTempDBHelper.getSumOfRepsSet(finishFileId);
+        Log.d(TAG, "Суммарное количество повторений  = " + mTotalReps);
+
         //покажем общее время подхода и общее число повторений в подходе
         showTotalValues(mTimeOfSet, mTotalReps, SingleFragmentActivity.mKvant);
     }
@@ -391,6 +397,8 @@ public class SetListFragment extends Fragment {
 
         // общее количество повторений в подходе
         String reps = String.format("Количество  %d", totalReps);
+
+        //вызываем метод интерфейса для передачи time,reps из фрагмента в активность
         mShowTotalValuesListener.onShowTotalValues(time,reps);
     }
 

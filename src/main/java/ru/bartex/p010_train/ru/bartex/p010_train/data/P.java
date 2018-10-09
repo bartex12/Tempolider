@@ -1,7 +1,11 @@
 package ru.bartex.p010_train.ru.bartex.p010_train.data;
 
+import android.content.Context;
 import android.database.Cursor;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -15,8 +19,16 @@ public class P {
 
     //идентификатор интента : Откуда пришёл?
     public static final String FROM_ACTIVITY = "ru.bartex.p010_train_from_activity";
+    //пришёл от TabBarActivity
+    public static final int TAB_BAR_ACTIVITY = 333;
+    //пришёл от TimeGrafactivity
+    public static final int TIME_GRAF_ACTIVITY = 222;
+    //пришёл от MainActivity
+    public static final int MAIN_ACTIVITY = 111;
+    // MainActivity =111   TIME_GRAF_ACTIVITY = 222    TabBarActivity = 333
     //идентификатор интента : пришёл от Main
     public final static String FROM_MAIN = "ru.bartex.p010_train.FROM_MAIN";
+
     // идёт к расчёту количества прожитых дней
     public final static int TO_SEC = 1111;
     //идёт к расчёту биоритмов`
@@ -56,6 +68,7 @@ public class P {
     //имя файла из строки в TabBarActivity
     public static final String NAME_OF_FILE = "ru.bartex.p010_train.name_of_file";
     public static final String FINISH_FILE_NAME = "Раскладка без имени";
+    public static final String FINISH_FILE_ID = "ru.bartex.p010_train_date_fileId";
     //имя файла для имени последнего сохранённого файла
     public static final String NAME_OF_LAST_FILE = "ru.bartex.p010_train.name_of_last_file";
     // ключ для имени последнего сохранённого файла
@@ -64,10 +77,50 @@ public class P {
     public static final String NAME_OF_LAST_FILE_ZERO = "У вас нет сохранённых файлов";
 
     public static final String KEY_DELAY = "DELAY";
+    public static final String KEY_FILENAME = "FILENAME";
 
-    public final static String ATTR_ITEM_GRAF = "ru.bartex.p008_complex_imit_real.item";
-    public final static String ATTR_TIME_GRAF = "ru.bartex.p008_complex_imit_real.time";
-    public final static String ATTR_DELTA_GRAF = "ru.bartex.p008_complex_imit_real.delta";
+    public final static String ATTR_TIME = "ru.bartex.p010_train.ATTR_TIME";
+    public final static String ATTR_REP = "ru.bartex.p010_train.ATTR_REP";
+    public final static String ATTR_NUMBER = "ru.bartex.p010_train.ATTR_NUMBER";
+
+
+    public final static String ATTR_ITEM_GRAF = "ru.bartex.p010_train.item";
+    public final static String ATTR_TIME_GRAF = "ru.bartex.p010_train.time";
+    public final static String ATTR_DELTA_GRAF = "ru.bartex.p010_train.delta";
+
+    public static final String CHANGE_TEMP_POSITION = "ru.bartex.p010_train.position_ChangeTempActivity";
+    public static final String CHANGE_TEMP_NAME_OF_FILE = "ru.bartex.p010_train.nameOfFile_ChangeTempActivity";
+    public static final String CHANGE_TEMP_CHANGE_REQUEST = "ru.bartex.p010_train.changeRequest_ChangeTempActivity.";
+
+    public static final String ARG_NAME_OF_FILE = "ru.bartex.p010_train.NameOfFile";
+    public static final String ARG_NUMBER_ITEM_SEC = "ru.bartex.p010_train.NumberItemSec";
+    public static final String ARG_NUMBER_ITEM_TEMP = "ru.bartex.p010_train.NumberItemTemp";
+    public static final String ARG_NUMBER_ITEM_LIKE = "ru.bartex.p010_train.NumberItemLike";
+    public static final String ARG_DELAY = "ru.bartex.p010_train.delay";
+
+    public static final int DELETE_ACTION_SEC = 1;
+    public static final int CHANGE_ACTION_SEC = 2;
+    public static final int CANCEL_ACTION_SEC = 3;
+    public static final int DETAIL_ACTION_SEC = 4;
+    public static final int MOVE_LIKE_ACTION_SEC = 5;
+    public static final int MOVE_SEC_ACTION_SEC = 6;
+    public static final int MOVE_TEMP_ACTION_SEC = 7;
+
+    public static final int DELETE_ACTION_TEMP = 11;
+    public static final int CHANGE_ACTION_TEMP = 12;
+    public static final int CANCEL_ACTION_TEMP = 13;
+    public static final int DETAIL_ACTION_TEMP = 14;
+    public static final int MOVE_LIKE_ACTION_TEMP = 15;
+    public static final int MOVE_SEC_ACTION_TEMP = 16;
+    public static final int MOVE_TEMP_ACTION_TEMP = 17;
+
+    public static final int DELETE_ACTION = 21;
+    public static final int CHANGE_ACTION = 22;
+    public static final int CANCEL_ACTION = 23;
+    public static final int DETAIL_ACTION = 24;
+    public static final int MOVE_LIKE_ACTION = 25;
+    public static final int MOVE_SEC_ACTION = 26;
+    public static final int MOVE_TEMP_ACTION = 27;
 
     //====================================================================//
 

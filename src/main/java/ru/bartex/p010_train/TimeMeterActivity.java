@@ -60,13 +60,13 @@ public class TimeMeterActivity extends AppCompatActivity
     private boolean mRestart = false; //признак повторного старта (true)
     private boolean start = false;//признак нажатия на старт
     int ii = 0; //порядковый номер отсечки
-    //private String finishFileName = P.FINISH_FILE_NAME;
 
     //Временный список отсечек по кругам для записи в базу, если будет нужно (в диалоге сохранения)
     ArrayList<String> repTimeList = new ArrayList<>();
     //список данных для показа на экране
     ArrayList<Map<String, Object>> data = new ArrayList<>();
     SimpleAdapter sara;
+
     final String ATTR_ITEM = "ru.bartex.p008_complex_imit_real.item";
     final String ATTR_TIME = "ru.bartex.p008_complex_imit_real.time";
     final String ATTR_DELTA = "ru.bartex.p008_complex_imit_real.delta";
@@ -77,6 +77,7 @@ public class TimeMeterActivity extends AppCompatActivity
     private SharedPreferences prefNameOfLastFile;// предпочтения - имя последнего сохранённого файла
 
     TempDBHelper mTempDBHelper = new TempDBHelper(this);
+    String finishNameFile;//имя файла - или из метода интерфейса или по умолчанию
 
     // Метод интерфейса, в котором передаём имя,тип сохранения данных (показать или нет)
     //и пометить как избранные
@@ -98,17 +99,19 @@ public class TimeMeterActivity extends AppCompatActivity
             //если строка имени пустая
             if (nameFile.isEmpty()) {
                 //имя будет "Автосохранение секундомера"
-                nameFile = P.FILENAME_OTSECHKI_SEC;
+                finishNameFile = P.FILENAME_OTSECHKI_SEC;
 
             Log.d(TAG, "onNameAndGrafTransmit nameFile = " + nameFile);
 
             //проверяем, есть ли в базе запись с таким именем
-            long repeatId = mTempDBHelper.getIdFromFileName (nameFile);
+            long repeatId = mTempDBHelper.getIdFromFileName (finishNameFile);
             Log.d(TAG,"onNameAndGrafTransmit repeatId = " + repeatId);
             //если есть (repeatId не равно -1), стираем её и потом пишем новые данные под таким именем
             if (repeatId != -1){
                 mTempDBHelper.deleteFileAndSets(repeatId);
             }
+            }else {
+                finishNameFile = nameFile;
             }
             //======Начало добавления записей в таблицы DataFile и DataSet=========//
             //если имя файла не пустое или "Автосохранение секундомера"
@@ -478,12 +481,12 @@ public class TimeMeterActivity extends AppCompatActivity
                 //получаем из предпочтений имя файла и отправляем его в интенте
                 //если этого не делать, будет крах
                 prefNameOfLastFile = getPreferences(MODE_PRIVATE);
-                String finishFileName = prefNameOfLastFile.getString(P.LAST_FILE,
-                        P.NAME_OF_LAST_FILE_ZERO);
-                Log.d(TAG, "action_timing finishFileName = " + finishFileName);
+                finishNameFile = prefNameOfLastFile.getString(P.LAST_FILE,
+                        P.FILENAME_OTSECHKI_SEC);
+                Log.d(TAG, "action_timing finishFileName = " + finishNameFile);
                 Intent intentTiming = new Intent(this, TimeGrafActivity.class);
                 intentTiming.putStringArrayListExtra(TimeGrafActivity.REP_TIME_LIST,repTimeList);
-                intentTiming.putExtra(P.FINISH_FILE_NAME, finishFileName);
+                intentTiming.putExtra(P.FINISH_FILE_NAME, finishNameFile);
                 startActivity(intentTiming);
                 return true;
 
@@ -495,9 +498,6 @@ public class TimeMeterActivity extends AppCompatActivity
         }
         return super.onOptionsItemSelected(item);
     }
-
-
-
 
     //======================class MyTimerTask=================================//
     public class MyTimerTask extends TimerTask{

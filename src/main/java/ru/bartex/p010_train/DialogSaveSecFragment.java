@@ -27,7 +27,6 @@ import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
 public class DialogSaveSecFragment extends DialogFragment {
 
     static String TAG = "33333";
-    ArrayList<String> dataFromSec;
 
     public DialogSaveSecFragment(){}
 

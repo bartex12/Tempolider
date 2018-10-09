@@ -40,7 +40,6 @@ public class TimeGrafActivity extends AppCompatActivity {
     public static final String TAG ="33333";
 
     static final String REP_TIME_LIST = "ru.bartex.p010_train.repTimeList";
-    static final int TIME_GRAF_ACTIVITY = 222;
 
     ListView mListViewTiming;
     TextView nameOfFile;
@@ -48,10 +47,6 @@ public class TimeGrafActivity extends AppCompatActivity {
     private GraphView graphPace;
     LineGraphSeries<DataPoint> seriesPace;
     DataPoint[] pointPace1;
-
-    //final String ATTR_ITEM = "ru.bartex.p008_complex_imit_real.item";
-    //final String ATTR_TIME = "ru.bartex.p008_complex_imit_real.time";
-    //final String ATTR_DELTA = "ru.bartex.p008_complex_imit_real.delta";
 
     //список данных для показа на экране
     ArrayList<Map<String, Object>> data = new ArrayList<Map<String, Object>>();
@@ -217,37 +212,13 @@ public class TimeGrafActivity extends AppCompatActivity {
             case R.id.action_transfer:
                 Log.d(TAG, "action_transfer");
                 Intent intent = new Intent(this, SetListActivity.class);
-                intent.putExtra(P.FROM_ACTIVITY, TIME_GRAF_ACTIVITY);
+                intent.putExtra(P.FROM_ACTIVITY, P.TIME_GRAF_ACTIVITY);
                 intent.putExtra(P.FINISH_FILE_NAME, finishFileName);
                 startActivity(intent);
                 finish();
                 return true;
-
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    //Прочитать список  с данными из файла
-    private ArrayList<String> readArrayList( String fileName) {
-
-        ArrayList<String> arrayList = new ArrayList<>();
-
-        try {
-            // открываем поток для чтения
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    openFileInput(fileName)));
-            try {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    arrayList.add(line);
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return arrayList;
     }
 
     public void setParamSeries(LineGraphSeries<DataPoint> series){

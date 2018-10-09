@@ -13,6 +13,7 @@ import java.util.GregorianCalendar;
 
 import ru.bartex.p010_train.DataFile;
 import ru.bartex.p010_train.DataSet;
+import ru.bartex.p010_train.SetLab;
 
 import static ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile.COLUMN_DELAY;
 import static ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile.COLUMN_DESCRIPTION_OF_SPORT;
@@ -75,63 +76,104 @@ public class TempDBHelper extends SQLiteOpenHelper {
     }
 
     // Если записей в базе нет, вносим запись
-    public void createDefaultSetIfNeed()  {
+    public void createDefaultSetIfNeed() {
         int count = this.getFilesCount();
-        if(count ==0 ) {
+        if (count == 0) {
 
             //получаем дату и время в нужном для базы данных формате
-            String dateFormat  = getDateString();
-            String timeFormat  = getTimeString();
+            String dateFormat = getDateString();
+            String timeFormat = getTimeString();
 
             //создаём экземпляр класса DataFile в конструкторе
             DataFile file1 = new DataFile(P.FILENAME_OTSECHKI_SEC,
-                    dateFormat, timeFormat,"Подтягивание",
+                    dateFormat, timeFormat, "Подтягивание",
                     "Подтягивание на перекладине", P.TYPE_TIMEMETER, 6);
 
             //добавляем запись в таблицу TabFile, используя данные DataFile и получаем id записи
-            long file1_id =  this.addFile(file1);
+            long file1_id = this.addFile(file1);
 
             //создаём экземпляр класса DataSet в конструкторе
-            DataSet set1 = new DataSet(1,1,1);
+            DataSet set1 = new DataSet(2f, 1, 1);
             //добавляем запись в таблицу TabSet, используя данные DataSet
             this.addSet(set1, file1_id);
             // повторяем для всех фрагментов подхода
-            DataSet set2 = new DataSet(2,1,2);
+            DataSet set2 = new DataSet(2.5f, 1, 2);
             this.addSet(set2, file1_id);
-            DataSet set3 = new DataSet(3,1,3);
+            DataSet set3 = new DataSet(3f, 1, 3);
             this.addSet(set3, file1_id);
-            DataSet set4 = new DataSet(4,1,4);
+            DataSet set4 = new DataSet(3.5f, 1, 4);
             this.addSet(set4, file1_id);
 
             Log.d(TAG, "MyDatabaseHelper.createDefaultPersonIfNeed ... count = " +
                     this.getFilesCount());
+
+            //создаём экземпляр класса DataFile в конструкторе
+            DataFile file2 = new DataFile(P.FILENAME_OTSECHKI_TEMP,
+                    dateFormat, timeFormat, "Пистолетики",
+                    "Полиатлон", P.TYPE_TEMPOLEADER, 6);
+
+            //добавляем запись в таблицу TabFile, используя данные DataFile и получаем id записи
+            long file2_id = this.addFile(file2);
+
+            //создаём экземпляр класса DataSet в конструкторе
+            DataSet set11 = new DataSet(2.2f, 3, 1);
+            //добавляем запись в таблицу TabSet, используя данные DataSet
+            this.addSet(set11, file2_id);
+            // повторяем для всех фрагментов подхода
+            DataSet set22 = new DataSet(2.3f, 3, 2);
+            this.addSet(set22, file2_id);
+            DataSet set33 = new DataSet(2.5f, 4, 3);
+            this.addSet(set33, file2_id);
+            DataSet set44 = new DataSet(2.7f, 2, 4);
+            this.addSet(set44, file2_id);
+
+            Log.d(TAG, "MyDatabaseHelper.createDefaultPersonIfNeed ... count = " +
+                    this.getFilesCount());
         }
+
+
     }
+
 
     public String getDateString() {
         Calendar calendar = new GregorianCalendar();
-        return  String.format("%s-%s-%s",
+        return String.format("%s-%s-%s",
                 calendar.get(Calendar.YEAR),
-                calendar.get(Calendar.MONTH)+1,
+                calendar.get(Calendar.MONTH) + 1,
                 calendar.get(Calendar.DAY_OF_MONTH));
     }
 
     public String getTimeString() {
         Calendar calendar = new GregorianCalendar();
-        return  String.format("%s:%s:%s",
+        return String.format("%s:%s:%s",
                 calendar.get(Calendar.HOUR_OF_DAY),
                 calendar.get(Calendar.MINUTE),
                 calendar.get(Calendar.SECOND));
     }
 
     //получаем количество файлов (сохранённых подходов) в базе
-     public int getFilesCount() {
-        Log.i(TAG, "TempDBHelper.getSetCount ... " );
+    public int getFilesCount() {
+        Log.i(TAG, "TempDBHelper.getFilesCount ... ");
         String countQuery = "SELECT  * FROM " + TabFile.TABLE_NAME;
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.rawQuery(countQuery, null);
         int count = cursor.getCount();
         cursor.close();
+        return count;
+    }
+
+    //получаем количество фрагментов подхода в подходе
+    public int getSetFragmentsCount(long rowId) {
+
+        Log.i(TAG, "TempDBHelper.getSetFragmentsCount ... ");
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "select " + TabSet.COLUMN_SET_TIME + " from " + TabSet.TABLE_NAME +
+                " where " + TabSet.COLUMN_SET_FILE_ID + " = ? ";
+        Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(rowId)});
+
+        int count = mCursor.getCount();
+        mCursor.close();
         return count;
     }
 
@@ -173,6 +215,37 @@ public class TempDBHelper extends SQLiteOpenHelper {
         return ID;
     }
 
+    //Метод для изменения имени файла
+    public void updateFileName(String nameFile, long fileId) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(TabFile.COLUMN_FILE_NAME, nameFile);
+        db.update(TabFile.TABLE_NAME, updatedValues,
+                TabFile._ID + "=" + fileId, null);
+    }
+
+    //Метод для изменения времени и количества повторений фрагмента подхода  по известному DataSet
+    public void updateSetFragment(DataSet mDataSet) {
+
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues updatedValues = new ContentValues();
+        updatedValues.put(TabSet.COLUMN_SET_TIME, mDataSet.getTimeOfRep());
+        updatedValues.put(TabSet.COLUMN_SET_REPS, mDataSet.getReps());
+
+        db.update(TabSet.TABLE_NAME, updatedValues,
+                TabSet.COLUMN_SET_FILE_ID + "=" + mDataSet.getFile_id()+
+                        " AND " + TabSet._ID + "=" + mDataSet.getSet_id(), null);
+
+        Log.d(TAG, "updateSetFragment COLUMN_SET_TIME  = " + mDataSet.getTimeOfRep()+
+                "  COLUMN_SET_REPS = " +  mDataSet.getReps() +
+                "  mDataSet.getFile_id() = " + mDataSet.getFile_id()+
+                "  mDataSet.getSet_id() = " + mDataSet.getSet_id());
+    }
+
+
     //Удалить запись в таблице TabFile и все записи в таблице TabSet с id удалённой записи в TabFile
     public void deleteFileAndSets(long rowId) {
         SQLiteDatabase db = this.getWritableDatabase();
@@ -180,34 +253,70 @@ public class TempDBHelper extends SQLiteOpenHelper {
         db.delete(TabSet.TABLE_NAME, TabSet.COLUMN_SET_FILE_ID + "=" + rowId, null);
         db.close();
     }
-/*
-    public void deleteSet(long rowId) {
+
+    //удаляем строку с номером fragmentNumber, относящуюся к файлу с id =fileId
+        public void deleteSet(long fileId, long fragmentNumber) {
+
+            SQLiteDatabase db = this.getWritableDatabase();
+            db.delete(TabSet.TABLE_NAME, TabSet.COLUMN_SET_FILE_ID +
+                    " =? " + " AND " + TabSet.COLUMN_SET_FRAG_NUMBER +
+                    " =? ", new String[]{String.valueOf(fileId),String.valueOf(fragmentNumber)});
+            db.close();
+        }
+
+    /**
+     * Пересчитывает  номера фрагментов подхода поле удаления какого либо фрагмента подхода
+     */
+    public void rerangeSetFragments(long fileId) throws SQLException {
         SQLiteDatabase db = this.getWritableDatabase();
-        db.delete(TABLE_NAME, PersonTable._ID + "=" + rowId, null);
-        db.close();
+        String query = "select " + TabSet._ID + " , " +  TabSet.COLUMN_SET_FRAG_NUMBER +
+                " from " + TabSet.TABLE_NAME +
+                " where " + TabSet.COLUMN_SET_FILE_ID + " = ? ";
+        Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(fileId)});
+
+        try {
+            // Проходим через все строки в курсоре
+            while (mCursor.moveToNext()) {
+
+                //вычисляем id текущей строки курсора
+                long id = mCursor.getLong(mCursor.getColumnIndex(TabSet._ID));
+
+                ContentValues updatedValues = new ContentValues();
+                updatedValues.put(TabSet.COLUMN_SET_FRAG_NUMBER, (mCursor.getPosition()+1));
+                db.update(TabSet.TABLE_NAME, updatedValues,
+                        TabSet.COLUMN_SET_FILE_ID + "=" + fileId +
+                        " AND " + TabSet._ID + "=" + id, null);
+                Log.d(TAG, "rerangeSetFragments mCursor.getPosition() = " +
+                        mCursor.getPosition() + " id строки =" + id);
+            }
+        } finally {
+            // Всегда закрываем курсор после чтения
+            mCursor.close();
+        }
     }
-    */
+
+
     //получаем ID по имени
-    public long getIdFromFileName(String name){
+    public long getIdFromFileName(String name) {
         long currentID;
         // Создадим и откроем для чтения базу данных
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursor = db.query(
                 TabFile.TABLE_NAME,   // таблица
-                new String[] { TabFile._ID},            // столбцы
-                TabFile.COLUMN_FILE_NAME + "=?" ,                  // столбцы для условия WHERE
-                new String[] {name},                  // значения для условия WHERE
+                new String[]{TabFile._ID},            // столбцы
+                TabFile.COLUMN_FILE_NAME + "=?",                  // столбцы для условия WHERE
+                new String[]{name},                  // значения для условия WHERE
                 null,                  // Don't group the rows
                 null,                  // Don't filter by row groups
                 null);                   // порядок сортировки
 
-        if ((cursor != null) && (cursor.getCount()!=0)) {
+        if ((cursor != null) && (cursor.getCount() != 0)) {
             cursor.moveToFirst();
             // Узнаем индекс каждого столбца
             int idColumnIndex = cursor.getColumnIndex(TabFile._ID);
             // Используем индекс для получения строки или числа
             currentID = cursor.getLong(idColumnIndex);
-        }else {
+        } else {
             currentID = -1;
         }
         Log.d(TAG, "getIdFromName currentID = " + currentID);
@@ -218,12 +327,34 @@ public class TempDBHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Возвращает курсор с указанной записи
+     * Возвращает имя файла по его ID
+     */
+    public String getFileNameFromDataFile( long rowId) throws SQLException {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor mCursor = db.query(true, TabFile.TABLE_NAME,
+                null,
+                TabFile._ID + "=" + rowId,
+                null, null, null, null, null);
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+        }
+        String fileName = mCursor.getString(mCursor.getColumnIndex(TabFile.COLUMN_FILE_NAME));
+
+        mCursor.close();
+
+        return fileName;
+    }
+
+    /**
+     * Возвращает курсор с набором данных времени, количества повторений
+     * и порядкового номера фрагмента для всех фрагментов одного подхода с id = rowId
      */
     public Cursor getAllSetFragments(long rowId) throws SQLException {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor mCursor = db.query(true, TabSet.TABLE_NAME,
-                new String[] {TabSet.COLUMN_SET_TIME, TabSet.COLUMN_SET_REPS,TabSet.COLUMN_SET_FRAG_NUMBER },
+                new String[]{TabSet.COLUMN_SET_TIME, TabSet.COLUMN_SET_REPS, TabSet.COLUMN_SET_FRAG_NUMBER},
                 TabSet.COLUMN_SET_FILE_ID + "=" + rowId,
                 null, null, null, null, null);
         if (mCursor != null) {
@@ -233,17 +364,151 @@ public class TempDBHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Возвращает курсор с указанной записи
+     * Возвращает объект DataFile с данными файла из таблицы TabFile с номмером ID = rowId
+     */
+    public DataFile getAllFilesData(long rowId) throws SQLException {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursorFile = db.query(true, TabFile.TABLE_NAME,
+                new String[]{TabFile._ID, TabFile.COLUMN_FILE_NAME, TabFile.COLUMN_FILE_NAME_DATE,
+                        TabFile.COLUMN_FILE_NAME_TIME, TabFile.COLUMN_KIND_OF_SPORT,
+                        TabFile.COLUMN_DESCRIPTION_OF_SPORT, TabFile.COLUMN_TYPE_FROM,
+                        TabFile.COLUMN_DELAY},
+                TabFile._ID + "=" + rowId,
+                null, null, null, null, null);
+        if (cursorFile != null) {
+            cursorFile.moveToFirst();
+        }
+
+        // Используем индекс для получения строки или числа
+        long current_ID = cursorFile.getLong(
+                cursorFile.getColumnIndex(TabFile._ID));
+        String current_nameFile = cursorFile.getString(
+                cursorFile.getColumnIndex(TabFile.COLUMN_FILE_NAME));
+        String current_nameFileDate = cursorFile.getString(
+                cursorFile.getColumnIndex(TabFile.COLUMN_FILE_NAME_DATE));
+        String current_nameFileTime = cursorFile.getString(
+                cursorFile.getColumnIndex(TabFile.COLUMN_FILE_NAME_TIME));
+        String current_kindSport = cursorFile.getString(
+                cursorFile.getColumnIndex(TabFile.COLUMN_KIND_OF_SPORT));
+        String current_descript = cursorFile.getString(
+                cursorFile.getColumnIndex(TabFile.COLUMN_DESCRIPTION_OF_SPORT));
+        String current_typeFrom = cursorFile.getString(
+                cursorFile.getColumnIndex(TabFile.COLUMN_TYPE_FROM));
+        int current_delay = cursorFile.getInt(
+                cursorFile.getColumnIndex(TabFile.COLUMN_DELAY));
+
+        DataFile dataFile = new DataFile(current_ID,current_nameFile,
+                current_nameFileDate,current_nameFileTime,current_kindSport,
+                current_descript,current_typeFrom,current_delay);
+
+        cursorFile.close();
+        return dataFile;
+    }
+
+    /**
+     * Возвращает объект DataFile с данными файла из таблицы TabFile с номмером ID = rowId
+     */
+    public DataSet getAllSetData(long fileId, int position) throws SQLException {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursorFile = db.query(true, TabSet.TABLE_NAME,
+                new String[]{TabSet._ID, TabSet.COLUMN_SET_FILE_ID, TabSet.COLUMN_SET_FRAG_NUMBER,
+                        TabSet.COLUMN_SET_TIME, TabSet.COLUMN_SET_REPS},
+                TabSet.COLUMN_SET_FILE_ID + "=" + fileId,
+                null, null, null, null, null);
+        if ((cursorFile != null)&& (cursorFile.getCount()>=position)) {
+            cursorFile.moveToPosition(position);
+        }else {
+            Log.d(TAG, "getAllSetData cursorFile.getCount() = " + cursorFile.getCount()+
+            "  position" + position);
+        }
+        // Используем индекс для получения строки или числа
+        long current_ID = cursorFile.getLong(
+                cursorFile.getColumnIndex(TabSet._ID));
+        long current_fileId = cursorFile.getLong(
+                cursorFile.getColumnIndex(TabSet.COLUMN_SET_FILE_ID));
+        float current_setTime = cursorFile.getFloat(
+                cursorFile.getColumnIndex(TabSet.COLUMN_SET_TIME));
+        int current_setReps = cursorFile.getInt(
+                cursorFile.getColumnIndex(TabSet.COLUMN_SET_REPS));
+        int current_nameFragNumber = cursorFile.getInt(
+                cursorFile.getColumnIndex(TabSet.COLUMN_SET_FRAG_NUMBER));
+
+        DataSet dataset = new DataSet(current_ID, current_fileId,
+                current_setTime, current_setReps, current_nameFragNumber);
+
+        cursorFile.close();
+        return dataset;
+    }
+
+
+    /**
+     * Возвращает курсор с набором данных времени всех фрагментов одного подхода с id = rowId
      */
     public Cursor getAllSetFragmentsRaw(long rowId) throws SQLException {
         SQLiteDatabase db = this.getReadableDatabase();
         String query = "select " + TabSet.COLUMN_SET_TIME + " from " + TabSet.TABLE_NAME +
-        " where " + TabSet.COLUMN_SET_FILE_ID + " = ? ";
+                " where " + TabSet.COLUMN_SET_FILE_ID + " = ? ";
         Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(rowId)});
         if (mCursor != null) {
             mCursor.moveToFirst();
         }
         return mCursor;
+    }
+
+
+    /**
+     * Возвращает время фрагмента подхода с номером position для файла подхода с id = rowId
+     */
+    public float getTimeOfRepInPosition(long rowId, int position) throws SQLException {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "select " + TabSet.COLUMN_SET_TIME + " from " + TabSet.TABLE_NAME +
+                " where " + TabSet.COLUMN_SET_FILE_ID + " = ? ";
+        Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(rowId)});
+
+        if ((mCursor != null) && (mCursor.getCount() != 0)) {
+            mCursor.moveToPosition(position);
+            // Используем индекс для получения времени фрагмента подхода с номером position
+            float currentTime = mCursor.getFloat(mCursor.getColumnIndex(TabSet.COLUMN_SET_TIME));
+            Log.d(TAG, "getTimeOfRepInPosition position = " + position +
+                    " currentTime = " + currentTime);
+
+            return currentTime;
+        }
+        if (mCursor != null) {
+            mCursor.close();
+        }
+        //если курсор = null или в курсоре нет данных, то
+        return -1;
+    }
+
+    /**
+     * Возвращает количество повторений для фрагмента подхода с номером position
+     * для файла подхода с id = rowId
+     */
+    public int getRepsInPosition(long rowId, int position) throws SQLException {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = "select " + TabSet.COLUMN_SET_REPS + " from " + TabSet.TABLE_NAME +
+                " where " + TabSet.COLUMN_SET_FILE_ID + " = ? ";
+        Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(rowId)});
+
+        if ((mCursor != null) && (mCursor.getCount() != 0)) {
+            mCursor.moveToPosition(position);
+            // Используем индекс для получения времени фрагмента подхода с номером position
+            int currentReps = mCursor.getInt(mCursor.getColumnIndex(TabSet.COLUMN_SET_REPS));
+            Log.d(TAG, "getTimeOfRepInPosition position = " + position +
+                    " currentReps = " + currentReps);
+
+            return currentReps;
+        }
+        if (mCursor != null) {
+            mCursor.close();
+        }
+        //если курсор = null или в курсоре нет данных, то
+        return -1;
     }
 
     //вывод в лог всех строк базы
@@ -348,4 +613,71 @@ public class TempDBHelper extends SQLiteOpenHelper {
         }
     }
 
+    public float getSumOfTimeSet(long rowId) throws SQLException {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = " select " + " sum( " + TabSet.COLUMN_SET_TIME + " ) " +
+                " from " + TabSet.TABLE_NAME + " where " + TabSet.COLUMN_SET_FILE_ID + " = ?";
+
+        Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(rowId)});
+        float sum = -1;
+        if ((mCursor != null) && (mCursor.getCount() != 0)) {
+            mCursor.moveToFirst();
+
+            // Используем индекс для получения строки или числа
+            sum = mCursor.getFloat(0);
+        }
+        Log.d(TAG, "getSumOfTimeSet sum = " + sum);
+        if (mCursor != null) {
+            mCursor.close();
+        }
+        return sum;
+    }
+
+    public int getSumOfRepsSet(long rowId) throws SQLException {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        String query = " select " + " sum( " + TabSet.COLUMN_SET_REPS + " ) " +
+                " from " + TabSet.TABLE_NAME + " where " + TabSet.COLUMN_SET_FILE_ID + " = ?";
+
+        Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(rowId)});
+        int sum = -1;
+        if ((mCursor != null) && (mCursor.getCount() != 0)) {
+            mCursor.moveToFirst();
+
+            // Используем индекс для получения строки или числа
+            sum = mCursor.getInt(0);
+        }
+        Log.d(TAG, "getSumOfRepsSet sum = " + sum);
+        if (mCursor != null) {
+            mCursor.close();
+        }
+        return sum;
+    }
+
+    //получить названия всех файлов с типом файла P.TYPE_TIMEMETER
+    public Cursor getAllFilesFromTimemeter() throws SQLException {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "select " + TabFile._ID + " , " + TabFile.COLUMN_FILE_NAME  + " from " + TabFile.TABLE_NAME +
+                " where " + TabFile.COLUMN_TYPE_FROM + " = ? ";
+        Cursor mCursor = db.rawQuery(query, new String[]{P.TYPE_TIMEMETER});
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+        }
+        return mCursor;
+    }
+
+    //получить названия всех файлов с типом файла P.TYPE_TIMEMETER
+    public Cursor getAllFilesWhithType(String type) throws SQLException {
+        SQLiteDatabase db = this.getReadableDatabase();
+        String query = "select " + TabFile._ID + " , " + TabFile.COLUMN_FILE_NAME  + " from " + TabFile.TABLE_NAME +
+                " where " + TabFile.COLUMN_TYPE_FROM + " = ? ";
+        Cursor mCursor = db.rawQuery(query, new String[]{type});
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+        }
+        return mCursor;
+    }
 }

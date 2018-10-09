@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
+
 public class ChangeTempActivity extends AppCompatActivity implements
         DialogChangeTemp.ChangeTempUpDownListener{
 
@@ -106,7 +108,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
         acBar.setHomeButtonEnabled(true);
 
         Intent intent = getIntent();
-        positionOfList = intent.getIntExtra(POSITION,0);
+        positionOfList = intent.getIntExtra(P.CHANGE_TEMP_POSITION,0);
         pos = positionOfList;
         Log.d(TAG, "ChangeTempActivity positionOfList = " + (positionOfList+1));
 
@@ -131,16 +133,16 @@ public class ChangeTempActivity extends AppCompatActivity implements
                     case R.id.radioButtonTime:
                         redactTime = true;
                         changeTemp_buttonMinus5.setText("-5%");
-                        changeTemp_buttonMinus1.setText("-1%");;
-                        changeTemp_buttonPlus1.setText("+1%");;
-                        changeTemp_buttonPlus5.setText("+5%");;
+                        changeTemp_buttonMinus1.setText("-1%");
+                        changeTemp_buttonPlus1.setText("+1%");
+                        changeTemp_buttonPlus5.setText("+5%");
                         break;
                     case R.id.radioButtonCount:
                         redactTime = false;
                         changeTemp_buttonMinus5.setText("-5");
-                        changeTemp_buttonMinus1.setText("-1");;
-                        changeTemp_buttonPlus1.setText("+1");;
-                        changeTemp_buttonPlus5.setText("+5");;
+                        changeTemp_buttonMinus1.setText("-1");
+                        changeTemp_buttonPlus1.setText("+1");
+                        changeTemp_buttonPlus5.setText("+5");
                         break;
                 }
             }

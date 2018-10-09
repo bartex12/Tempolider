@@ -45,16 +45,11 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     public static final String TAG ="33333";
-    public static final String FILENAME = "ru.bartex.p010_train.filename";
-    public static final String ACCURANCY = "ru.bartex.p010_train.accurancy";
-    public static final int MAIN_ACTIVITY = 111;
-    public final int PREF_ACTIVITY_ACCURANCY = 1;
+
     int accurancy;
 
     ListView mListView;
-    //ArrayList<String> tempFiles = new ArrayList<>();
-    ArrayList<String> arList = new ArrayList<>();
-    ArrayAdapter<String> ara;
+
     SimpleAdapter sara;
     ArrayList<Map<String, Object>> data;
     Map<String,Object> m;
@@ -94,17 +89,17 @@ public class MainActivity extends AppCompatActivity
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
                 if (i == 0) {
                     Intent intent = new Intent(MainActivity.this, TimeMeterActivity.class);
-                    //intent.putExtra(PersonCategoryActivity.PERSON_RESOURS_ID, position);
                     startActivity(intent);
                 }else if(i == 1){
                     Intent intent = new Intent(MainActivity.this, SetListActivity.class);
-                    intent.putExtra(SingleFragmentActivity.FROM_ACTIVITY,MAIN_ACTIVITY);
+                    intent.putExtra(P.FROM_ACTIVITY,P.MAIN_ACTIVITY);
                     startActivity(intent);
                 }else if(i == 2){
                     //вариант 1, когда просто список, в котором имя, дата и тип а одной строке
                     //Intent intent = new Intent(MainActivity.this, ListOfFilesActivity.class);
                     //Вариант 2 на основе Tab? что устарело, хотя и работает
                     //Intent intent = new Intent(MainActivity.this, TabActivity.class);
+
                     //Вариант 3 на основе TabBar с ViewPager и фрагментами
                     Intent intent = new Intent(MainActivity.this, TabBarActivity.class);
                     startActivity(intent);
@@ -322,7 +317,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_pischalka) {
             Intent intent = new Intent(this,SetListActivity.class);
-            intent.putExtra(SingleFragmentActivity.FROM_ACTIVITY,MAIN_ACTIVITY);
+            intent.putExtra(P.FROM_ACTIVITY,P.MAIN_ACTIVITY);
             startActivity(intent);
 
         } else if (id == R.id.nav_raskladki) {

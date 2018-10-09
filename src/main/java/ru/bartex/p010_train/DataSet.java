@@ -4,6 +4,8 @@ import java.io.Serializable;
 
 public class DataSet implements Serializable {
 
+    private long mSet_id;
+    private long mFile_id;
     private float mTimeOfRep;
     private int mReps;
     private int mNumberOfFrag = 0;
@@ -14,6 +16,15 @@ public class DataSet implements Serializable {
 
     //основной конструктор
     public DataSet(float TimeOfRep, int Reps, int NumberOfFrag){
+        mTimeOfRep = TimeOfRep;
+        mReps = Reps;
+        mNumberOfFrag = NumberOfFrag;
+    }
+
+    //конструктор с заданным id
+    public DataSet(long setId, long fileId, float TimeOfRep, int Reps, int NumberOfFrag){
+        mSet_id =setId;
+        mFile_id = fileId;
         mTimeOfRep = TimeOfRep;
         mReps = Reps;
         mNumberOfFrag = NumberOfFrag;
@@ -43,4 +54,11 @@ public class DataSet implements Serializable {
         mNumberOfFrag = numberOfFrag;
     }
 
+    public long getSet_id() {
+        return mSet_id;
+    }
+
+    public long getFile_id() {
+        return mFile_id;
+    }
 }

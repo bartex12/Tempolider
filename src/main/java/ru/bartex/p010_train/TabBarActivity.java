@@ -26,19 +26,10 @@ import java.util.ArrayList;
 
 public class TabBarActivity extends AppCompatActivity {
 
-    ArrayList<String> tempFiles = new ArrayList<>();
     static String TAG = "33333";
     final int PAGE_COUNT = 3; //количество вкладок
     private String tabTitles[] = new String[] { "Сек", "Темп", "Избр" };
 
-    /**
-     * The {@link android.support.v4.view.PagerAdapter} that will provide
-     * fragments for each of the sections. We use a
-     * {@link FragmentPagerAdapter} derivative, which will keep every
-     * loaded fragment in memory. If this becomes too memory intensive, it
-     * may be best to switch to a
-     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
-     */
     private SectionsPagerAdapter mSectionsPagerAdapter;
 
     //ViewPager that will host the section contents.
@@ -160,14 +151,11 @@ public class TabBarActivity extends AppCompatActivity {
             // getItem is called to instantiate the fragment for the given page.
             switch (position){
                 case 0:
-                    TabBarSecFragment tabBarSecFragment= TabBarSecFragment.newInstance(0);
-                    return tabBarSecFragment;
+                    return TabBarSecFragment.newInstance(0);
                 case 1:
-                    TabBarTempFragment tabBarTempFragment= TabBarTempFragment.newInstance(1);
-                    return tabBarTempFragment;
+                    return TabBarTempFragment.newInstance(1);
                 case 2:
-                    TabBarLikeFragment tabBarLikeFragment= TabBarLikeFragment.newInstance(2);
-                    return tabBarLikeFragment;
+                    return TabBarLikeFragment.newInstance(2);
                 default:
                     return null;
             }
@@ -188,7 +176,6 @@ public class TabBarActivity extends AppCompatActivity {
             //для установки иконок надо return null
             //return null;
         }
-
             //метод из PageAdapter, при return POSITION_NONE позволяет обновить адаптер с помощью
             //метода notifyDataSetChanged() из любого фрагмента
             @Override
@@ -196,8 +183,5 @@ public class TabBarActivity extends AppCompatActivity {
                // POSITION_NONE makes it possible to reload the PagerAdapter
                 return POSITION_NONE;
             }
-
-
     }
-
 }
