@@ -408,7 +408,7 @@ public class TempDBHelper extends SQLiteOpenHelper {
     /**
      * Возвращает объект DataFile с данными файла из таблицы TabFile с номмером ID = rowId
      */
-    public DataSet getAllSetData(long fileId, int position) throws SQLException {
+    public DataSet getAllSetFragmentData(long fileId, int position) throws SQLException {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursorFile = db.query(true, TabSet.TABLE_NAME,
                 new String[]{TabSet._ID, TabSet.COLUMN_SET_FILE_ID, TabSet.COLUMN_SET_FRAG_NUMBER,
@@ -617,7 +617,8 @@ public class TempDBHelper extends SQLiteOpenHelper {
 
         SQLiteDatabase db = this.getReadableDatabase();
 
-        String query = " select " + " sum( " + TabSet.COLUMN_SET_TIME + " ) " +
+        String query = " select " + " sum( " + TabSet.COLUMN_SET_TIME +
+        " * " + TabSet.COLUMN_SET_REPS + " ) " +
                 " from " + TabSet.TABLE_NAME + " where " + TabSet.COLUMN_SET_FILE_ID + " = ?";
 
         Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(rowId)});

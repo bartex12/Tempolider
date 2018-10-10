@@ -3,6 +3,7 @@ package ru.bartex.p010_train;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.support.annotation.IdRes;
@@ -34,6 +35,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TabSet;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 
 public class ChangeTempActivity extends AppCompatActivity implements
         DialogChangeTemp.ChangeTempUpDownListener{
@@ -75,6 +78,17 @@ public class ChangeTempActivity extends AppCompatActivity implements
 
     List<Set> listSetCopy; //резервный список отсечек
 
+    TempDBHelper mDBHelper = new TempDBHelper(this);
+    ArrayList<Map<String, Object>> data;
+    Map<String,Object> m;
+    SimpleAdapter sara;
+
+    private float mTimeOfSet = 0;   //общее время выполнения подхода в секундах
+    private int mTotalReps = 0;  //общее количество повторений в подходе
+
+    long fileId;
+    String finishFileName;
+
     @Override
     public void changeTempUpDown(int valueDelta, boolean up) {
 
@@ -87,7 +101,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
             s.setTimeOfRep((s.getTimeOfRep())*ff);
         }
 
-        updateAdapter(changeTemp_listView);
+        updateAdapter();
         calculateAndShowTotalValues();
         changeTemp_listView.setSelection(0);
     }
@@ -108,15 +122,19 @@ public class ChangeTempActivity extends AppCompatActivity implements
         acBar.setHomeButtonEnabled(true);
 
         Intent intent = getIntent();
-        positionOfList = intent.getIntExtra(P.CHANGE_TEMP_POSITION,0);
-        pos = positionOfList;
-        Log.d(TAG, "ChangeTempActivity positionOfList = " + (positionOfList+1));
+        //получаем имя файла из интента
+        finishFileName = intent.getStringExtra(P.INTENT_TO_CHANGE_TEMP_FILE_NAME);
+        Log.d(TAG, "ChangeTempActivity finishFileName = " + finishFileName);
+        //получаем id файла
+        fileId = mDBHelper.getIdFromFileName(finishFileName);
 
+        /*
         //сделаем копию списка отсечек для случая отмены изменений
         SetLab setLab = SetLab.get();
         listSetCopy = setLab.getSetListCopy();
         //без этой строки возврат почему-то не работает!!! а listSetCopy обновляется сам
         SetLab.returnToOldSetList(listSetCopy);
+*/
 
         deltaValue = (TextView)findViewById(R.id.deltaValue);
         deltaValue.setVisibility(View.INVISIBLE);
@@ -154,7 +172,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
 
-                updateAdapter(changeTemp_listView);
+                updateAdapter();
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
 
@@ -187,7 +205,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
                     offset = v.getTop() - changeTemp_listView.getPaddingTop();
                 }
 
-                updateAdapter(changeTemp_listView);
+                updateAdapter();
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
 
@@ -200,7 +218,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
         });
 
         changeTemp_textViewName =(TextView)findViewById(R.id.changeTemp_textViewName);
-        changeTemp_textViewName.setText("Имя:  " + intent.getStringExtra(NAME_OF_FILE));
+        changeTemp_textViewName.setText("Имя:  " + finishFileName);
 
         timeTotal = (TextView)findViewById(R.id.timeTotal);
         repsTotal = (TextView)findViewById(R.id.repsTotal);
@@ -212,7 +230,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
 
                 //String s = reductAction(0.95f,-5);
                 reductAction(0.95f,-5);
-                updateAdapter(changeTemp_listView);
+                updateAdapter();
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
 
@@ -229,7 +247,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
 
                 //String s = reductAction(0.99f, -1);
                 reductAction(0.99f, -1);
-                updateAdapter(changeTemp_listView);
+                updateAdapter();
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
 
@@ -248,7 +266,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
                 SetLab.returnToOldTimeOrReps(listSetCopy,redactTime,
                         mCheckBoxAll.isChecked(),positionOfList);
 
-                updateAdapter(changeTemp_listView);
+                updateAdapter();
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
 
@@ -267,7 +285,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
 
                 //String s = reductAction(1.01f, 1);
                 reductAction(1.01f, 1);
-                updateAdapter(changeTemp_listView);
+                updateAdapter();
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
 
@@ -283,7 +301,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
 
                 //String s = reductAction(1.05f, 5);
                 reductAction(1.05f, 5);
-                updateAdapter(changeTemp_listView);
+                updateAdapter();
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
 
@@ -313,7 +331,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
         Log.d(TAG, "ChangeTempActivity onResume");
 
         //выводим список, суммарные время и количество, устанавливаем выделение цветом
-        updateAdapter(changeTemp_listView);
+        updateAdapter();
         calculateAndShowTotalValues();
         changeTemp_listView.setSelection(positionOfList);
     }
@@ -372,7 +390,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
         return super.onOptionsItemSelected(item);
     }
 
-
+/*
     public void updateAdapter(ListView listView) {
         Log.d(TAG, "ChangeTempActivity: updateAdapter() ");
         //получаем экземпляр SetLab
@@ -413,6 +431,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
     }
     }
 
+
     private void calculateAndShowTotalValues(){
 
         //посчитаем общее врямя выполнения подхода в секундах
@@ -426,39 +445,48 @@ public class ChangeTempActivity extends AppCompatActivity implements
         repsTotal.setText(totalReps);
     }
 
+*/
 
+    private void calculateAndShowTotalValues(){
 
-    // класс для изменения цвета элемента строки - маркера номера фрагмента подхода
-    private class MyViewBinder implements SimpleAdapter.ViewBinder{
-        @Override
-        public boolean setViewValue(View view, Object o, String s) {
+        //посчитаем общее врямя выполнения подхода в секундах
+        mTimeOfSet = mDBHelper.getSumOfTimeSet(fileId);
+        Log.d(TAG, "Суммарное время подхода  = " + mTimeOfSet);
 
-            int i = 0;
+        //посчитаем общее количество повторений в подходе
+        mTotalReps = mDBHelper.getSumOfRepsSet(fileId);
+        Log.d(TAG, "Суммарное количество повторений  = " + mTotalReps);
 
-            switch (view.getId()) {
+        //покажем общее время подхода и общее число повторений в подходе
 
-                case R.id.mark_item_set_textview:
-
-                    i = ((Integer) o).intValue()-1;
-
-                    if (mCheckBoxAll.isChecked()){
-                        view.setBackgroundColor(Color.YELLOW);
-
-                    }else {
-                        if (i!= positionOfList) {
-                            //оставляем как есть
-                            view.setBackgroundResource(R.drawable.rect);
-
-                        }else {
-                            //меняем цвет Background
-                            view.setBackgroundColor(Color.YELLOW);
-                        }
-                    }
-            }
-            //если поставить true? почему то работает неправильно
-            return false;
-        }
+        timeTotal.setText(showTotalTime(mTimeOfSet, SingleFragmentActivity.mKvant));
+        repsTotal.setText(String.format("Количество  %d", mTotalReps));
     }
+
+    //покажем общее время подхода
+    public String showTotalTime(float timeOfSet, long kvant){
+
+        float millisTime = timeOfSet*1000;
+        //покажем суммарное время подхода
+        int minut = ((int)millisTime/60000)%60;
+        int second = ((int)millisTime/1000)%60;
+        int decim = (int)((millisTime%1000)/kvant);
+        int hour = (int)((millisTime/3600000)%24);
+
+        // общее время подхода
+        String time = "";
+        if (hour<1){
+            if(minut<10) {
+                time = String.format("Время  %d:%02d.%d",minut, second, decim);
+            }else if (minut<60){
+                time = String.format("Время  %02d:%02d.%d",minut,second,decim);
+            }
+        }else {
+            time = String.format("Время  %d:%02d:%02d.%d",hour,minut,second,decim);
+        }
+        return time;
+    }
+
 
     private String reductAction(float ff, int ii){
 
@@ -505,5 +533,108 @@ public class ChangeTempActivity extends AppCompatActivity implements
         }
     }
 
+    public void updateAdapter() {
+        Log.d(TAG, "SetListFragment: updateAdapter() ");
+        //получаем id записи с таким именем
+        long finishFileId = mDBHelper.getIdFromFileName (finishFileName);
+        Log.d(TAG,"SetListFragment  имя =" + finishFileName + "  Id = " + finishFileId );
+
+        //получаем курсор с данными подхода с id = finishFileId
+        Cursor cursor = mDBHelper.getAllSetFragments(finishFileId);
+        Log.d(TAG, "SetListFragment: updateAdapter() cursor.getCount() = " + cursor.getCount());
+
+        //Список с данными для адаптера
+        data = new ArrayList<Map<String, Object>>(cursor.getCount());
+        //проходим по курсору и берём данные
+        if (cursor.moveToFirst()) {
+            do {
+                float time  = cursor.getFloat(cursor.getColumnIndex(TabSet.COLUMN_SET_TIME));
+                //пока не используем, так как появляется запятая вместо точки
+                //String timeFormat = String.format("%.2f",time);
+                int reps_now = cursor.getInt(cursor.getColumnIndex(TabSet.COLUMN_SET_REPS));
+                int number_now = cursor.getInt(cursor.getColumnIndex(TabSet.COLUMN_SET_FRAG_NUMBER));
+
+                Log.d(TAG,"SetListFragment time_now = " + time +
+                        "  reps_now = " + reps_now + "  number_now = " + number_now);
+
+                m = new HashMap<>();
+                //m.put(P.ATTR_TIME, timeFormat);
+                m.put(P.ATTR_TIME, time);
+                m.put(P.ATTR_REP, reps_now);
+                m.put(P.ATTR_NUMBER, number_now);
+                data.add(m);
+
+            } while (cursor.moveToNext());
+        }else {
+            data.clear();
+        }
+        String[] from = {P.ATTR_TIME, P.ATTR_REP, P.ATTR_NUMBER};
+        int[] to = {R.id.time_item_set_textview, R.id.reps_item_set_textview,
+                R.id.mark_item_set_textview};
+        //заводим данные в адаптер и присваиваем его встроенному списку ListFragment
+        sara = new SimpleAdapter(this, data, R.layout.list_item_set_textview, from, to);
+        //устанавливаем свой биндер
+        sara.setViewBinder(new MyViewBinder());
+        changeTemp_listView.setAdapter(sara);
+        //setListAdapter(sara);
+        //Чтобы сделать что-то при щелчке на галке, нужно расширить адаптер и сделать
+        // слушатель внутри View на флажок
+    }
+
+    // класс для изменения цвета элемента строки - маркера номера фрагмента подхода
+    private class MyViewBinder implements SimpleAdapter.ViewBinder{
+        @Override
+        public boolean setViewValue(View view, Object o, String s) {
+
+            int i = 0;
+
+            switch (view.getId()) {
+
+                case R.id.mark_item_set_textview:
+
+                    i = ((Integer) o).intValue()-1;
+
+                    if (mCheckBoxAll.isChecked()){
+                        view.setBackgroundColor(Color.YELLOW);
+
+                    }else {
+                        if (i!= positionOfList) {
+                            //оставляем как есть
+                            view.setBackgroundResource(R.drawable.rect);
+
+                        }else {
+                            //меняем цвет Background
+                            view.setBackgroundColor(Color.YELLOW);
+                        }
+                    }
+            }
+            //если поставить true? почему то работает неправильно
+            return false;
+        }
+    }
+
+
+/*
+    // класс для изменения цвета элемента строки - маркера номера фрагмента подхода
+    private class MyViewBinder implements SimpleAdapter.ViewBinder{
+        @Override
+        public boolean setViewValue(View view, Object o, String s) {
+            int i;
+            switch (view.getId()) {
+                case R.id.mark_item_set_textview:
+                    i = ((Integer) o).intValue();
+                    //Log.d(TAG, "SetListFragment:  i == mCountFragment =  " + i + "  " + mCountFragment);
+                    if (!end) {
+                        if (i >= mCountFragment) {
+                            //оставляем как есть, если нужно сделать другого цвета, то
+                        } else view.setBackgroundColor(Color.YELLOW);
+                    }else view.setBackgroundColor(Color.YELLOW);
+            }
+
+            //если поставить true? почемуто работает неправильно
+            return false;
+        }
+    }
+*/
 
 }

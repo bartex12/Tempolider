@@ -29,12 +29,17 @@ public class P {
     //идентификатор интента : пришёл от Main
     public final static String FROM_MAIN = "ru.bartex.p010_train.FROM_MAIN";
 
+    public static final String DETAIL_DATA_SET = "ru.bartex.p010_train.DetailActivity.DATA_SET";
+    public static final String DETAIL_CHANGE_REQUEST = "ru.bartex.p010_train.DetailActivity.change_request";
+
     // идёт к расчёту количества прожитых дней
     public final static int TO_SEC = 1111;
     //идёт к расчёту биоритмов`
     public final static int TO_TEMP = 2222;
     //идёт новой персоне и затем диплоговое окно
     public final static int TO_ADD = 3333;
+    //плюсик в тулбаре темполидера
+    public final static int TO_ADD_SET = 4444;
     //откуда идёт запрос на справку
     public final static String HELP_FROM = "ru.bartex.p010_train.HELP_FROM";
     //варианты запросов на справку
@@ -47,6 +52,10 @@ public class P {
     public final static int HELP_FROM_JOINT = 7;
     public final static int HELP_FROM_FIND_DATE = 8;
     public final static int HELP_ALL = 9;
+
+    public final static int DETAIL_CHANGE_REQUEST_KODE = 10;
+    public final static int CHANGE_TEMP_CHANGE_REQUEST_CODE = 20;
+
 
     //имя файла для записи раскладки темполидера  по умолчанию - когда имя - пустая строка
     public static final String FILENAME_OTSECHKI_TEMP ="автосохранение__темполидера";
@@ -97,6 +106,10 @@ public class P {
     public static final String ARG_NUMBER_ITEM_TEMP = "ru.bartex.p010_train.NumberItemTemp";
     public static final String ARG_NUMBER_ITEM_LIKE = "ru.bartex.p010_train.NumberItemLike";
     public static final String ARG_DELAY = "ru.bartex.p010_train.delay";
+
+    public static final String INTENT_TO_DETILE_FILE_ID = "ru.bartex.p010_train.IntentToDetileFileId";
+    public static final String INTENT_TO_CHANGE_TEMP_FILE_ID = "ru.bartex.p010_train.IntentToChangeTempFileId";
+    public static final String INTENT_TO_CHANGE_TEMP_FILE_NAME = "ru.bartex.p010_train.IntentToChangeTempFileName";
 
     public static final int DELETE_ACTION_SEC = 1;
     public static final int CHANGE_ACTION_SEC = 2;

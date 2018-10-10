@@ -13,8 +13,6 @@ import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.ContextMenu;
 import android.view.LayoutInflater;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,9 +24,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TabSet;
@@ -114,6 +110,9 @@ public class SetListFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mTempDBHelper = new TempDBHelper(getActivity());
+        //id файла с именем finishFileName
+        finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
+
     }
 
     @Override
@@ -172,7 +171,7 @@ public class SetListFragment extends Fragment {
         //если здесь не обновлять, то список не обновляется при возврате из DetailActivity
         updateAdapter();
         //вычисляем и показываем общее время выполнения подхода и количество повторов в подходе
-        //calculateAndShowTotalValues();
+        calculateAndShowTotalValues();
     }
     
     //создаём контекстное меню для списка (сначала регистрация нужна в onCreateView)
@@ -244,11 +243,11 @@ public class SetListFragment extends Fragment {
                 //id файла с именем finishFileName
                 finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
 
-                DataSet dataSet = mTempDBHelper.getAllSetData(finishFileId, acmi.position);
+                DataSet dataSet = mTempDBHelper.getAllSetFragmentData(finishFileId, acmi.position);
 
                 Intent intent = new Intent(getContext(), DetailActivity.class);
-                intent.putExtra(DetailActivity.DETAIL_DATA_SET, dataSet);
-                intent.putExtra(DetailActivity.DETAIL_REQUEST, request_code);
+                intent.putExtra(P.DETAIL_DATA_SET, dataSet);
+                intent.putExtra(P.DETAIL_CHANGE_REQUEST, P.DETAIL_CHANGE_REQUEST_KODE);
                 Log.d(TAG, "SetListFragment CM_CHANGE_ID acmi.position = " + acmi.position+
                                 "  acmi.id = " + acmi.id);
                startActivity(intent);
@@ -360,6 +359,9 @@ public class SetListFragment extends Fragment {
     }
 
     private void calculateAndShowTotalValues(){
+
+        Log.d(TAG, "mTempDBHelper  = " + mTempDBHelper +
+                "finishFileId  = " + finishFileId);
 
         //посчитаем общее врямя выполнения подхода в секундах
         mTimeOfSet = mTempDBHelper.getSumOfTimeSet(finishFileId);
