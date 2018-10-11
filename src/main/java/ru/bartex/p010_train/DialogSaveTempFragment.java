@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
@@ -25,12 +26,21 @@ import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
  */
 public class DialogSaveTempFragment extends DialogFragment {
 
-     static String TAG = "33333";
+    static String TAG = "33333";
+    String finishFileName; //имя файла, передаваемое в аргументах фрагмента
 
     public DialogSaveTempFragment(){}
 
+    public static DialogSaveTempFragment newInstance(String nameOfFile){
+        Bundle args = new Bundle();
+        args.putString(P.ARG_NAME_OF_FILE,nameOfFile);
+        DialogSaveTempFragment fragment = new DialogSaveTempFragment();
+        fragment.setArguments(args);
+        return fragment;
+    }
+
     public interface SaverFragmentListener{
-        void onArrayListTransmit(String nameFile);
+        void onFileNameTransmit(String nameFile);
     }
 
     SaverFragmentListener mSaverFragmentListener;
@@ -39,6 +49,20 @@ public class DialogSaveTempFragment extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mSaverFragmentListener = (SaverFragmentListener)context;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Log.d(TAG, "DialogSaveTempFragment: onCreate  ");
+
+        if ((getArguments()) != null){
+            //имя файла из аргументов
+            finishFileName = getArguments().getString(P.ARG_NAME_OF_FILE);
+
+        }else finishFileName = "";
+
+
     }
 
     @Override
@@ -51,6 +75,7 @@ public class DialogSaveTempFragment extends DialogFragment {
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.save_data_in_file, null);
         final EditText name = view.findViewById(R.id.editTextNameOfFile);
+        name.setText(finishFileName);
         final CheckBox date = view.findViewById(R.id.checkBoxDate);
         name.requestFocus();
         name.setInputType(InputType.TYPE_CLASS_TEXT);
@@ -67,7 +92,7 @@ public class DialogSaveTempFragment extends DialogFragment {
                     Log.d(TAG, "SaverFragment date.isChecked() Имя файла = " + nameFile);
                 }
                 //Вызываем метод интерфейса, передаем  имя файла в SingleFragmentActivity
-                mSaverFragmentListener.onArrayListTransmit(nameFile);
+                mSaverFragmentListener.onFileNameTransmit(nameFile);
 
                 //принудительно прячем  клавиатуру - повторный вызов ее покажет
                 takeOnAndOffSoftInput();

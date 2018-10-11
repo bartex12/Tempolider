@@ -163,14 +163,14 @@ public class TempDBHelper extends SQLiteOpenHelper {
     }
 
     //получаем количество фрагментов подхода в подходе
-    public int getSetFragmentsCount(long rowId) {
+    public int getSetFragmentsCount(long fileId) {
 
         Log.i(TAG, "TempDBHelper.getSetFragmentsCount ... ");
         SQLiteDatabase db = this.getReadableDatabase();
 
         String query = "select " + TabSet.COLUMN_SET_TIME + " from " + TabSet.TABLE_NAME +
                 " where " + TabSet.COLUMN_SET_FILE_ID + " = ? ";
-        Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(rowId)});
+        Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(fileId)});
 
         int count = mCursor.getCount();
         mCursor.close();
@@ -245,6 +245,24 @@ public class TempDBHelper extends SQLiteOpenHelper {
                 "  mDataSet.getSet_id() = " + mDataSet.getSet_id());
     }
 
+    // создать копию файла  в базе данных и получить его id
+    public long createFileCopy(String finishFileName, long fileId){
+        //количество фрагментов подхода
+        int countOfSet =this.getSetFragmentsCount(fileId);
+        String newFileName = finishFileName + "Copy";
+        Log.d(TAG, "createFileCopy newFileName = " + newFileName);
+        //создаём и записываем в базу копию файла на случай отмены изменений
+        DataFile dataFileCopy = this.getAllFilesData(fileId);
+        dataFileCopy.setFileName(newFileName);
+        long fileIdCopy = this.addFile(dataFileCopy);
+        //записываем фрагменты подхода в файл-копию
+        for (int i = 0; i<countOfSet; i++ ){
+            DataSet dataSet = this.getOneSetFragmentData(fileId, i);
+            this.addSet(dataSet,fileIdCopy);
+            Log.d(TAG, "createFileCopy dataSet № = " + dataSet.getNumberOfFrag());
+        }
+        return  fileIdCopy;
+    }
 
     //Удалить запись в таблице TabFile и все записи в таблице TabSet с id удалённой записи в TabFile
     public void deleteFileAndSets(long rowId) {
@@ -406,9 +424,9 @@ public class TempDBHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Возвращает объект DataFile с данными файла из таблицы TabFile с номмером ID = rowId
+     * Возвращает один объект DataFile с данными файла из таблицы TabFile с номмером ID = rowId
      */
-    public DataSet getAllSetFragmentData(long fileId, int position) throws SQLException {
+    public DataSet getOneSetFragmentData(long fileId, int position) throws SQLException {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor cursorFile = db.query(true, TabSet.TABLE_NAME,
                 new String[]{TabSet._ID, TabSet.COLUMN_SET_FILE_ID, TabSet.COLUMN_SET_FRAG_NUMBER,

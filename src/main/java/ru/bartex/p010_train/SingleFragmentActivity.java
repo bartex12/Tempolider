@@ -152,12 +152,12 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
     //nameFile - имя файла для записи в список сохранённых файлов
     @Override
-    public void onArrayListTransmit(String nameFile) {
+    public void onFileNameTransmit(String nameFile) {
 
+        //Если данные пришли из диалога сохранения в файл в темполидере
         if (fromActivity ==111) {
-            Log.d(TAG, "SingleFragmentActivity - onArrayListTransmit fromActivity = " +
+            Log.d(TAG, "SingleFragmentActivity - onFileNameTransmit fromActivity = " +
                     fromActivity);
-            //Если данные пришли из MainActivity,
             finishFileName = saveDataAndFilename(nameFile,
                     P.FILENAME_OTSECHKI_TEMP , P.TYPE_TEMPOLEADER);
             //выводим имя файла на экран
@@ -392,9 +392,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         // MainActivity =111   TIME_GRAF_ACTIVITY = 222    TabBarActivity = 333
         fromActivity = intent.getIntExtra(P.FROM_ACTIVITY,111);
 
-        //если интент пришел от MainActivity, список должен быть очищен от старых данных
-        //а SetLab должен быть обнулён, после этого нужно считать данные из файла
-        // и если они есть, распарсить и передать в SetLab
+        //если интент пришел от MainActivity
         if (fromActivity == 111){
             Log.d(TAG, " fromActivity =  " + fromActivity);
 
@@ -428,26 +426,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
         Log.d(TAG, " fromActivity =  " + fromActivity +" mNameOfFile = " + finishFileName);
 
-        //выводим имя файла на экран
-        mNameOfFile.setText(finishFileName);
 
-        //получаем id  файла с раскладкой по его имени finishFileName из интента
-        fileId = mTempDBHelper.getIdFromFileName(finishFileName);
-
-        //получаем количество фрагментов в выполняемом подходе если было удаление или добавление
-        //фрагмента подхода, нужно пересчитывать каждый раз - это по кнопке Старт
-        mTotalCountFragment = mTempDBHelper.getSetFragmentsCount(fileId);
-
-        //посчитаем общее врямя выполнения подхода в секундах
-        mTimeOfSet = mTempDBHelper.getSumOfTimeSet(fileId);
-        Log.d(TAG, "Суммарное время подхода  = " + mTimeOfSet);
-
-        //посчитаем общее количество повторений в подходе
-        mTotalReps = mTempDBHelper.getSumOfRepsSet(fileId);
-        Log.d(TAG, "Суммарное количество повторений  = " + mTotalReps);
-
-        //покажем общее время подхода и общее число повторений в подходе
-        showTotalValues(mTimeOfSet,mTotalReps, mKvant);
 
         //Вставляем фрагмент, реализованный в классе, наследующем SingleFragmentActivity
         //и реализующем абстрактный метод createFragment()
@@ -491,6 +470,27 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
             audioManager =    (AudioManager)getSystemService(Context.AUDIO_SERVICE);
             audioManager.setStreamMute(AudioManager.STREAM_MUSIC, true);
         }
+
+        //выводим имя файла на экран
+        mNameOfFile.setText(finishFileName);
+
+        //получаем id  файла с раскладкой по его имени finishFileName из интента
+        fileId = mTempDBHelper.getIdFromFileName(finishFileName);
+
+        //получаем количество фрагментов в выполняемом подходе если было удаление или добавление
+        //фрагмента подхода, нужно пересчитывать каждый раз - это по кнопке Старт
+        mTotalCountFragment = mTempDBHelper.getSetFragmentsCount(fileId);
+
+        //посчитаем общее врямя выполнения подхода в секундах
+        mTimeOfSet = mTempDBHelper.getSumOfTimeSet(fileId);
+        Log.d(TAG, "Суммарное время подхода  = " + mTimeOfSet);
+
+        //посчитаем общее количество повторений в подходе
+        mTotalReps = mTempDBHelper.getSumOfRepsSet(fileId);
+        Log.d(TAG, "Суммарное количество повторений  = " + mTotalReps);
+
+        //покажем общее время подхода и общее число повторений в подходе
+        showTotalValues(mTimeOfSet,mTotalReps, mKvant);
     }
 
     @Override
@@ -529,11 +529,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         edit.apply();
 
         Log.d(TAG, "SingleFragmentActivity - onDestroy");
-        //**************** сохраняем  в файл список файлов с раскладками *********
-        //получаем список имён файлов из FileSaverLab
-        ArrayList<String> listNamesOfFiles = getListNamesOfFiles();
-        //сохраняем в файл список сохранённых файлов
-        writeArrayList(listNamesOfFiles,FILENAME_NAMES_OF_FILES);
+
         //отключаем таймер
         if (mTimer!=null)mTimer.cancel();
     }
@@ -600,7 +596,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 return true;
 
             case R.id.save_data_in_file:
-                DialogFragment dialogFragment = new DialogSaveTempFragment();
+                DialogFragment dialogFragment = DialogSaveTempFragment.newInstance(finishFileName);
                 dialogFragment.show(getSupportFragmentManager(),"SavePickerTempolider");
                 onPause();
                 return true;
@@ -853,6 +849,8 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     //в зависимости от имени, введённого в диалоге сохранения и типа данных
     public  String saveDataAndFilename(String nameFile, String fileNameDefoult, String typeData){
 
+        Log.d(TAG, "saveDataAndFilename nameFile = " + nameFile);
+
         String finishFileName;
         //получаем дату и время в нужном для базы данных формате
         String dateFormat  = mTempDBHelper.getDateString();
@@ -862,7 +860,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         if (nameFile.isEmpty()) {
             //имя будет fileNameDefoult
             finishFileName = fileNameDefoult;
-            Log.d(TAG, "saveDataAndFilename nameFile = " + nameFile);
 
             //проверяем, есть ли в базе запись с таким именем
             long repeatId = mTempDBHelper.getIdFromFileName (finishFileName);
@@ -876,7 +873,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         }
         Log.d(TAG, "saveDataAndFilename finishFileName = " + finishFileName);
         //======Начало добавления записей в таблицы DataFile и DataSet=========//
-        //если имя файла не пустое или fileNameDefoult
+        //если имя файла не пустое (может быть fileNameDefoult)
         //создаём экземпляр класса DataFile в конструкторе
         DataFile file1 = new DataFile(finishFileName, dateFormat, timeFormat,
                 null,null, typeData, 6);
@@ -899,10 +896,8 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
             float time_now;
             int reps_now;
             int number_now;
-             HashMap<String,Object> map = ( HashMap<String,Object>)sara.getItem(j);
-            //TextView tvTime = view.findViewById(R.id.time_item_set_textview);
-            //TextView tvReps = view.findViewById(R.id.reps_item_set_textview);
-            //TextView tvNumber = view.findViewById(R.id.mark_item_set_textview);
+             HashMap<String,Object> map = (HashMap<String,Object>)sara.getItem(j);
+
             time_now = Float.parseFloat((map.get(P.ATTR_TIME).toString()));
             reps_now = (int)map.get(P.ATTR_REP);
             number_now = (int)map.get(P.ATTR_NUMBER);
@@ -917,25 +912,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
             }
 
         return finishFileName;
-    }
-
-    //получаем список имён файлов из FileSaverLab
-    private ArrayList<String> getListNamesOfFiles(){
-        ArrayList<String> listNamesOfFiles = new ArrayList<>();
-        FileSaverLab fileSaverLab = FileSaverLab.get();
-        //получаем список данных о сохранённых файлов
-        List<FileSaver> fi = fileSaverLab.getFileSavers();
-        //заводим список сохранённых файлов ArrayList и пишем в лог
-        for (FileSaver set: fi){
-            String name =set.getTitle();
-            String date = set.getDate();
-            String type = set.getTipe();
-            String nameOfFile = String.format("%s:%s:%s",name,date,type);
-            //Log.d(TAG, " number = "  + number);
-            listNamesOfFiles.add(nameOfFile);
-        }
-        Log.d(TAG, " sizeOfList  = "  + listNamesOfFiles.size());
-        return listNamesOfFiles;
     }
 
 }

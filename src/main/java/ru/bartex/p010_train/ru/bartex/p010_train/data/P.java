@@ -260,4 +260,68 @@ public class P {
                 return  data;
     }
 
+    public static String getTimeString1_Float (float timeFloat){
+
+        float timeInMillis = timeFloat*1000;
+
+        //формируем формат строки показа времени
+        int minut = (int)((timeInMillis/60000)%60);
+        int second = (int)((timeInMillis/1000)%60);
+        int decim = Math.round((timeInMillis%1000)/100);
+        String time;
+
+        if(minut<1) {
+            time = String.format("%d.%01d", second, decim);
+        }else if (minut<60){
+            time = String.format("%d:%02d.%01d",minut,second,decim);
+        }else {
+            int hour = (int)((timeInMillis/3600000)%24);
+            time = String.format("%d:%02d:%02d.%01d",hour,minut,second,decim);
+        }
+        return time;
+    }
+
+    public static String getTimeString2_Float (float timeFloat){
+
+        float timeInMillis = timeFloat*1000;
+
+        //формируем формат строки показа времени
+        int minut = (int)((timeInMillis/60000)%60);
+        int second = (int)((timeInMillis/1000)%60);
+        int decim = Math.round((timeInMillis%1000)/10);
+        String time;
+
+        if(minut<1) {
+            time = String.format("%d.%02d", second, decim);
+        }else if (minut<60){
+            time = String.format("%d:%02d.%02d",minut,second,decim);
+        }else {
+            int hour = (int)((timeInMillis/3600000)%24);
+            time = String.format("%d:%02d:%02d.%02d",hour,minut,second,decim);
+        }
+        return time;
+    }
+
+    public static String getTimeString3_Float (float timeFloat){
+
+        float timeInMillis = timeFloat*1000;
+
+        //формируем формат строки показа времени
+        int minut = (int)((timeInMillis/60000)%60);
+        int second = (int)((timeInMillis/1000)%60);
+        int decim = (int)(timeInMillis%1000);
+        String time;
+
+        if(minut<1) {
+            time = String.format("%d.%03d", second, decim);
+        }else if (minut<60){
+            time = String.format("%d:%02d.%03d",minut,second,decim);
+        }else {
+            int hour = (int)((timeInMillis/3600000)%24);
+            time = String.format("%d:%02d:%02d.%03d",hour,minut,second,decim);
+        }
+        return time;
+    }
+
+
 }

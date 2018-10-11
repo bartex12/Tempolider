@@ -5,9 +5,11 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -58,6 +60,8 @@ public class SetListFragment extends Fragment {
     long finishFileId;
 
     TempDBHelper mTempDBHelper;
+    int accurancy; //точность отсечек - количество знаков после запятой - от MainActivity
+    private SharedPreferences prefSetting;// предпочтения из PrefActivity
 
 
     public interface OnShowTotalValuesListener {
@@ -101,6 +105,8 @@ public class SetListFragment extends Fragment {
         super.onCreate(savedInstanceState);
         Log.d(TAG, "SetListFragment: onCreate  ");
 
+        //имя файла из аргументов - оно остаётся тем же после редактирования в отличие от id  файла
+        //который надо вычислять снова после возврата из редактирования
         finishFileName = getArguments().getString(P.ARG_NAME_OF_FILE);
         //для фрагментов требуется так разрешить появление меню
         setHasOptionsMenu(true);
@@ -110,9 +116,6 @@ public class SetListFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mTempDBHelper = new TempDBHelper(getActivity());
-        //id файла с именем finishFileName
-        finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
-
     }
 
     @Override
@@ -152,6 +155,7 @@ public class SetListFragment extends Fragment {
         });
         //объявляем о регистрации контекстного меню
         registerForContextMenu(mListView);
+
         return v;
     }
 
@@ -166,9 +170,18 @@ public class SetListFragment extends Fragment {
         super.onResume();
         Log.d(TAG, "SetListFragment: onResume  ");
 
-        //readArrayList(SingleFragmentActivity.FILENAME_OTSECHKI);
+        //получаем настройки из активности настроек
+        prefSetting = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        //получаем из файла настроек количество знаков после запятой
+        accurancy = Integer.parseInt(prefSetting.getString("accurancy", "1"));
+        Log.d(TAG,"SingleFragmentActivity onResume accurancy = " + accurancy);
         //обновляем данные списка фрагмента активности
         //если здесь не обновлять, то список не обновляется при возврате из DetailActivity
+
+        //id файла с именем finishFileName - он меняется при возврате из редактирования
+        //так как файл может быть перезаписан с другим id  - кстати, это нужно исправить
+        finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
+
         updateAdapter();
         //вычисляем и показываем общее время выполнения подхода и количество повторов в подходе
         calculateAndShowTotalValues();
@@ -243,7 +256,7 @@ public class SetListFragment extends Fragment {
                 //id файла с именем finishFileName
                 finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
 
-                DataSet dataSet = mTempDBHelper.getAllSetFragmentData(finishFileId, acmi.position);
+                DataSet dataSet = mTempDBHelper.getOneSetFragmentData(finishFileId, acmi.position);
 
                 Intent intent = new Intent(getContext(), DetailActivity.class);
                 intent.putExtra(P.DETAIL_DATA_SET, dataSet);
@@ -304,18 +317,32 @@ public class SetListFragment extends Fragment {
             //проходим по курсору и берём данные
             if (cursor.moveToFirst()) {
                 do {
-                    float time  = cursor.getFloat(cursor.getColumnIndex(TabSet.COLUMN_SET_TIME));
-                    //пока не используем, так как появляется запятая вместо точки
-                    //String timeFormat = String.format("%.2f",time);
+                    float time_now  = cursor.getFloat(cursor.getColumnIndex(TabSet.COLUMN_SET_TIME));
                     int reps_now = cursor.getInt(cursor.getColumnIndex(TabSet.COLUMN_SET_REPS));
                     int number_now = cursor.getInt(cursor.getColumnIndex(TabSet.COLUMN_SET_FRAG_NUMBER));
 
-                    Log.d(TAG,"SetListFragment time_now = " + time +
+                    Log.d(TAG,"SetListFragment time_now = " + time_now +
                             "  reps_now = " + reps_now + "  number_now = " + number_now);
 
+                    String s_delta;
+
+                    switch (accurancy){
+                        case 1:
+                            s_delta = String.format("%.01f",time_now);
+                            break;
+                        case 2:
+                            s_delta = String.format("%.02f",time_now);
+                            break;
+                        case 3:
+                            s_delta = String.format("%.03f",time_now);
+                            break;
+                        default:
+                            s_delta =String.format("%.01f",time_now);
+                    }
+
                     m = new HashMap<>();
-                    //m.put(P.ATTR_TIME, timeFormat);
-                    m.put(P.ATTR_TIME, time);
+
+                    m.put(P.ATTR_TIME, s_delta);
                     m.put(P.ATTR_REP, reps_now);
                     m.put(P.ATTR_NUMBER, number_now);
                     data.add(m);
@@ -360,8 +387,7 @@ public class SetListFragment extends Fragment {
 
     private void calculateAndShowTotalValues(){
 
-        Log.d(TAG, "mTempDBHelper  = " + mTempDBHelper +
-                "finishFileId  = " + finishFileId);
+        Log.d(TAG,"SetListFragment calculateAndShowTotalValues finishFileId  = " + finishFileId);
 
         //посчитаем общее врямя выполнения подхода в секундах
         mTimeOfSet = mTempDBHelper.getSumOfTimeSet(finishFileId);
