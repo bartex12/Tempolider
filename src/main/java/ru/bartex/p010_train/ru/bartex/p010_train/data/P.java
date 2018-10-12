@@ -55,12 +55,15 @@ public class P {
 
     public final static int DETAIL_CHANGE_REQUEST_KODE = 10;
     public final static int CHANGE_TEMP_CHANGE_REQUEST_CODE = 20;
-
+    public final static int CHANGE_TEMP_SET_LIST_REQUEST_CODE = 30;
 
     //имя файла для записи раскладки темполидера  по умолчанию - когда имя - пустая строка
     public static final String FILENAME_OTSECHKI_TEMP ="автосохранение__темполидера";
     //имя файла для записи раскладки секундомера по умолчанию - когда имя - пустая строка
     public static final String FILENAME_OTSECHKI_SEC ="автосохранение_секундомера";
+    //имя файла для записи раскладки Избранное по умолчанию - когда имя - пустая строка
+    public static final String FILENAME_OTSECHKI_LIKE ="автосохранение_избранное";
+
 
     //имя файла для записи текущей раскладки секундомера - когда не стали сохранять (или случайно)
     // перезаписывается при новой порции отсечек

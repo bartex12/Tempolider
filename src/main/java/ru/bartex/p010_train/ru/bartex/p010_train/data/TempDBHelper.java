@@ -130,10 +130,7 @@ public class TempDBHelper extends SQLiteOpenHelper {
             Log.d(TAG, "MyDatabaseHelper.createDefaultPersonIfNeed ... count = " +
                     this.getFilesCount());
         }
-
-
     }
-
 
     public String getDateString() {
         Calendar calendar = new GregorianCalendar();
@@ -246,10 +243,10 @@ public class TempDBHelper extends SQLiteOpenHelper {
     }
 
     // создать копию файла  в базе данных и получить его id
-    public long createFileCopy(String finishFileName, long fileId){
+    public long createFileCopy(String finishFileName, long fileId, String endName){
         //количество фрагментов подхода
         int countOfSet =this.getSetFragmentsCount(fileId);
-        String newFileName = finishFileName + "Copy";
+        String newFileName = finishFileName + endName;
         Log.d(TAG, "createFileCopy newFileName = " + newFileName);
         //создаём и записываем в базу копию файла на случай отмены изменений
         DataFile dataFileCopy = this.getAllFilesData(fileId);
@@ -347,7 +344,7 @@ public class TempDBHelper extends SQLiteOpenHelper {
     /**
      * Возвращает имя файла по его ID
      */
-    public String getFileNameFromDataFile( long rowId) throws SQLException {
+    public String getFileNameFromTabFile( long rowId) throws SQLException {
 
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -363,6 +360,27 @@ public class TempDBHelper extends SQLiteOpenHelper {
         mCursor.close();
 
         return fileName;
+    }
+
+    /**
+     * Возвращает имя файла по его ID
+     */
+    public String getFileTypeFromTabFile( long rowId) throws SQLException {
+
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        Cursor mCursor = db.query(true, TabFile.TABLE_NAME,
+                null,
+                TabFile._ID + "=" + rowId,
+                null, null, null, null, null);
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+        }
+        String fileType = mCursor.getString(mCursor.getColumnIndex(TabFile.COLUMN_TYPE_FROM));
+
+        mCursor.close();
+
+        return fileType;
     }
 
     /**

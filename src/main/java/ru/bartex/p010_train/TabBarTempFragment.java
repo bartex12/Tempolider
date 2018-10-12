@@ -74,7 +74,7 @@ public class TabBarTempFragment extends StatFrag {
             public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
 
                 //строка с именем файла
-                String fileName = mTempDBHelper.getFileNameFromDataFile(l);
+                String fileName = mTempDBHelper.getFileNameFromTabFile(l);
                 Log.d(TAG, "TabBarTempFragment onCreateView     имя файла = " +  fileName +
                         "  long l = " + l ) ;
                 //отправляем интент с меткой 333, что значит из TabBarActivity

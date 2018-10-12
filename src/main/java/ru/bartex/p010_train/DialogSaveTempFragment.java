@@ -40,7 +40,7 @@ public class DialogSaveTempFragment extends DialogFragment {
     }
 
     public interface SaverFragmentListener{
-        void onFileNameTransmit(String nameFile);
+        void onFileNameTransmit(String oldNameFile, String newNameFile);
     }
 
     SaverFragmentListener mSaverFragmentListener;
@@ -80,7 +80,7 @@ public class DialogSaveTempFragment extends DialogFragment {
         name.requestFocus();
         name.setInputType(InputType.TYPE_CLASS_TEXT);
         bilder.setView(view);
-        bilder.setTitle("Запись в файл");
+        bilder.setTitle("Сохранить как");
         bilder.setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -92,7 +92,7 @@ public class DialogSaveTempFragment extends DialogFragment {
                     Log.d(TAG, "SaverFragment date.isChecked() Имя файла = " + nameFile);
                 }
                 //Вызываем метод интерфейса, передаем  имя файла в SingleFragmentActivity
-                mSaverFragmentListener.onFileNameTransmit(nameFile);
+                mSaverFragmentListener.onFileNameTransmit(finishFileName,nameFile);
 
                 //принудительно прячем  клавиатуру - повторный вызов ее покажет
                 takeOnAndOffSoftInput();

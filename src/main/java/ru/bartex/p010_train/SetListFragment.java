@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
@@ -252,7 +253,7 @@ public class SetListFragment extends Fragment {
 
                 //если выбран пункт Изменить запись
             } else if (item.getItemId() == CHANGE_ID) {
-
+                Log.d(TAG, "SetListFragment CHANGE_ID");
                 //id файла с именем finishFileName
                 finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
 
@@ -268,22 +269,14 @@ public class SetListFragment extends Fragment {
 
             } else if (item.getItemId() == CHANGE_TEMP_ID) {
 
-                Log.d(TAG, "SetListFragment getCheckedItemPosition = " +
-                        mListView.getCheckedItemPosition());
-                //ищем в активности TextView с именем файла
-                TextView tv = getActivity().findViewById(R.id.textViewName);
-                //читаем имя
-                String name = tv.getText().toString();
+                Log.d(TAG, "SetListFragment CHANGE_TEMP_ID");
+
                 Intent intent = new Intent(getContext(), ChangeTempActivity.class);
-                //передаём позицию списка, на которой сделано нажатие
-                intent.putExtra(ChangeTempActivity.POSITION, acmi.position);
-                //передаём имя файла
-                intent.putExtra(ChangeTempActivity.NAME_OF_FILE, name);
-                //передаём request_code
-                intent.putExtra(ChangeTempActivity.CHANGE_REQUEST, request_code);
-                Log.d(TAG, "SetListFragment CHANGE_TEMP_ID acmi.position = " + acmi.position);
+                //передаём id  файла на экране
+                intent.putExtra(P.INTENT_TO_CHANGE_TEMP_FILE_NAME, finishFileName);
+                //передаём request_code - откуда пришл интент
+                intent.putExtra(P.CHANGE_TEMP_CHANGE_REQUEST, P.CHANGE_TEMP_SET_LIST_REQUEST_CODE);
                 startActivity(intent);
-                return true;
             }
         }
         //если ничего не выбрано
@@ -328,16 +321,16 @@ public class SetListFragment extends Fragment {
 
                     switch (accurancy){
                         case 1:
-                            s_delta = String.format("%.01f",time_now);
+                            s_delta = String.format(Locale.ENGLISH,"%.01f",time_now);
                             break;
                         case 2:
-                            s_delta = String.format("%.02f",time_now);
+                            s_delta = String.format(Locale.ENGLISH,"%.02f",time_now);
                             break;
                         case 3:
-                            s_delta = String.format("%.03f",time_now);
+                            s_delta = String.format(Locale.ENGLISH,"%.03f",time_now);
                             break;
                         default:
-                            s_delta =String.format("%.01f",time_now);
+                            s_delta =String.format(Locale.ENGLISH,"%.01f",time_now);
                     }
 
                     m = new HashMap<>();

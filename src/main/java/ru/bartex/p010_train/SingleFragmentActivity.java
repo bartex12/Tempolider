@@ -150,45 +150,37 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     }
 
 
-    //nameFile - имя файла для записи в список сохранённых файлов
+    //oldNameFile - имя файла для записи в список сохранённых файлов
     @Override
-    public void onFileNameTransmit(String nameFile) {
+    public void onFileNameTransmit(String oldNameFile, String newNameFile) {
 
-        //Если данные пришли из диалога сохранения в файл в темполидере
-        if (fromActivity ==111) {
-            Log.d(TAG, "SingleFragmentActivity - onFileNameTransmit fromActivity = " +
-                    fromActivity);
-            finishFileName = saveDataAndFilename(nameFile,
-                    P.FILENAME_OTSECHKI_TEMP , P.TYPE_TEMPOLEADER);
-            //выводим имя файла на экран
-            mNameOfFile.setText(finishFileName);
+        //имя файла, если строка имени пуста
+        String fileNameDefoult =P.FINISH_FILE_NAME;
 
-        //если данные пришли  от секундомера - отсечки
-        } else if (fromActivity == 222) {
-            Log.d(TAG, "SingleFragmentActivity - onArrayListTransmit fromActivity = " +
-                    fromActivity);
-            finishFileName = saveDataAndFilename(nameFile,
-                    FILENAME_OTSECHKI_SEC , SingleFragmentActivity.TYPE_TIMEMETER);
-            //выводим имя файла на экран
-            mNameOfFile.setText(finishFileName);
+        long oldFileId = mTempDBHelper.getIdFromFileName(oldNameFile);
+        String typeFile = mTempDBHelper.getFileTypeFromTabFile(oldFileId);
 
-        }else if (fromActivity == 333){
-            //если данные пришли  из списка сохранённых файлов, смотрим на имя файла
-            Log.d(TAG, "SingleFragmentActivity - onArrayListTransmit nameFile = " + nameFile);
-            String def;
-            if (typeOfFile.equalsIgnoreCase(TYPE_TEMPOLEADER)){
-                def = FILENAME_OTSECHKI_TEMP;
-            }else if (typeOfFile.equalsIgnoreCase(TYPE_TIMEMETER)){
-                def = FILENAME_OTSECHKI_SEC;
-            }else {
-                def = FILENAME_OTSECHKI_SEC;
+        if (newNameFile.isEmpty()) {
+            switch (typeFile) {
+                case P.TYPE_TIMEMETER:
+                    fileNameDefoult = P.FILENAME_OTSECHKI_SEC;
+                    break;
+                case P.TYPE_TEMPOLEADER:
+                    fileNameDefoult = P.FILENAME_OTSECHKI_TEMP;
+                    break;
+                case P.TYPE_LIKE:
+                    fileNameDefoult = P.FILENAME_OTSECHKI_LIKE;
+                    break;
             }
-            //и устанавливаем соответствующие параметры
-            finishFileName = saveDataAndFilename(nameFile, def , typeOfFile);
-            //выводим имя файла на экран
-            mNameOfFile.setText(finishFileName);
         }
-    }
+
+        //и устанавливаем соответствующие параметры
+        finishFileName = saveDataAndFilename(newNameFile, fileNameDefoult, typeFile);
+        //выводим имя файла на экран
+        mNameOfFile.setText(finishFileName);
+
+        }
+
 
     //метод интерфейса для передачи величины задержки из диалога
     @Override
@@ -595,6 +587,15 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 startActivity(intentDetail);
                 return true;
 
+            case R.id.change_data:
+                Intent intent = new Intent(this, ChangeTempActivity.class);
+                //передаём id  файла на экране
+                intent.putExtra(P.INTENT_TO_CHANGE_TEMP_FILE_NAME, finishFileName);
+                //передаём request_code - откуда пришл интент
+                intent.putExtra(P.CHANGE_TEMP_CHANGE_REQUEST, P.CHANGE_TEMP_CHANGE_REQUEST_CODE);
+                startActivity(intent);
+                return true;
+
             case R.id.save_data_in_file:
                 DialogFragment dialogFragment = DialogSaveTempFragment.newInstance(finishFileName);
                 dialogFragment.show(getSupportFragmentManager(),"SavePickerTempolider");
@@ -602,7 +603,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 return true;
 
             case R.id.show_list_of_files:
-
                 //вызываем TabBarActivity
                 Intent intentList = new Intent(getBaseContext(), TabBarActivity.class);
                 startActivity(intentList);
@@ -616,15 +616,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 //finish();  //не нужно
                 return true;
 
-            case R.id.change_data:
 
-                Intent intent = new Intent(this, ChangeTempActivity.class);
-                //передаём id  файла на экране
-                intent.putExtra(P.INTENT_TO_CHANGE_TEMP_FILE_NAME, finishFileName);
-                //передаём request_code - откуда пришл интент
-                intent.putExtra(P.CHANGE_TEMP_CHANGE_REQUEST, P.CHANGE_TEMP_CHANGE_REQUEST_CODE);
-                startActivity(intent);
-                return true;
         }
         return super.onOptionsItemSelected(item);
     }

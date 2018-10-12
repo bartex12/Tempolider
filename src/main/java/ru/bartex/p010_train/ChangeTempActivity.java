@@ -33,6 +33,7 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 
@@ -95,9 +96,11 @@ public class ChangeTempActivity extends AppCompatActivity implements
     private float mTimeOfSet = 0;   //общее время выполнения подхода в секундах
     private int mTotalReps = 0;  //общее количество повторений в подходе
 
-    long fileId; //имя файла на редактировании
-    long fileIdCopy;  //имя копии файла для отмены
+    long fileId; //id  файла на редактировании
+    long fileIdCopy;  // id копии файла для отмены
     String finishFileName;
+    //добавка к имени в копии файла
+    String endName = "copy";
 
     @Override
     public void changeTempUpDown(int valueDelta, boolean up) {
@@ -106,14 +109,20 @@ public class ChangeTempActivity extends AppCompatActivity implements
         float ff = (up == true) ? (1 - ((float)valueDelta/100)) : (1 + ((float)valueDelta/100));
         Log.d(TAG, "ChangeTempActivity changeTempUpDown ff = " + ff);
 
-        List<Set> sets = SetLab.getSets();
-        for (Set s:sets){
-            s.setTimeOfRep((s.getTimeOfRep())*ff);
+        //обновляем фрагменты по очереди
+        for (int i = 0; i<countOfSet; i++ ){
+            DataSet dataSet = mDBHelper.getOneSetFragmentData(fileId, i);
+            dataSet.setTimeOfRep((dataSet.getTimeOfRep())*ff);
+            mDBHelper.updateSetFragment(dataSet);
+            Log.d(TAG, "ChangeTempActivity changeTempUpDown dataSet Time = " +
+                    dataSet.getTimeOfRep());
         }
 
         updateAdapter();
         calculateAndShowTotalValues();
         changeTemp_listView.setSelection(0);
+
+        finish();
     }
 
     @Override
@@ -141,8 +150,9 @@ public class ChangeTempActivity extends AppCompatActivity implements
         //количество фрагментов подхода
         countOfSet =mDBHelper.getSetFragmentsCount(fileId);
 
+
          //создаём и записываем в базу копию файла на случай отмены изменений
-        fileIdCopy = mDBHelper.createFileCopy(finishFileName, fileId);
+        fileIdCopy = mDBHelper.createFileCopy(finishFileName, fileId, endName);
 
         deltaValue = (TextView)findViewById(R.id.deltaValue);
         deltaValue.setVisibility(View.INVISIBLE);
@@ -244,7 +254,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
 
                 //deltaValue.setVisibility(View.VISIBLE);
                 //String ss = redactTime == true ? s+"%":s;
-               // deltaValue.setText(ss);
+                //deltaValue.setText(ss);
 
             }
         });
@@ -277,7 +287,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
                 //изменяем имя у копии файла на первоначальное имя
                 mDBHelper.updateFileName(finishFileName,fileIdCopy);
                 // снова создаём и записываем в базу копию файла на случай отмены изменений
-                fileIdCopy = mDBHelper.createFileCopy(finishFileName, fileId);
+                fileIdCopy = mDBHelper.createFileCopy(finishFileName, fileId, endName);
 
                 updateAdapter();
                 calculateAndShowTotalValues();
@@ -554,16 +564,16 @@ public class ChangeTempActivity extends AppCompatActivity implements
 
                 switch (accurancy){
                     case 1:
-                        s_delta = String.format("%.01f",time);
+                        s_delta = String.format(Locale.ENGLISH,"%.01f",time);
                         break;
                     case 2:
-                        s_delta = String.format("%.02f",time);
+                        s_delta = String.format(Locale.ENGLISH,"%.02f",time);
                         break;
                     case 3:
-                        s_delta = String.format("%.03f",time);
+                        s_delta = String.format(Locale.ENGLISH,"%.03f",time);
                         break;
                     default:
-                        s_delta =String.format("%.01f",time);
+                        s_delta =String.format(Locale.ENGLISH,"%.01f",time);
                 }
 
                 m = new HashMap<>();

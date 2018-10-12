@@ -60,9 +60,9 @@ public class DialogChangeTemp extends DialogFragment {
         AlertDialog.Builder bilder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
         View view = inflater.inflate(R.layout.fragment_dialog_chahge_temp, null);
-        final EditText value = (EditText)view.findViewById(R.id.editTextChangeTempValue);
-       // final RadioButton radioButtonUp = (RadioButton) view.findViewById(R.id.radioButtonTempUp);
-       // final RadioButton radioButtonDown = (RadioButton) view.findViewById(R.id.radioButtonTempDown);
+
+        final EditText valueChangTemp = (EditText)view.findViewById(R.id.editTextChangeTempValue);
+
         final RadioGroup radioGroup =(RadioGroup)view.findViewById(R.id.radioGroupTempUpDown);
         radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
@@ -81,7 +81,7 @@ public class DialogChangeTemp extends DialogFragment {
         //value.requestFocus();
         //value.setInputType(InputType.TYPE_CLASS_NUMBER);
         int valueOfDelta = (Integer) getArguments().get(ARG_VALUE);
-        value.setText(String.valueOf(valueOfDelta));
+        valueChangTemp.setText(String.valueOf(valueOfDelta));
         bilder.setView(view);
         bilder.setTitle("Введите величину изменения темпа, %");
         bilder.setPositiveButton("Готово", new DialogInterface.OnClickListener() {
@@ -90,7 +90,7 @@ public class DialogChangeTemp extends DialogFragment {
 
                 //Вызываем метод интерфейса и передаём величину дельта
                 mChangeTempUpDownListener.changeTempUpDown(
-                        Integer.parseInt(value.getText().toString()), up);
+                        Integer.parseInt(valueChangTemp.getText().toString()), up);
 
                 //принудительно прячем  клавиатуру - повторный вызов ее покажет
                 takeOnAndOffSoftInput();
