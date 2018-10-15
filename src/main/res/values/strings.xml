@@ -17,24 +17,24 @@
     <string name="change_data">Изменить раскладку</string>
     <string name="change_temp">Изменить темп </string>
 
-    <string name="timeValue_item1">3</string>
-    <string name="repsValue_item1">5</string>
     <string name="start_button">старт</string>
     <string name="stop_button">стоп</string>
     <string name="reset_button">сброс</string>
-    <string name="timeValue_item2">4</string>
-    <string name="repsValue_item2">5</string>
-    <string name="timeValue_item3">5</string>
-    <string name="timeValue_item4">6</string>
-    <string name="timeValue_item5">6</string>
-    <string name="repsValue_item3">5</string>
-    <string name="repsValue_item4">5</string>
-    <string name="repsValue_item5">5</string>
-    <string name="lebelTime">Время</string>
-    <string name="lebelCount">Количество</string>
+    <string name="timeValue_item1">0</string>
+    <string name="repsValue_item1">1</string>
+    <string name="timeValue_item2">0</string>
+    <string name="repsValue_item2">1</string>
+    <string name="timeValue_item3">0</string>
+    <string name="timeValue_item4">0</string>
+    <string name="timeValue_item5">0</string>
+    <string name="repsValue_item3">1</string>
+    <string name="repsValue_item4">1</string>
+    <string name="repsValue_item5">1</string>
+    <string name="Communicate">Communicate</string>
+
     <string name="new_frag">Новый фрагмент</string>
-    <string name="list_empty_tempolider">Список пуст.
-        Создайте или загрузите раскладку.</string>
+    <string name="list_empty_tempolider">Данные отсутствуют либо удалены пользователем.
+        Создайте новую или загрузите другую раскладку подхода.</string>
 
     <string-array name="аccurancy_entry_number">
         <item>0.1 сек</item>
@@ -65,7 +65,40 @@
     <string name="title_activity_tab_bar">TabBarActivity</string>
     <string name="section_format">Список раскладок %1$d</string>
     <string name="change_name">Изменить</string>
+    <string name="new_name">Создание раскладки</string>
     <string name="Help">Справка</string>
+    <string name="Timemeter">Секундомер</string>
+    <string name="PaceMaker">Темполидер</string>
+    <string name="ListOfTimeReps">Раскладки по темпу</string>
+    <string name="Settings">Настройки</string>
+    <string name="Share">Share</string>
+    <string name="Send">Send</string>
+    <string name="FileName">Имя раскладки  </string>
+    <string name="FileNameInput">Введите имя</string>
+    <string name="DelayOfStart">Задержка старта, сек   </string>
+    <string name="DelayOfStartInput">Введите задержку</string>
+    <string name="DelayValue">6</string>
+    <string name="Fragment">Фрагмент</string>
+    <string name="OfSet">подхода</string>
+    <string name="FragmentOfSet1">1</string>
+    <string name="FragmentOfSet2">2</string>
+    <string name="FragmentOfSet3">3</string>
+    <string name="FragmentOfSet4">4</string>
+    <string name="FragmentOfSet5">5</string>
+    <string name="lebelTime">Время</string>
+    <string name="Sec">сек</string>
+    <string name="lebelCount">Кол-во</string>
+    <string name="lebelCountN">раз</string>
+    <string name="CreateFileSet">Создать раскладку</string>
+    <string name="Name">Имя:  </string>
+    <string name="Count">Количество:  </string>
+    <string name="CountZeroTime">00:00</string>
+    <string name="LowMinus">_</string>
+
+
+
+
+
 
 
 </resources>

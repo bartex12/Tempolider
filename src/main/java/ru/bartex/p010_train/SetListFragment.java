@@ -69,7 +69,12 @@ public class SetListFragment extends Fragment {
         void onShowTotalValues( String time,String reps);
     }
 
+    public interface OnShowTSaveIconListener {
+        void onSaveIconState();
+    }
+
     private OnShowTotalValuesListener mShowTotalValuesListener;
+    private OnShowTSaveIconListener mOnShowTSaveIconListener;
 
     public static SetListFragment newInstance(String nameOfFile){
         Bundle args = new Bundle();
@@ -99,6 +104,7 @@ public class SetListFragment extends Fragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mShowTotalValuesListener = (OnShowTotalValuesListener)context;
+        mOnShowTSaveIconListener = (OnShowTSaveIconListener)context;
     }
 
     @Override
@@ -146,10 +152,17 @@ public class SetListFragment extends Fragment {
 
                     //если в активности нажата Стоп, то Старт = false
                 }else{
+                    Log.d(TAG, "SetListFragment mListView.setOnItemClickListener");
+                    //id файла с именем finishFileName
+                    finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
+
+                    DataSet dataSet = mTempDBHelper.getOneSetFragmentData(finishFileId, i);
+
                     Intent intent = new Intent(getContext(), DetailActivity.class);
-                    intent.putExtra(DetailActivity.POSITION, i);
-                    intent.putExtra(DetailActivity.DETAIL_REQUEST, request_code);
-                    Log.d(TAG, "SetListFragment onItemClick   i = " + i);
+                    intent.putExtra(P.DETAIL_DATA_SET, dataSet);
+                    intent.putExtra(P.DETAIL_CHANGE_REQUEST, P.DETAIL_CHANGE_REQUEST_KODE);
+                    Log.d(TAG, "SetListFragment mListView.setOnItemClickListener position = " +
+                            i+ "  id = " + l);
                     startActivity(intent);
                 }
             }
@@ -209,6 +222,7 @@ public class SetListFragment extends Fragment {
             Log.d(TAG, "SetListFragment onItemClick  start = " + SingleFragmentActivity.start);
             Toast.makeText(getContext(),
                     "Сначала нажмите Стоп", Toast.LENGTH_SHORT).show();
+
         }else {
             //если выбран пункт Удалить запись
             if (item.getItemId() == DELETE_ID) {
@@ -245,6 +259,9 @@ public class SetListFragment extends Fragment {
 
                         //вычисляем и показываем общее время выполнения подхода и количество повторов в подходе
                         calculateAndShowTotalValues();
+
+                        //вызываем метод интерфейса, чтобы сообщить, что нужно показать иконку Сохранить
+                        mOnShowTSaveIconListener.onSaveIconState();
                     }
                 });
 
@@ -261,21 +278,23 @@ public class SetListFragment extends Fragment {
 
                 Intent intent = new Intent(getContext(), DetailActivity.class);
                 intent.putExtra(P.DETAIL_DATA_SET, dataSet);
+                intent.putExtra(P.FINISH_FILE_NAME, finishFileName);
                 intent.putExtra(P.DETAIL_CHANGE_REQUEST, P.DETAIL_CHANGE_REQUEST_KODE);
+
                 Log.d(TAG, "SetListFragment CM_CHANGE_ID acmi.position = " + acmi.position+
                                 "  acmi.id = " + acmi.id);
                startActivity(intent);
+               getActivity().finish();
                 return true;
 
+                //если выбран пункт Изменить раскладку
             } else if (item.getItemId() == CHANGE_TEMP_ID) {
 
                 Log.d(TAG, "SetListFragment CHANGE_TEMP_ID");
 
                 Intent intent = new Intent(getContext(), ChangeTempActivity.class);
                 //передаём id  файла на экране
-                intent.putExtra(P.INTENT_TO_CHANGE_TEMP_FILE_NAME, finishFileName);
-                //передаём request_code - откуда пришл интент
-                intent.putExtra(P.CHANGE_TEMP_CHANGE_REQUEST, P.CHANGE_TEMP_SET_LIST_REQUEST_CODE);
+                intent.putExtra(P.FINISH_FILE_NAME, finishFileName);
                 startActivity(intent);
             }
         }

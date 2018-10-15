@@ -101,22 +101,29 @@ public class TimeMeterActivity extends AppCompatActivity
                 //имя будет "Автосохранение секундомера"
                 finishNameFile = P.FILENAME_OTSECHKI_SEC;
 
-            Log.d(TAG, "onNameAndGrafTransmit nameFile = " + nameFile);
+            Log.d(TAG, "onNameAndGrafTransmit nameFile = " + nameFile.isEmpty()+
+                    "  finishNameFile = " + finishNameFile);
 
-            //проверяем, есть ли в базе запись с таким именем
+            //проверяем, есть ли в базе запись с таким именем FILENAME_OTSECHKI_SEC
             long repeatId = mTempDBHelper.getIdFromFileName (finishNameFile);
             Log.d(TAG,"onNameAndGrafTransmit repeatId = " + repeatId);
             //если есть (repeatId не равно -1), стираем её и потом пишем новые данные под таким именем
-            if (repeatId != -1){
-                mTempDBHelper.deleteFileAndSets(repeatId);
-            }
+            if (repeatId != -1){mTempDBHelper.deleteFileAndSets(repeatId);}
+
             }else {
-                finishNameFile = nameFile;
+                //проверяем, есть ли в базе запись с именем nameFile< чтобы избежать дублирования
+                long checkRepeatId = mTempDBHelper.getIdFromFileName (nameFile);
+                Log.d(TAG,"onNameAndGrafTransmit checkRepeatId = " + checkRepeatId);
+                //если есть (repeatId не равно -1), добавляем к имени +
+                if (checkRepeatId != -1){
+                    finishNameFile = nameFile + "_" + mTempDBHelper.getTimeString() ;
+                }else {finishNameFile = nameFile;}
             }
+            Log.d(TAG, " После finishNameFile = " + finishNameFile);
             //======Начало добавления записей в таблицы DataFile и DataSet=========//
             //если имя файла не пустое или "Автосохранение секундомера"
             //создаём экземпляр класса DataFile в конструкторе
-            DataFile file1 = new DataFile(nameFile, dateFormat, timeFormat,
+            DataFile file1 = new DataFile(finishNameFile, dateFormat, timeFormat,
                     null,null,P.TYPE_TIMEMETER, 6);
             //добавляем запись в таблицу TabFile, используя данные DataFile
             long file1_id =  mTempDBHelper.addFile(file1);
@@ -146,7 +153,7 @@ public class TimeMeterActivity extends AppCompatActivity
             // получаем Editor
             SharedPreferences.Editor ed = prefNameOfLastFile.edit();
             //пишем имя последнего сохранённого файла в предпочтения
-            ed.putString(P.LAST_FILE, nameFile);
+            ed.putString(P.LAST_FILE, finishNameFile);
             ed.apply();
 
             //если нужно записать и показать
@@ -154,8 +161,7 @@ public class TimeMeterActivity extends AppCompatActivity
             if (showGraf){
                 //открываем экран с графиком только что записанных данных
                 Intent intentTiming = new Intent(TimeMeterActivity.this, TimeGrafActivity.class);
-                //FINISH_FILE_NAME, так как в TimeGrafActivity эта величина
-                intentTiming.putExtra(P.FINISH_FILE_NAME, nameFile);
+                intentTiming.putExtra(P.FINISH_FILE_NAME, finishNameFile);
                 startActivity(intentTiming);
             }
             //стираем список с отсечками
@@ -312,7 +318,7 @@ public class TimeMeterActivity extends AppCompatActivity
                 //Останавливаем часы и обнуляем их, подаём звуковой сигнал
                 if (mTimer!=null)mTimer.cancel();
                 mTotalTime = 0;
-                mCurrentTime.setText("00:00");
+                mCurrentTime.setText(R.string.CountZeroTime);
                 mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 300);
 
                 ii = 0;
@@ -479,11 +485,16 @@ public class TimeMeterActivity extends AppCompatActivity
             case R.id.action_timing:
                 Log.d(TAG, "OptionsItem = action_timing");
                 //получаем из предпочтений имя файла и отправляем его в интенте
-                //если этого не делать, будет крах
                 prefNameOfLastFile = getPreferences(MODE_PRIVATE);
                 finishNameFile = prefNameOfLastFile.getString(P.LAST_FILE,
                         P.FILENAME_OTSECHKI_SEC);
                 Log.d(TAG, "action_timing finishFileName = " + finishNameFile);
+                //если файл был удалён, fileId = -1 и тогда вместо finishNameFile
+                // передаём Автосохранение секундомера
+                if ((mTempDBHelper.getIdFromFileName(finishNameFile)) == -1){
+                    finishNameFile = P.FILENAME_OTSECHKI_SEC;
+                }
+                Log.d(TAG, "После action_timing finishFileName = " + finishNameFile);
                 Intent intentTiming = new Intent(this, TimeGrafActivity.class);
                 intentTiming.putStringArrayListExtra(TimeGrafActivity.REP_TIME_LIST,repTimeList);
                 intentTiming.putExtra(P.FINISH_FILE_NAME, finishNameFile);

@@ -13,6 +13,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.InputType;
@@ -29,6 +30,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -36,7 +38,7 @@ import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 
-public class TabBarLikeFragment extends StatFrag {
+public class TabBarLikeFragment extends Fragment {
 
     static String TAG = "33333";
     ListView mListView;
@@ -182,13 +184,20 @@ public class TabBarLikeFragment extends StatFrag {
             deleteDialog.setNegativeButton("Да", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    //Удаление записи из базы данных
-                    mTempDBHelper.deleteFileAndSets(acmi.id);
-                    Log.d(TAG, "PersonsListActivity удалена позиция с ID " + acmi.id);
-                    //обновляем адаптер
 
-                    mViewPager.getAdapter().notifyDataSetChanged();
-                    //onResume();
+                    String fileName = mTempDBHelper.getFileNameFromTabFile(acmi.id);
+                    if (fileName.equals(P.FILENAME_OTSECHKI_SEC)||
+                            fileName.equals(P.FILENAME_OTSECHKI_TEMP)){
+                        Toast.makeText(getContext(), "Системный файл. Удаление запрещено.",
+                                Toast.LENGTH_SHORT).show();
+                    }else {
+                        //Удаление записи из базы данных
+                        mTempDBHelper.deleteFileAndSets(acmi.id);
+                        Log.d(TAG, "PersonsListActivity удалена позиция с ID " + acmi.id);
+                        //обновляем адаптер
+                        mViewPager.getAdapter().notifyDataSetChanged();
+                        //onResume();
+                    }
                 }
             });
             //если текущий фрагмент это открытая вкладка, то показываем диалог

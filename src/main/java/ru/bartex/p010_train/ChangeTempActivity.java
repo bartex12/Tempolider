@@ -44,15 +44,8 @@ import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 public class ChangeTempActivity extends AppCompatActivity implements
         DialogChangeTemp.ChangeTempUpDownListener{
 
-    public static final String POSITION = "position_ChangeTempActivity";
-    public static final String NAME_OF_FILE = "nameOfFile_ChangeTempActivity";
-    static final String CHANGE_REQUEST = "ChangeTempActivity.change_request";
-    public static final int  VALUE = 10;
     private static final String TAG = "33333";
-
-    final String ATTR_TIME = "time";
-    final String ATTR_REP = "rep";
-    final String ATTR_NUMBER = "number";
+    public static final int  VALUE = 10;
 
     ListView changeTemp_listView;
     TextView changeTemp_textViewName;
@@ -81,14 +74,14 @@ public class ChangeTempActivity extends AppCompatActivity implements
     //количество фрагментов подхода
     int countOfSet ;
 
-    List<Set> listSetCopy; //резервный список отсечек
 
     TempDBHelper mDBHelper = new TempDBHelper(this);
     ArrayList<Map<String, Object>> data;
     Map<String,Object> m;
     SimpleAdapter sara;
-    String newFileName;  // имя файла - копии
-    DataFile dataFileCopy; //экземпляр объекта "фрагмент подхода"
+    //показывать иконку Сохранить true - да false - нет
+    boolean saveVision = true;
+
 
     int accurancy; //точность отсечек - количество знаков после запятой - от MainActivity
     private SharedPreferences prefSetting;// предпочтения из PrefActivity
@@ -122,7 +115,6 @@ public class ChangeTempActivity extends AppCompatActivity implements
         calculateAndShowTotalValues();
         changeTemp_listView.setSelection(0);
 
-        finish();
     }
 
     @Override
@@ -142,14 +134,13 @@ public class ChangeTempActivity extends AppCompatActivity implements
 
         Intent intent = getIntent();
         //получаем имя файла из интента
-        finishFileName = intent.getStringExtra(P.INTENT_TO_CHANGE_TEMP_FILE_NAME);
+        finishFileName = intent.getStringExtra(P.FINISH_FILE_NAME);
         Log.d(TAG, "ChangeTempActivity finishFileName = " + finishFileName);
         //получаем id файла
         fileId = mDBHelper.getIdFromFileName(finishFileName);
 
         //количество фрагментов подхода
         countOfSet =mDBHelper.getSetFragmentsCount(fileId);
-
 
          //создаём и записываем в базу копию файла на случай отмены изменений
         fileIdCopy = mDBHelper.createFileCopy(finishFileName, fileId, endName);
@@ -168,6 +159,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
                 switch (i){
                     case R.id.radioButtonTime:
                         redactTime = true;
+                        deltaValue.setVisibility(View.VISIBLE);
                         changeTemp_buttonMinus5.setText("-5%");
                         changeTemp_buttonMinus1.setText("-1%");
                         changeTemp_buttonPlus1.setText("+1%");
@@ -175,6 +167,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
                         break;
                     case R.id.radioButtonCount:
                         redactTime = false;
+                        deltaValue.setVisibility(View.INVISIBLE);
                         changeTemp_buttonMinus5.setText("-5");
                         changeTemp_buttonMinus1.setText("-1");
                         changeTemp_buttonPlus1.setText("+1");
@@ -246,15 +239,20 @@ public class ChangeTempActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
 
-                //String s = reductAction(0.95f,-5);
-                reductAction(0.95f,-5);
+                String s = reductAction(0.95f,-5);
+                //reductAction(0.95f,-5);
                 updateAdapter();
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
+                saveVision = true;
 
-                //deltaValue.setVisibility(View.VISIBLE);
-                //String ss = redactTime == true ? s+"%":s;
-                //deltaValue.setText(ss);
+                if (redactTime){
+                    deltaValue.setVisibility(View.VISIBLE);
+                    String ss = s+"%";
+                    deltaValue.setText(ss);
+                }else {
+                    deltaValue.setVisibility(View.INVISIBLE);
+                }
 
             }
         });
@@ -263,15 +261,20 @@ public class ChangeTempActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
 
-                //String s = reductAction(0.99f, -1);
-                reductAction(0.99f, -1);
+                String s = reductAction(0.99f, -1);
+                //reductAction(0.99f, -1);
                 updateAdapter();
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
+                saveVision = true;
 
-                //deltaValue.setVisibility(View.VISIBLE);
-                //String ss = redactTime == true ? s+"%":s;
-                //deltaValue.setText(ss);
+                if (redactTime){
+                    deltaValue.setVisibility(View.VISIBLE);
+                    String ss = s+"%";
+                    deltaValue.setText(ss);
+                }else {
+                    deltaValue.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
@@ -279,6 +282,10 @@ public class ChangeTempActivity extends AppCompatActivity implements
         changeReps_imageButtonRevert.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                Log.d(TAG, "========ChangeTempActivity changeReps_imageButtonRevert=======");
+
+                Log.d(TAG, " ДО ChangeTempActivity fileId = " + fileId +
+                        "  fileIdCopy = " + fileIdCopy +"  finishFileName = " + finishFileName);
 
                 //удаляем изменённый файл
                 mDBHelper.deleteFileAndSets(fileId);
@@ -286,18 +293,31 @@ public class ChangeTempActivity extends AppCompatActivity implements
                 fileId = fileIdCopy;
                 //изменяем имя у копии файла на первоначальное имя
                 mDBHelper.updateFileName(finishFileName,fileIdCopy);
+
+               // Log.d(TAG, " ПОСЛЕ ИЗМ В КОПИИ ChangeTempActivity fileId = " + fileId +
+                //        "  fileIdCopy = " + fileIdCopy +"  finishFileName = " + finishFileName);
                 // снова создаём и записываем в базу копию файла на случай отмены изменений
                 fileIdCopy = mDBHelper.createFileCopy(finishFileName, fileId, endName);
+
+               // Log.d(TAG, " ПОСЛЕ СОЗД НОВОЙ КОПИИ ChangeTempActivity fileId = " + fileId +
+                //        "  fileIdCopy = " + fileIdCopy +"  finishFileName = " + finishFileName);
 
                 updateAdapter();
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
+                saveVision = false;
 
                 //делаем индикатор невидимым
-                //deltaValue.setVisibility(View.INVISIBLE);
+                deltaValue.setVisibility(View.INVISIBLE);
+                if (redactTime){
+                    deltaValue.setVisibility(View.VISIBLE);
+                    deltaValue.setText("0%");
+                }else {
+                    deltaValue.setVisibility(View.INVISIBLE);
+                }
                 //обнуляем показатели разности значений
-                //time = 0f;
-                //count = 0;
+                time = 0f;
+                count = 0;
             }
         });
 
@@ -306,15 +326,20 @@ public class ChangeTempActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
 
-                //String s = reductAction(1.01f, 1);
-                reductAction(1.01f, 1);
+                String s = reductAction(1.01f, 1);
+                //reductAction(1.01f, 1);
                 updateAdapter();
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
+                saveVision = true;
 
-                //deltaValue.setVisibility(View.VISIBLE);
-                //String ss = redactTime == true ? s+"%":s;
-                //deltaValue.setText(ss);
+                if (redactTime){
+                    deltaValue.setVisibility(View.VISIBLE);
+                    String ss = s+"%";
+                    deltaValue.setText(ss);
+                }else {
+                    deltaValue.setVisibility(View.INVISIBLE);
+                }
             }
         });
         changeTemp_buttonPlus5 = (Button) findViewById(R.id.changeTemp_buttonPlus5);
@@ -322,29 +347,34 @@ public class ChangeTempActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
 
-                //String s = reductAction(1.05f, 5);
-                reductAction(1.05f, 5);
+                String s = reductAction(1.05f, 5);
+                //reductAction(1.05f, 5);
                 updateAdapter();
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
+                saveVision = true;
 
-                //deltaValue.setVisibility(View.VISIBLE);
-               // String ss = redactTime == true ? s+"%":s;
-               // deltaValue.setText(ss);
+                if (redactTime){
+                    deltaValue.setVisibility(View.VISIBLE);
+                    String ss = s+"%";
+                    deltaValue.setText(ss);
+                }else {
+                    deltaValue.setVisibility(View.INVISIBLE);
+                }
             }
         });
 
         //Выставляем надписи на кнопках перед началом редактирования
         if(redactTime){
             changeTemp_buttonMinus5.setText("-5%");
-            changeTemp_buttonMinus1.setText("-1%");;
-            changeTemp_buttonPlus1.setText("+1%");;
-            changeTemp_buttonPlus5.setText("+5%");;
+            changeTemp_buttonMinus1.setText("-1%");
+            changeTemp_buttonPlus1.setText("+1%");
+            changeTemp_buttonPlus5.setText("+5%");
         }else {
             changeTemp_buttonMinus5.setText("-5");
-            changeTemp_buttonMinus1.setText("-1");;
-            changeTemp_buttonPlus1.setText("+1");;
-            changeTemp_buttonPlus5.setText("+5");;
+            changeTemp_buttonMinus1.setText("-1");
+            changeTemp_buttonPlus1.setText("+1");
+            changeTemp_buttonPlus5.setText("+5");
         }
 
         //получаем настройки из активности настроек
@@ -366,17 +396,20 @@ public class ChangeTempActivity extends AppCompatActivity implements
     }
 
     @Override
-    public View findViewById(@IdRes int id) {
-        return super.findViewById(id);
+    public void onBackPressed() {
+        //super.onBackPressed();
 
+        Intent intentSave = new Intent();
+        intentSave.putExtra(P.INTENT_SAVE_VISION, saveVision);
+        intentSave.putExtra(P.INTENT_SAVE_VISION_REPEAT, true);
+        setResult(RESULT_OK,intentSave);
+        finish();
     }
 
     @Override
     protected void onPause() {
-        super.onPause();
         Log.d(TAG, "ChangeTempActivity onPause");
-
-
+        super.onPause();
     }
 
     @Override
@@ -419,8 +452,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
         switch (item.getItemId()){
             case android.R.id.home:
                 Log.d(TAG, "Домой");
-                //Intent intentHome = new Intent(this,MainActivity.class);
-                //startActivity(intentHome);
+                onBackPressed();
                 finish();
                 return true;
 
@@ -478,7 +510,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
 
     private String reductAction(float ff, int ii){
 
-        String delta = "";
+        String delta;
         if (redactTime){
             time += (ff-1f)*100;
             if (mCheckBoxAll.isChecked()){
@@ -487,13 +519,13 @@ public class ChangeTempActivity extends AppCompatActivity implements
                     DataSet dataSet = mDBHelper.getOneSetFragmentData(fileId, i);
                     dataSet.setTimeOfRep((dataSet.getTimeOfRep())*ff);
                     mDBHelper.updateSetFragment(dataSet);
-                    Log.d(TAG, "ChangeTempActivity dataSet Time = " + dataSet.getTimeOfRep());
+                   // Log.d(TAG, "ChangeTempActivity dataSet Time = " + dataSet.getTimeOfRep());
                 }
             }else {
                 DataSet dataSet = mDBHelper.getOneSetFragmentData(fileId, positionOfList);
                 dataSet.setTimeOfRep((dataSet.getTimeOfRep())*ff);
                 mDBHelper.updateSetFragment(dataSet);
-                Log.d(TAG, "ChangeTempActivity dataSet Time = " + dataSet.getTimeOfRep());
+                //Log.d(TAG, "ChangeTempActivity dataSet Time = " + dataSet.getTimeOfRep());
             }
             delta = String.format("%+3.0f", time);
 
@@ -510,7 +542,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
                         dataSet.setReps(0);
                     }
                     mDBHelper.updateSetFragment(dataSet);
-                    Log.d(TAG, "ChangeTempActivity dataSet Reps = " + dataSet.getReps());
+                   // Log.d(TAG, "ChangeTempActivity dataSet Reps = " + dataSet.getReps());
                 }
                 //если только в одной - выбранной -  строке
             }else {
@@ -520,7 +552,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
                     dataSet.setReps(0);
                 }
                 mDBHelper.updateSetFragment(dataSet);
-                Log.d(TAG, "ChangeTempActivity dataSet Time = " + dataSet.getTimeOfRep());
+                //Log.d(TAG, "ChangeTempActivity dataSet Reps = " + dataSet.getTimeOfRep());
             }
             delta = String.format("%+3d", count);
 
@@ -528,25 +560,16 @@ public class ChangeTempActivity extends AppCompatActivity implements
         return delta;
     }
 
-    private void  reductActionProcent(int procent, boolean up){
-
-        float ff = up ==true ? (1+ procent/100) : (1- procent/100);
-
-        List<Set> sets = SetLab.getSets();
-        for (Set s:sets){
-            s.setTimeOfRep((s.getTimeOfRep())*ff);
-        }
-    }
 
     public void updateAdapter() {
-        Log.d(TAG, "SetListFragment: updateAdapter() ");
+        Log.d(TAG, "ChangeTempActivity: updateAdapter() ");
         //получаем id записи с таким именем
         long finishFileId = mDBHelper.getIdFromFileName (finishFileName);
-        Log.d(TAG,"SetListFragment  имя =" + finishFileName + "  Id = " + finishFileId );
+        Log.d(TAG,"ChangeTempActivity  имя =" + finishFileName + "  Id = " + finishFileId );
 
         //получаем курсор с данными подхода с id = finishFileId
         Cursor cursor = mDBHelper.getAllSetFragments(finishFileId);
-        Log.d(TAG, "SetListFragment: updateAdapter() cursor.getCount() = " + cursor.getCount());
+        Log.d(TAG, "ChangeTempActivity: updateAdapter() cursor.getCount() = " + cursor.getCount());
 
         //Список с данными для адаптера
         data = new ArrayList<Map<String, Object>>(cursor.getCount());
@@ -557,7 +580,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
                 int reps_now = cursor.getInt(cursor.getColumnIndex(TabSet.COLUMN_SET_REPS));
                 int number_now = cursor.getInt(cursor.getColumnIndex(TabSet.COLUMN_SET_FRAG_NUMBER));
 
-                Log.d(TAG,"SetListFragment time_now = " + time +
+                Log.d(TAG,"ChangeTempActivity time_now = " + time +
                         "  reps_now = " + reps_now + "  number_now = " + number_now);
 
                 String s_delta;

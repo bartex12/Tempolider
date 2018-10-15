@@ -8,15 +8,15 @@ package android.support.v7.recyclerview;
 
 public final class R {
 	public static final class attr {
-		public static final int fastScrollEnabled = 0x7f0100ed;
-		public static final int fastScrollHorizontalThumbDrawable = 0x7f0100f0;
-		public static final int fastScrollHorizontalTrackDrawable = 0x7f0100f1;
-		public static final int fastScrollVerticalThumbDrawable = 0x7f0100ee;
-		public static final int fastScrollVerticalTrackDrawable = 0x7f0100ef;
-		public static final int layoutManager = 0x7f0100e9;
-		public static final int reverseLayout = 0x7f0100eb;
-		public static final int spanCount = 0x7f0100ea;
-		public static final int stackFromEnd = 0x7f0100ec;
+		public static final int fastScrollEnabled = 0x7f010126;
+		public static final int fastScrollHorizontalThumbDrawable = 0x7f010129;
+		public static final int fastScrollHorizontalTrackDrawable = 0x7f01012a;
+		public static final int fastScrollVerticalThumbDrawable = 0x7f010127;
+		public static final int fastScrollVerticalTrackDrawable = 0x7f010128;
+		public static final int layoutManager = 0x7f010122;
+		public static final int reverseLayout = 0x7f010124;
+		public static final int spanCount = 0x7f010123;
+		public static final int stackFromEnd = 0x7f010125;
 	}
 	public static final class dimen {
 		public static final int fastscroll_default_thickness = 0x7f0a007a;
@@ -30,7 +30,7 @@ public final class R {
 		public static final int item_touch_helper_previous_elevation = 0x7f100005;
 	}
 	public static final class styleable {
-		public static final int[] RecyclerView = { 0x010100c4, 0x010100f1, 0x7f0100e9, 0x7f0100ea, 0x7f0100eb, 0x7f0100ec, 0x7f0100ed, 0x7f0100ee, 0x7f0100ef, 0x7f0100f0, 0x7f0100f1 };
+		public static final int[] RecyclerView = { 0x010100c4, 0x010100f1, 0x7f010122, 0x7f010123, 0x7f010124, 0x7f010125, 0x7f010126, 0x7f010127, 0x7f010128, 0x7f010129, 0x7f01012a };
 		public static final int RecyclerView_android_descendantFocusability = 1;
 		public static final int RecyclerView_android_orientation = 0;
 		public static final int RecyclerView_fastScrollEnabled = 6;

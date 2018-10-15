@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.SimpleCursorAdapter;
 import android.text.InputType;
@@ -26,13 +27,14 @@ import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 
 
-public class TabBarSecFragment extends StatFrag {
+public class TabBarSecFragment extends Fragment {
 
     static String TAG = "33333";
     ListView mListView;
@@ -140,7 +142,7 @@ public class TabBarSecFragment extends StatFrag {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.add(0, P.DELETE_ACTION_SEC, 0, "Удалить запись");
-        menu.add(0, P.CHANGE_ACTION_SEC, 0, "Изменить запись");
+        menu.add(0, P.CHANGE_ACTION_SEC, 0, "Изменить имя");
         menu.add(0, P.MOVE_TEMP_ACTION_SEC, 0, "Переместить в темполидер");
         menu.add(0, P.MOVE_LIKE_ACTION_SEC, 0, "Переместить в избранное");
         menu.add(0, P.CANCEL_ACTION_SEC, 0, "Отмена");
@@ -172,13 +174,20 @@ public class TabBarSecFragment extends StatFrag {
             deleteDialog.setNegativeButton("Да", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    //Удаление записи из базы данных
-                    mTempDBHelper.deleteFileAndSets(acmi.id);
-                    Log.d(TAG, "PersonsListActivity удалена позиция с ID " + acmi.id);
-                    //обновляем адаптер
 
-                    mViewPager.getAdapter().notifyDataSetChanged();
-                    //onResume();
+                    String fileName = mTempDBHelper.getFileNameFromTabFile(acmi.id);
+                    if (fileName.equals(P.FILENAME_OTSECHKI_SEC)||
+                            fileName.equals(P.FILENAME_OTSECHKI_TEMP)){
+                        Toast.makeText(getContext(), "Системный файл. Удаление запрещено.",
+                                Toast.LENGTH_SHORT).show();
+                    }else {
+                        //Удаление записи из базы данных
+                        mTempDBHelper.deleteFileAndSets(acmi.id);
+                        Log.d(TAG, "PersonsListActivity удалена позиция с ID " + acmi.id);
+                        //обновляем адаптер
+                        mViewPager.getAdapter().notifyDataSetChanged();
+                        //onResume();
+                    }
                 }
             });
             //если текущий фрагмент это открытая вкладка, то показываем диалог
@@ -228,13 +237,7 @@ public class TabBarSecFragment extends StatFrag {
 
                     //изменяем имя файла
                     mTempDBHelper.updateFileName(nameFile, acmi.id);
-/*
-                    SQLiteDatabase db = mTempDBHelper.getWritableDatabase();
-                    ContentValues updatedValues = new ContentValues();
-                    updatedValues.put(TabFile.COLUMN_FILE_NAME, nameFile);
-                    db.update(TabFile.TABLE_NAME, updatedValues,
-                            TabFile._ID + "=" + acmi.id, null);
-                    */
+
                     //принудительно прячем  клавиатуру - повторный вызов ее покажет
                     takeOnAndOffSoftInput();
 

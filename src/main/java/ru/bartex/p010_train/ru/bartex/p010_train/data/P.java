@@ -19,13 +19,19 @@ public class P {
 
     //идентификатор интента : Откуда пришёл?
     public static final String FROM_ACTIVITY = "ru.bartex.p010_train_from_activity";
-    //пришёл от TabBarActivity
-    public static final int TAB_BAR_ACTIVITY = 333;
-    //пришёл от TimeGrafactivity
-    public static final int TIME_GRAF_ACTIVITY = 222;
     //пришёл от MainActivity
     public static final int MAIN_ACTIVITY = 111;
-    // MainActivity =111   TIME_GRAF_ACTIVITY = 222    TabBarActivity = 333
+    //пришёл от TimeGrafactivity
+    public static final int TIME_GRAF_ACTIVITY = 222;
+    //пришёл от TabBarActivity
+    public static final int TAB_BAR_ACTIVITY = 333;
+    //пришёл от DetailActivity
+    public static final int DETAIL_ACTIVITY = 444;
+    //пришёл от DetailActivity
+    public static final int NEW_EXERCISE_ACTIVITY = 555;
+    // MainActivity =111   TIME_GRAF_ACTIVITY = 222    TabBarActivity = 333 DetailActivity =444
+    //NewExerciseActivity = 555
+
     //идентификатор интента : пришёл от Main
     public final static String FROM_MAIN = "ru.bartex.p010_train.FROM_MAIN";
 
@@ -52,6 +58,9 @@ public class P {
     public final static int HELP_FROM_JOINT = 7;
     public final static int HELP_FROM_FIND_DATE = 8;
     public final static int HELP_ALL = 9;
+
+    //риквест код для startActivityForResult
+    public final static String REQUEST_CODE = "ru.bartex.p010_train.REQUEST_CODE";
 
     public final static int DETAIL_CHANGE_REQUEST_KODE = 10;
     public final static int CHANGE_TEMP_CHANGE_REQUEST_CODE = 20;
@@ -113,6 +122,10 @@ public class P {
     public static final String INTENT_TO_DETILE_FILE_ID = "ru.bartex.p010_train.IntentToDetileFileId";
     public static final String INTENT_TO_CHANGE_TEMP_FILE_ID = "ru.bartex.p010_train.IntentToChangeTempFileId";
     public static final String INTENT_TO_CHANGE_TEMP_FILE_NAME = "ru.bartex.p010_train.IntentToChangeTempFileName";
+    public static final String INTENT_TO_SINGLE_FROM_DETAIL_SAVE = "ru.bartex.p010_train.INTENT_TO_SINGLE_FROM_DETAIL_SAVE";
+    public static final String INTENT_SAVE_VISION = "ru.bartex.p010_train.INTENT_SAVE_VISION";
+    public static final String INTENT_SAVE_VISION_REPEAT = "ru.bartex.p010_train.INTENT_SAVE_VISION_REPEAT";
+
 
     public static final int DELETE_ACTION_SEC = 1;
     public static final int CHANGE_ACTION_SEC = 2;
@@ -137,6 +150,9 @@ public class P {
     public static final int MOVE_LIKE_ACTION = 25;
     public static final int MOVE_SEC_ACTION = 26;
     public static final int MOVE_TEMP_ACTION = 27;
+
+    public static final int SAVE_ICON_REQUEST = 28;
+    public static final int SAVE_ICON_REQUEST_CHANGE_TEMP = 29;
 
     //====================================================================//
 

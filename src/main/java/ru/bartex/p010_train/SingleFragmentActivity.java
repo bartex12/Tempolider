@@ -59,12 +59,14 @@ import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
  */
 public abstract class SingleFragmentActivity extends AppCompatActivity implements
         SetListFragment.OnShowTotalValuesListener, DialogSaveTempFragment.SaverFragmentListener,
-        DialogSetDelay.DelayListener {
+        DialogSetDelay.DelayListener, SetListFragment.OnShowTSaveIconListener {
 
     // Лайаут этого класса R.layout.activity_set_list
 
     protected abstract Fragment createFragment(String nameOfFile);
     //реализация в SetListFragment через SetListActivity и её метод createFragment(String nameOfFile)
+
+    static String TAG = "33333";
 
     LinearLayout mNameLayout; // Layout для имени файла - на нём щелчок для вызова списка имён
 
@@ -80,13 +82,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     private TextView mRepsLabel;
     private TextView mtextViewCountDown;
     private TextView mNameOfFile;
-
-    static String TAG = "33333";
-
-    public static final int REQUEST_UUID = 1;
-    public static final String ARRAY_STRING_TRANSFER = "ru.bartex.p010_train_transfer";
-    public static final String ARRAY_STRING_FROM_LIST = "ru.bartex.p010_train_from_main";
-    public static final String FROM_ACTIVITY = "ru.bartex.p010_train_from_activity";
 
     private Timer mTimer;
     private TimerTask mTimerTask;
@@ -111,25 +106,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     private boolean end = false; //признак окончания подхода
     public static boolean start = false;//признак нажатия на старт: public static для доступа из фрагмента
 
-    ArrayList<String> mListTimeTransfer = new ArrayList<>(); //список отсечек от секундомера
     int mCountFragmentLast = 0;
-
-    public static final String FILENAME_OTSECHKI_TEMP ="автосохранение__темполидера";
-    public static final String FILENAME_OTSECHKI_SEC ="автосохранение_секундомера";
-    public static final String TYPE_TIMEMETER ="type_timemeter";
-    public static final String TYPE_TEMPOLEADER ="type_tempoleader";
-    public static final String TYPE_LIKE ="type_like";
-    public static final String FILENAME_NAMES_OF_FILES ="ru.bartex.p010_train_names_of_files";
-    public static final String FILENAME_TYPE ="ru.bartex.p010_train_type";
-    public static final String FILENAME_DATE ="ru.bartex.p010_train_date";
-
-    private static final String KEY_DELAY = "DELAY";
-    static final int request_code = 111;
-
-    int fromActivity; //код -откуда пришли данные 111 --Main, 222-TimeMeterActivity, 333-ListOfFilesActivity
-    private String typeOfFile;  //тип файла из ListOfFileActivity
-    private String date;  //дата из ListOfFileActivity
-
+    //код -откуда пришли данные 111 --Main, 222-TimeMeterActivity, 333-ListOfFilesActivity
+    //444 -DetailActivity
+    int fromActivity;
 
     int accurancy; //точность отсечек - количество знаков после запятой - от MainActivity
     boolean sound = true; // включение / выключение звука
@@ -140,6 +120,22 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     TempDBHelper mTempDBHelper = new TempDBHelper(this);
     private String finishFileName; //имя файла с раскладкой
     long fileId; //id файла, загруженного в темполидер
+    long fileIdCopy;  // id копии файла для отмены
+    //количество фрагментов подхода
+    int countOfSet ;
+    //добавка к имени в копии файла
+    String endName = "new";
+    //показывать иконку Сохранить true - да false - нет
+    boolean saveVision = true;
+    boolean repeat = false; // повторно ли вызвана ChangeTempActivity
+
+    // Метод интерфейса из класса SetListFragment
+    @Override
+    public void  onSaveIconState(){
+        Log.d(TAG, "SingleFragmentActivity - onSaveIconState");
+        saveVision = true;
+        invalidateOptionsMenu();
+    }
 
     // Метод интерфейса из класса SetListFragment
     @Override
@@ -225,6 +221,8 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
                     //если в активности нажата Стоп, то Старт = false
                 }else{
+                    //удаляем  файл - копию
+                    mTempDBHelper.deleteFileAndSets(fileIdCopy);
                     //вызываем TabBarActivity
                     Intent intentList = new Intent(getBaseContext(), TabBarActivity.class);
                     startActivity(intentList);
@@ -393,8 +391,14 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
             //имя файла  = null, если не было записи в преференсис-это возможно при первом запуске
             // тогда присваиваем имя записи в базе, сделанной в onCreate MainActivity
             finishFileName = shp.getString(P.KEY_FILENAME,P.FILENAME_OTSECHKI_TEMP);
+            //если файл был удалён, fileId = -1 и тогда вместо finishNameFile
+            // передаём Автосохранение секундомера
+            if ((mTempDBHelper.getIdFromFileName(finishFileName)) == -1){
+                finishFileName = P.FILENAME_OTSECHKI_TEMP;
+            }
+            Log.d(TAG, " finishFileName = " + finishFileName);
 
-            //если интент пришел от TimeGrafActivity, он принёс с собой список отсечек
+            //если интент пришел от TimeGrafActivity, он принёс с собой  отсечеки в файле
         }else if (fromActivity == 222){
             Log.d(TAG, " SingleFragmentActivity fromActivity =  " + fromActivity);
             //получаем имя файла из интента
@@ -411,14 +415,40 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
             //получаем имя файла из интента
             finishFileName = intent.getStringExtra(P.FINISH_FILE_NAME);
-            //получаем id  файла с раскладкой по его имени finishFileName из интента
-            fileId = mTempDBHelper.getIdFromFileName(finishFileName);
 
-        } else Log.d(TAG, " intentTransfer = null ");
+            //если интент пришёл от DetailActivity после Изменить из контекст меню в SetListFragment
+        } else if(fromActivity == 444) {
+            //получаем обратно имя файла из интента (прогнали его по кругу, чтобы не было краха)
+            finishFileName = intent.getStringExtra(P.FINISH_FILE_NAME);
+            //показать иконку Сохранить как
+            saveVision = true;
+            Log.d(TAG, " saveVision = " + saveVision );
+            invalidateOptionsMenu();
+
+        } else if(fromActivity == 555) {
+            //получаем имя файла из интента
+            finishFileName = intent.getStringExtra(P.FINISH_FILE_NAME);
+
+        }else Log.d(TAG, " intentTransfer = null ");
 
         Log.d(TAG, " fromActivity =  " + fromActivity +" mNameOfFile = " + finishFileName);
 
+        //=============== Создание копии файла с данными finishFileName================//
 
+            //получаем id файла
+            fileId = mTempDBHelper.getIdFromFileName(finishFileName);
+            //количество фрагментов подхода
+            countOfSet =mTempDBHelper.getSetFragmentsCount(fileId);
+            //создаём и записываем в базу копию файла на случай отмены изменений
+            fileIdCopy = mTempDBHelper.createFileCopy(finishFileName, fileId, endName);
+
+            //если не из делализации то скрываем Сохранить на тулбаре
+            if (fromActivity != 444){
+                saveVision =false;
+                invalidateOptionsMenu();
+            }
+
+        //======================================================================//
 
         //Вставляем фрагмент, реализованный в классе, наследующем SingleFragmentActivity
         //и реализующем абстрактный метод createFragment()
@@ -435,8 +465,13 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                     .commit();
         }
 
+       //если в списке ничего нет, делаем Старт недоступной
+       // fileId = mTempDBHelper.getIdFromFileName(finishFileName);
+        //boolean st = (fileId==-1) ? false : true;
+
         //выставляем доступность кнопок
         buttonsEnable (true,false,false);
+
     }
     //**********************   конец onCreate    ************************//
 
@@ -469,6 +504,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         //получаем id  файла с раскладкой по его имени finishFileName из интента
         fileId = mTempDBHelper.getIdFromFileName(finishFileName);
 
+        Log.d(TAG, "fileId  = " + fileId);
         //получаем количество фрагментов в выполняемом подходе если было удаление или добавление
         //фрагмента подхода, нужно пересчитывать каждый раз - это по кнопке Старт
         mTotalCountFragment = mTempDBHelper.getSetFragmentsCount(fileId);
@@ -479,7 +515,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
         //посчитаем общее количество повторений в подходе
         mTotalReps = mTempDBHelper.getSumOfRepsSet(fileId);
-        Log.d(TAG, "Суммарное количество повторений  = " + mTotalReps);
+        Log.d(TAG, "Суммарное количество повторений  = " + mTotalReps + " fileId = " + fileId);
 
         //покажем общее время подхода и общее число повторений в подходе
         showTotalValues(mTimeOfSet,mTotalReps, mKvant);
@@ -513,6 +549,8 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        //удаляем  файл - копию
+        mTempDBHelper.deleteFileAndSets(fileIdCopy);
 
         //записываем последнее имя файла на экране в преференсис активности
         shp = getPreferences(MODE_PRIVATE);
@@ -525,6 +563,32 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         //отключаем таймер
         if (mTimer!=null)mTimer.cancel();
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "SingleFragmentActivity - onActivityResult requestCode = " + requestCode);
+            if (resultCode == RESULT_OK) {
+                Log.d(TAG, "onActivityResult resultCode = RESULT_OK");
+                //если из плюсика  на тулбаре
+                if ((requestCode == P.SAVE_ICON_REQUEST)) {
+                    saveVision = true;
+                    invalidateOptionsMenu();
+                }else if (requestCode == P.SAVE_ICON_REQUEST_CHANGE_TEMP){
+
+                    if (repeat){
+                        saveVision = true;
+                    }else {
+                        saveVision = data.getExtras().getBoolean(P.INTENT_SAVE_VISION);
+                        repeat = data.getExtras().getBoolean(P.INTENT_SAVE_VISION_REPEAT);
+                    }
+
+                    invalidateOptionsMenu();
+                }
+                Log.d(TAG, "onActivityResult saveVision = " + saveVision);
+                //если из карандаша на тулбаре почему то resultCode != RESULT_OK ???
+            }else {Log.d(TAG, "onActivityResult resultCode != RESULT_OK");}
+        }
 
     //отслеживание нажатия кнопки HOME
     @Override
@@ -543,12 +607,14 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     public boolean onCreateOptionsMenu(Menu menu) {
         //return super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.singl_fragment_activity_menu,menu);
+        Log.d(TAG, "onCreateOptionsMenu");
         return true;
     }
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         ActionBar acBar = getSupportActionBar();
+        Log.d(TAG, "onPrepareOptionsMenu");
     /*
         //можно прятать всю панель
         if (start){
@@ -560,7 +626,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         acBar.setDisplayHomeAsUpEnabled(!start );
         //отключаем видимость на время от Старт до Стоп
         menu.findItem(R.id.menu_item_new_frag).setVisible(!start);
-        menu.findItem(R.id.save_data_in_file).setVisible(!start);
+        menu.findItem(R.id.save_data_in_file).setVisible((!start)&&saveVision);
         menu.findItem(R.id.show_list_of_files).setVisible(!start);
         menu.findItem(R.id.action_settings_temp).setVisible(!start);
         menu.findItem(R.id.change_data).setVisible(!start);
@@ -579,21 +645,19 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 return true;
 
             case R.id.menu_item_new_frag:
-
+                Log.d(TAG, "menu_item_new_frag");
                 //вызываем DetailActivity и передаём туда fileId
                 Intent intentDetail = new Intent(getBaseContext(), DetailActivity.class);
                 intentDetail.putExtra(P.INTENT_TO_DETILE_FILE_ID, fileId);
                 intentDetail.putExtra(P.FROM_ACTIVITY,P.TO_ADD_SET);
-                startActivity(intentDetail);
+                startActivityForResult(intentDetail, P.SAVE_ICON_REQUEST);
                 return true;
 
             case R.id.change_data:
-                Intent intent = new Intent(this, ChangeTempActivity.class);
-                //передаём id  файла на экране
-                intent.putExtra(P.INTENT_TO_CHANGE_TEMP_FILE_NAME, finishFileName);
-                //передаём request_code - откуда пришл интент
-                intent.putExtra(P.CHANGE_TEMP_CHANGE_REQUEST, P.CHANGE_TEMP_CHANGE_REQUEST_CODE);
-                startActivity(intent);
+                Log.d(TAG, "change_data");
+                Intent intent = new Intent(getBaseContext(), ChangeTempActivity.class);
+                intent.putExtra(P.FINISH_FILE_NAME, finishFileName);
+                startActivityForResult(intent, P.SAVE_ICON_REQUEST_CHANGE_TEMP);
                 return true;
 
             case R.id.save_data_in_file:
@@ -603,6 +667,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 return true;
 
             case R.id.show_list_of_files:
+
+                //удаляем  файл - копию
+                mTempDBHelper.deleteFileAndSets(fileIdCopy);
+
                 //вызываем TabBarActivity
                 Intent intentList = new Intent(getBaseContext(), TabBarActivity.class);
                 startActivity(intentList);

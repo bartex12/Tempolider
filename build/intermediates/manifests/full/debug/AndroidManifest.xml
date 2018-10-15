@@ -50,8 +50,6 @@
             android:name="ru.bartex.p010_train.HelpMainActivity"
             android:label="" >
         </activity>
-        <activity android:name="ru.bartex.p010_train.TabActivity" >
-        </activity>
         <activity
             android:name="ru.bartex.p010_train.TabBarActivity"
             android:label="@string/title_activity_tab_bar"
@@ -60,6 +58,10 @@
         <activity
             android:name="ru.bartex.p010_train.ChangeTempActivity"
             android:label="@string/change_name" >
+        </activity>
+        <activity
+            android:name="ru.bartex.p010_train.NewExerciseActivity"
+            android:label="@string/new_name" >
         </activity>
     </application>
 

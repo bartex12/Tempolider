@@ -1,6 +1,7 @@
 package ru.bartex.p010_train;
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.AudioManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -28,7 +29,6 @@ public class DetailActivity extends AppCompatActivity {
     private Button mButtonCancel;
 
     private static final String TAG = "33333";
-    private Set mSet;
     public static final String INTENT_SET_UUID = "DetailActivity.intent_set_uuid";
     public static final String POSITION = "positionDetailActivity";
     static final String DETAIL_REQUEST = "DetailActivity.change_request";
@@ -39,6 +39,7 @@ public class DetailActivity extends AppCompatActivity {
     TempDBHelper mDBHelper = new TempDBHelper(this);
     int fragmentCount;  //количество фрагментов подхода
     long fileId; //id файла, в который добавляем новый фрагмент подхода
+    String finishFileName; //имя файла для обратной отправки
 
     //редактируемая запись появляется в списке, только если нажата кнопка Принять
     //кнопка Назад в панели инструментов, кнопка отмена и кнопка Обратно на телефоне - отменяют
@@ -62,6 +63,7 @@ public class DetailActivity extends AppCompatActivity {
             //если Изменить из контекстного меню темполидера
             if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE) {
                 act.setTitle("Изменить");
+                finishFileName = extras.getString(P.FINISH_FILE_NAME);
                 mDataSet = (DataSet) extras.getSerializable(P.DETAIL_DATA_SET);
                 Log.d(TAG, "DetailActivity onCreate mDataSet № = " + mDataSet.getNumberOfFrag());
 
@@ -72,6 +74,7 @@ public class DetailActivity extends AppCompatActivity {
                 fragmentCount = mDBHelper.getSetFragmentsCount(fileId);
                 mDataSet = new DataSet();
                 mDataSet.setNumberOfFrag(fragmentCount + 1);
+                Log.d(TAG, "DetailActivity onCreate Добавить с тулбара темполидера  fileId= " +fileId);
 
                 //если плавающая кнопка из главного меню
             }else if (extras.getInt(P.FROM_MAIN) ==P.TO_ADD){
@@ -94,12 +97,24 @@ public class DetailActivity extends AppCompatActivity {
                     mDBHelper.addSet(mDataSet, fileId);
                     Log.d(TAG, "mButtonOk (P.FROM_ACTIVITY) == P.TO_ADD_SET ");
 
+                    Intent intentSave = new Intent();
+                    setResult(RESULT_OK,intentSave);
+
                     //если Изменить из контекстного меню темполидера
                 }else if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE){
                     //обновляем фрагмент подхода в базе данных
                     mDBHelper.updateSetFragment(mDataSet);
                     Log.d(TAG, "mButtonOk (P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE ");
+
+                        //посылаем интент чтобы показать иконку Сохранить как
+                        Intent intentSaveIcon = new Intent(DetailActivity.this,
+                                SetListActivity.class);
+                        intentSaveIcon.putExtra(P.FROM_ACTIVITY, P.DETAIL_ACTIVITY);
+                        intentSaveIcon.putExtra(P.FINISH_FILE_NAME, finishFileName);
+                        startActivity(intentSaveIcon);
+                    finish();
                 }
+
                 //прячем экранную клавиатуру
                 takeOffSoftInput();
                 //завершаем
@@ -157,7 +172,7 @@ public class DetailActivity extends AppCompatActivity {
                 }else if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE) {
 
                     //получаем float миллисекунд для времени между повторами из строчки mTimeOfRepFrag
-                    float ft = getСountMilliSecond(mTimeOfRepFrag);
+                    float ft = getCountMilliSecond(mTimeOfRepFrag);
                     //и присваиваем его переменной mTimeOfRep класса Set
                     mDataSet.setTimeOfRep(ft);
                     //доступность кнопки Ok, если оба значения ненулевые
@@ -168,7 +183,7 @@ public class DetailActivity extends AppCompatActivity {
                     //если Добавить с тулбара темполидера +
             }else if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_SET){
                     //получаем float миллисекунд для времени между повторами из строчки mTimeOfRepFrag
-                    float ft = getСountMilliSecond(mTimeOfRepFrag);
+                    float ft = getCountMilliSecond(mTimeOfRepFrag);
                     //и присваиваем его переменной mTimeOfRep класса Set
                     mDataSet.setTimeOfRep(ft);
                     //доступность кнопки Ok, если оба значения ненулевые
@@ -205,7 +220,7 @@ public class DetailActivity extends AppCompatActivity {
                     //если Изменить из контекстного меню темполидера
                 }else if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE) {
                     //получаем int количество повторений для фрагмента из строчки mRepsFrag
-                    int ir = getСountReps(mRepsFrag);
+                    int ir = getCountReps(mRepsFrag);
                     //и присваиваем его переменной mReps класса Set
                     mDataSet.setReps(ir);
                     //доступность кнопки Ok, если оба значения ненулевые
@@ -215,7 +230,7 @@ public class DetailActivity extends AppCompatActivity {
                     //если Добавить с тулбара темполидера +
                 }else if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_SET){
                     //получаем int количество повторений для фрагмента из строчки mRepsFrag
-                    int ir = getСountReps(mRepsFrag);
+                    int ir = getCountReps(mRepsFrag);
                     //и присваиваем его переменной mReps класса Set
                     mDataSet.setReps(ir);
                     //доступность кнопки Ok, если оба значения ненулевые
@@ -304,15 +319,15 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     //перевоим текст в миллисекунды для времени между повторениями одного фрагмента
-    private float getСountMilliSecond(EditText time) {
+    private float getCountMilliSecond(EditText time) {
         String s = time.getText().toString();
         if ((s.equals("")) ||(s.equals("."))) {
             return 0;
         } else return Float.parseFloat(time.getText().toString());
     }
-
+    //getCountMilliSecond
     //переводим текст в цифру для количества повторений одного фрагмента
-    private int getСountReps(EditText reps){
+    private int getCountReps(EditText reps){
         String s = reps.getText().toString();
         if ((s.equals("")) ||(s.equals("."))) {
             return 0;

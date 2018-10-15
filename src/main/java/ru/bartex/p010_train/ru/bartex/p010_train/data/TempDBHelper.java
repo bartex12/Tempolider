@@ -13,7 +13,6 @@ import java.util.GregorianCalendar;
 
 import ru.bartex.p010_train.DataFile;
 import ru.bartex.p010_train.DataSet;
-import ru.bartex.p010_train.SetLab;
 
 import static ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile.COLUMN_DELAY;
 import static ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile.COLUMN_DESCRIPTION_OF_SPORT;
@@ -235,11 +234,12 @@ public class TempDBHelper extends SQLiteOpenHelper {
         db.update(TabSet.TABLE_NAME, updatedValues,
                 TabSet.COLUMN_SET_FILE_ID + "=" + mDataSet.getFile_id()+
                         " AND " + TabSet._ID + "=" + mDataSet.getSet_id(), null);
-
+/*
         Log.d(TAG, "updateSetFragment COLUMN_SET_TIME  = " + mDataSet.getTimeOfRep()+
                 "  COLUMN_SET_REPS = " +  mDataSet.getReps() +
                 "  mDataSet.getFile_id() = " + mDataSet.getFile_id()+
                 "  mDataSet.getSet_id() = " + mDataSet.getSet_id());
+        */
     }
 
     // создать копию файла  в базе данных и получить его id
@@ -256,8 +256,8 @@ public class TempDBHelper extends SQLiteOpenHelper {
         for (int i = 0; i<countOfSet; i++ ){
             DataSet dataSet = this.getOneSetFragmentData(fileId, i);
             this.addSet(dataSet,fileIdCopy);
-            Log.d(TAG, "createFileCopy dataSet № = " + dataSet.getNumberOfFrag());
         }
+        Log.d(TAG, "createFileCopy фрагментов  = " + this.getSetFragmentsCount(fileIdCopy));
         return  fileIdCopy;
     }
 
@@ -356,7 +356,7 @@ public class TempDBHelper extends SQLiteOpenHelper {
             mCursor.moveToFirst();
         }
         String fileName = mCursor.getString(mCursor.getColumnIndex(TabFile.COLUMN_FILE_NAME));
-
+        Log.d(TAG, "getFileNameFromTabFile fileName = " + fileName);
         mCursor.close();
 
         return fileName;
@@ -411,34 +411,36 @@ public class TempDBHelper extends SQLiteOpenHelper {
                         TabFile.COLUMN_DELAY},
                 TabFile._ID + "=" + rowId,
                 null, null, null, null, null);
-        if (cursorFile != null) {
+        if ((cursorFile != null)&& (cursorFile.getCount()>0)) {
             cursorFile.moveToFirst();
         }
+            Log.d(TAG, "getAllFilesData cursorFile.getCount() = " + cursorFile.getCount());
 
-        // Используем индекс для получения строки или числа
-        long current_ID = cursorFile.getLong(
-                cursorFile.getColumnIndex(TabFile._ID));
-        String current_nameFile = cursorFile.getString(
-                cursorFile.getColumnIndex(TabFile.COLUMN_FILE_NAME));
-        String current_nameFileDate = cursorFile.getString(
-                cursorFile.getColumnIndex(TabFile.COLUMN_FILE_NAME_DATE));
-        String current_nameFileTime = cursorFile.getString(
-                cursorFile.getColumnIndex(TabFile.COLUMN_FILE_NAME_TIME));
-        String current_kindSport = cursorFile.getString(
-                cursorFile.getColumnIndex(TabFile.COLUMN_KIND_OF_SPORT));
-        String current_descript = cursorFile.getString(
-                cursorFile.getColumnIndex(TabFile.COLUMN_DESCRIPTION_OF_SPORT));
-        String current_typeFrom = cursorFile.getString(
-                cursorFile.getColumnIndex(TabFile.COLUMN_TYPE_FROM));
-        int current_delay = cursorFile.getInt(
-                cursorFile.getColumnIndex(TabFile.COLUMN_DELAY));
+            // Используем индекс для получения строки или числа
+            long current_ID = cursorFile.getLong(
+                    cursorFile.getColumnIndex(TabFile._ID));
+            String current_nameFile = cursorFile.getString(
+                    cursorFile.getColumnIndex(TabFile.COLUMN_FILE_NAME));
+            String current_nameFileDate = cursorFile.getString(
+                    cursorFile.getColumnIndex(TabFile.COLUMN_FILE_NAME_DATE));
+            String current_nameFileTime = cursorFile.getString(
+                    cursorFile.getColumnIndex(TabFile.COLUMN_FILE_NAME_TIME));
+            String current_kindSport = cursorFile.getString(
+                    cursorFile.getColumnIndex(TabFile.COLUMN_KIND_OF_SPORT));
+            String current_descript = cursorFile.getString(
+                    cursorFile.getColumnIndex(TabFile.COLUMN_DESCRIPTION_OF_SPORT));
+            String current_typeFrom = cursorFile.getString(
+                    cursorFile.getColumnIndex(TabFile.COLUMN_TYPE_FROM));
+            int current_delay = cursorFile.getInt(
+                    cursorFile.getColumnIndex(TabFile.COLUMN_DELAY));
 
-        DataFile dataFile = new DataFile(current_ID,current_nameFile,
-                current_nameFileDate,current_nameFileTime,current_kindSport,
-                current_descript,current_typeFrom,current_delay);
+            DataFile dataFile = new DataFile(current_ID,current_nameFile,
+                    current_nameFileDate,current_nameFileTime,current_kindSport,
+                    current_descript,current_typeFrom,current_delay);
 
-        cursorFile.close();
-        return dataFile;
+            cursorFile.close();
+            return dataFile;
+
     }
 
     /**

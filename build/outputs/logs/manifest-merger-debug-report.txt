@@ -1,6 +1,6 @@
 -- Merging decision tree log ---
 manifest
-ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:2:1-55:12
+ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:2:1-57:12
 	package
 		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:3:11-41
 		INJECTED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml
@@ -14,7 +14,8 @@ ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.x
 		INJECTED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml
 		INJECTED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml
 application
-ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:5:5-53:19
+ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:5:5-55:19
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] D:\003 ANDROID Projects\Sensors\p010_train\build\intermediates\exploded-aar\com.android.support.constraint\constraint-layout\1.1.3\AndroidManifest.xml:9:5-20
 MERGED from [com.android.support:appcompat-v7:26.0.0-alpha1] D:\003 ANDROID Projects\Sensors\p010_train\build\intermediates\exploded-aar\com.android.support\appcompat-v7\26.0.0-alpha1\AndroidManifest.xml:29:5-20
 MERGED from [com.android.support:support-v4:26.0.0-alpha1] D:\003 ANDROID Projects\Sensors\p010_train\build\intermediates\exploded-aar\com.android.support\support-v4\26.0.0-alpha1\AndroidManifest.xml:29:5-20
 MERGED from [com.android.support:support-compat:26.0.0-alpha1] D:\003 ANDROID Projects\Sensors\p010_train\build\intermediates\exploded-aar\com.android.support\support-compat\26.0.0-alpha1\AndroidManifest.xml:29:5-20
@@ -151,7 +152,7 @@ ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.x
 	android:name
 		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:28:13-44
 meta-data#android.support.PARENT_ACTIVITY
-ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:31:13-33:49
+ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:31:13-33:48
 	android:value
 		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:33:17-46
 	android:name
@@ -168,26 +169,29 @@ ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.x
 		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:41:13-29
 	android:name
 		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:40:13-45
-activity#ru.bartex.p010_train.TabActivity
-ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:43:9-44:20
-	android:name
-		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:43:19-46
 activity#ru.bartex.p010_train.TabBarActivity
-ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:45:9-49:20
+ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:43:9-47:20
 	android:label
-		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:47:13-59
+		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:45:13-59
 	android:theme
-		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:48:13-56
+		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:46:13-56
 	android:name
-		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:46:13-43
+		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:44:13-43
 activity#ru.bartex.p010_train.ChangeTempActivity
-ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:50:9-52:20
+ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:48:9-51:20
 	android:label
-		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:51:19-54
+		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:50:13-48
 	android:name
-		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:50:19-53
+		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:49:13-47
+activity#ru.bartex.p010_train.NewExerciseActivity
+ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:52:9-54:20
+	android:label
+		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:53:19-51
+	android:name
+		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:52:19-54
 uses-sdk
 INJECTED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml reason: use-sdk injection requested
+MERGED from [com.android.support.constraint:constraint-layout:1.1.3] D:\003 ANDROID Projects\Sensors\p010_train\build\intermediates\exploded-aar\com.android.support.constraint\constraint-layout\1.1.3\AndroidManifest.xml:5:5-7:41
 MERGED from [com.android.support:appcompat-v7:26.0.0-alpha1] D:\003 ANDROID Projects\Sensors\p010_train\build\intermediates\exploded-aar\com.android.support\appcompat-v7\26.0.0-alpha1\AndroidManifest.xml:21:5-23:78
 MERGED from [com.android.support:support-v4:26.0.0-alpha1] D:\003 ANDROID Projects\Sensors\p010_train\build\intermediates\exploded-aar\com.android.support\support-v4\26.0.0-alpha1\AndroidManifest.xml:21:5-23:54
 MERGED from [com.android.support:support-compat:26.0.0-alpha1] D:\003 ANDROID Projects\Sensors\p010_train\build\intermediates\exploded-aar\com.android.support\support-compat\26.0.0-alpha1\AndroidManifest.xml:21:5-23:58

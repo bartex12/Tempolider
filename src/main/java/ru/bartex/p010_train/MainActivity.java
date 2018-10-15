@@ -129,16 +129,10 @@ public class MainActivity extends AppCompatActivity
                 //        .setAction("Action", null).show();
 
                 //создаём новую запись
-                Intent intentAdd = new Intent(MainActivity.this, DetailActivity.class);
+                Intent intentAdd = new Intent(MainActivity.this, NewExerciseActivity.class);
                 intentAdd.putExtra(P.FROM_MAIN, P.TO_ADD);
                 startActivity(intentAdd);
 
-       /*
-                //Удаление единственной записи в списке
-                long file1_id = mDbHelper.getIdFromFileName("Подтягивание 50раз за 4мин");
-                mDbHelper.deleteFileAndSets(file1_id);
-                Log.d(TAG,"Удалена запись 'Подтягивание 50раз за 4мин'");
-*/
             }
         });
 
@@ -153,15 +147,6 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
-
-      /*
-        //читаем файл с именами файлов с раскладками
-        ArrayList<String> allNamesOfFiles = readArrayList(FileSaver.FILENAME_NAMES_OF_FILES);
-        //заполняем синглет-держатель имён файлов новыми данными из списка имён файлов
-       //пишем имя, дату, тип и номер строки списка для каждого имени файла
-        Stat.addAllFileSaverToFileSaverLabFromList(allNamesOfFiles);
-        Log.d(TAG, "MainActivity размер   списка файлов с именами файлов = " + allNamesOfFiles.size());
-    */
     }
 
     @Override
@@ -229,16 +214,6 @@ public class MainActivity extends AppCompatActivity
     protected void onDestroy() {
         super.onDestroy();
         Log.d(TAG,"MainActivity onDestroy");
-        /*
-        //получаем ссылку на экземпляр FileSaverLab
-        FileSaverLab fileSaverLab = FileSaverLab.get();
-        //получаем весь список имён файлов из FileSaverLab
-        ArrayList<String> listNamesOfFiles = fileSaverLab.getListFullNamesOfFiles();
-        //пишем список имён в файл имён в формате
-        // String.format("%s:%s:%s",name,date,type);
-        writeArrayList(listNamesOfFiles,FileSaver.FILENAME_NAMES_OF_FILES);
-        Log.d(TAG,"MainActivity onDestroy записаны имена в FILENAME_NAMES_OF_FILES");
-        */
         //включаем звук
         AudioManager audioManager =(AudioManager)getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
@@ -256,8 +231,6 @@ public class MainActivity extends AppCompatActivity
 
         super.onUserLeaveHint();
     }
-
-
 
     private void openQuitDialog() {
         AlertDialog.Builder quitDialog = new AlertDialog.Builder(this);
@@ -303,7 +276,6 @@ public class MainActivity extends AppCompatActivity
         return super.onOptionsItemSelected(item);
     }
 
-
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
@@ -324,12 +296,19 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(this,TabBarActivity.class);
             startActivity(intent);
 
+        } else if (id == R.id.nav_setting) {
+            Intent intent = new Intent(this,PrefActivity.class);
+            startActivity(intent);
+
+        } else if (id == R.id.nav_help) {
+            Intent intent = new Intent(this,HelpMainActivity.class);
+            startActivity(intent);
+
         } else if (id == R.id.nav_share) {
 
         } else if (id == R.id.nav_send) {
 
         }
-
         // Выделяем выбранный пункт меню в шторке
         item.setChecked(true);
         // Выводим выбранный пункт в заголовке
@@ -339,71 +318,4 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
-
-    /*
-    //Записать список меток времени для каждого найденного шага   в файл
-    public void writeArrayList(ArrayList<String> arrayList) {
-        try {
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                    openFileOutput(FILENAME, MODE_PRIVATE)));
-            for (String line : arrayList) {
-                //функция write не работает для CharSequence, поэтому String
-                bw.write(line);
-                // тут мог бы быть пробел если надо в одну строку
-                //сли не включать эту строку, то в файле будет всего одна строчка, а нужен массив
-                bw.write(System.getProperty("line.separator"));
-            }
-            Log.d(TAG, "Файл ArrayList записан ");
-            bw.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    //Прочитать список имён с данными из файла
-    private ArrayList<String> readArrayList(String fileName) {
-
-        ArrayList<String> newArrayList = new ArrayList<String>();
-
-        try {
-            // открываем поток для чтения
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    openFileInput(fileName)));
-            try {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    newArrayList.add(line);
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return newArrayList;
-    }
-
-
-    //Записать список имён с данными  в файл
-    private void writeArrayList(ArrayList<String> arrayList, String fileName) {
-        try {
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                    openFileOutput(fileName, MODE_PRIVATE)));
-            for (String line : arrayList) {
-                //функция write не работает для CharSequence, поэтому String
-                bw.write(line);
-                // тут мог бы быть пробел если надо в одну строку
-                //сли не включать эту строку, то в файле будет всего одна строчка, а нужен массив
-                bw.write(System.getProperty("line.separator"));
-            }
-            Log.d(TAG, "Файл ArrayList записан ");
-            bw.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    */
-
 }

@@ -30,7 +30,7 @@
             android:windowSoftInputMode="stateHidden">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".MainActivity" />
+                android:value=".MainActivity"/>
         </activity>
         <activity
             android:name=".DetailActivity"
@@ -40,15 +40,17 @@
             android:name=".HelpMainActivity"
             android:label="">
         </activity>
-        <activity android:name=".TabActivity">
-        </activity>
         <activity
             android:name=".TabBarActivity"
             android:label="@string/title_activity_tab_bar"
             android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".ChangeTempActivity"
-                  android:label="@string/change_name">
+        <activity
+            android:name=".ChangeTempActivity"
+            android:label="@string/change_name">
+        </activity>
+        <activity android:name=".NewExerciseActivity"
+                  android:label="@string/new_name">
         </activity>
     </application>
 
