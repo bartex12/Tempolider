@@ -108,7 +108,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
     int mCountFragmentLast = 0;
     //код -откуда пришли данные 111 --Main, 222-TimeMeterActivity, 333-ListOfFilesActivity
-    //444 -DetailActivity
+    //444 -DetailActivity  555 - NewExerciseActivity
     int fromActivity;
 
     int accurancy; //точность отсечек - количество знаков после запятой - от MainActivity
@@ -118,7 +118,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     private int  timeOfDelay = 0; //задержка в секундах
 
     TempDBHelper mTempDBHelper = new TempDBHelper(this);
-    private String finishFileName; //имя файла с раскладкой
+    //имя файла с раскладкой
+    private String finishFileName;
+    //имя файла с раскладкой после изменения и сохранения при щелчке по дискете в тулбаре
+    private String finishFileNameNew;
     long fileId; //id файла, загруженного в темполидер
     long fileIdCopy;  // id копии файла для отмены
     //количество фрагментов подхода
@@ -170,13 +173,28 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
             }
         }
 
-        //и устанавливаем соответствующие параметры
+        //удаляем данные старого файла
+        mTempDBHelper.deleteFileAndSets(fileId);
+        //и записываем новый файл с новым именем (переменнная для имени старая )
         finishFileName = saveDataAndFilename(newNameFile, fileNameDefoult, typeFile);
+        //стотрим его id чтобы не было краха - ЭТОТ id используется дальше в show_list_of_files
+        fileId = mTempDBHelper.getIdFromFileName(finishFileName);
         //выводим имя файла на экран
         mNameOfFile.setText(finishFileName);
 
-        }
 
+        //после этого можно спросить - созданить ли старый файл из копии под старым именем
+        String oldNameOfFileCopy = mTempDBHelper.getFileNameFromTabFile(fileIdCopy);
+        String oldNameOfFile = oldNameOfFileCopy.substring(0,
+                oldNameOfFileCopy.length()-3);
+        Log.d(TAG, "SingleFragmentActivity - onFileNameTransmit oldNameOfFileCopy.length() = "+
+                oldNameOfFileCopy.length());
+        Log.d(TAG, "SingleFragmentActivity - onFileNameTransmit oldNameOfFileCopy = "+
+                oldNameOfFileCopy + "  oldNameOfFile = "+ oldNameOfFile);
+        long oldNameOfFileId = mTempDBHelper.createFileCopy(oldNameOfFile,fileIdCopy,"");
+        Log.d(TAG, "SingleFragmentActivity - onFileNameTransmit oldNameOfFileId = "+
+                oldNameOfFileId + "  oldNameOfFile = "+ oldNameOfFile);
+        }
 
     //метод интерфейса для передачи величины задержки из диалога
     @Override
@@ -223,8 +241,12 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 }else{
                     //удаляем  файл - копию
                     mTempDBHelper.deleteFileAndSets(fileIdCopy);
+
+                    //определяем тип файла
+                    String type =  mTempDBHelper.getFileTypeFromTabFile(fileId);
                     //вызываем TabBarActivity
                     Intent intentList = new Intent(getBaseContext(), TabBarActivity.class);
+                    intentList.putExtra(P.TYPE_OF_FILE, type);
                     startActivity(intentList);
                     finish(); //чтобы не включать в стек возврата,
                 }
@@ -425,9 +447,12 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
             Log.d(TAG, " saveVision = " + saveVision );
             invalidateOptionsMenu();
 
+            //если интент пришёл от NewExerciseActivity после + в Главном меню
         } else if(fromActivity == 555) {
             //получаем имя файла из интента
             finishFileName = intent.getStringExtra(P.FINISH_FILE_NAME);
+            timeOfDelay = mTempDBHelper.getFileDelayFromTabFile(finishFileName);
+            mDelayButton.setText(String.valueOf(timeOfDelay));
 
         }else Log.d(TAG, " intentTransfer = null ");
 
@@ -456,7 +481,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         Fragment fragment = fm.findFragmentById(R.id.fragment_container);
         if (fragment == null) {
             //Вызываем класс, реализующий абстрактный метод createFragment(),т.е. SetListFragment(),
-            //и на всякий случай передаём имя файла в абстрактном методе createFragment()
+            //и  передаём имя файла в абстрактном методе createFragment()
             fragment = createFragment(finishFileName);
             //Получив View из R.layout.fragment_set_list в SetListFragment(),
             // вставляем фрагмент в FrameLayout (с R.id.fragment_container) разметки fragment_set_list
@@ -667,12 +692,13 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 return true;
 
             case R.id.show_list_of_files:
-
                 //удаляем  файл - копию
                 mTempDBHelper.deleteFileAndSets(fileIdCopy);
-
+                //определяем тип файла
+                String type =  mTempDBHelper.getFileTypeFromTabFile(fileId);
                 //вызываем TabBarActivity
                 Intent intentList = new Intent(getBaseContext(), TabBarActivity.class);
+                intentList.putExtra(P.TYPE_OF_FILE, type);
                 startActivity(intentList);
                 finish();
                 return true;
@@ -862,49 +888,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         }
     }
 
-    //Записать список имён с данными  в файл
-    private void writeArrayList(ArrayList<String> arrayList, String fileName) {
-        try {
-            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
-                    openFileOutput(fileName, MODE_PRIVATE)));
-            for (String line : arrayList) {
-                //функция write не работает для CharSequence, поэтому String
-                bw.write(line);
-                // тут мог бы быть пробел если надо в одну строку
-                //если не включать эту строку, то в файле будет всего одна строчка, а нужен массив
-                bw.write(System.getProperty("line.separator"));
-            }
-            Log.d(TAG, "Файл ArrayList записан ");
-            bw.flush();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    //Прочитать список имён с данными из файла
-    private ArrayList<String> readArrayList(String fileName) {
-
-        ArrayList<String> newArrayList = new ArrayList<String>();
-
-        try {
-            // открываем поток для чтения
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    openFileInput(fileName)));
-            try {
-                String line;
-                while ((line = br.readLine()) != null) {
-                    newArrayList.add(line);
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        return newArrayList;
-    }
-
     //запись данных в файл и запись имени файла в список сохранённых файлов
     //в зависимости от имени, введённого в диалоге сохранения и типа данных
     public  String saveDataAndFilename(String nameFile, String fileNameDefoult, String typeData){
@@ -966,10 +949,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
             DataSet set = new DataSet(time_now,reps_now,number_now);
             //добавляем запись в таблицу TabSet, используя данные DataSet
             mTempDBHelper.addSet(set, file1_id);
-            Log.d(TAG, "SingleFragmentActivity saveDataAndFilename записан файл = " +
-                    finishFileName + "  Количество фрагментов = " + sara.getCount());
-            //======Окончание добавления записей в таблицы DataFile и DataSet=========//
             }
+        //======Окончание добавления записей в таблицы DataFile и DataSet=========//
+        Log.d(TAG, "SingleFragmentActivity saveDataAndFilename записан файл = " +
+                finishFileName + "  Количество фрагментов = " + sara.getCount());
 
         return finishFileName;
     }

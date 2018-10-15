@@ -215,36 +215,44 @@ public class TabBarTempFragment extends Fragment {
             String nameFile = dataFile.getFileName();
             name.setText(nameFile);
 
+            String min = dataFile.getFileNameDate() +
+                    getResources().getString(R.string.LowMinus)+ dataFile.getFileNameTime();
             final EditText dateAndTime = view.findViewById(R.id.editTextDateAndTime);
-            dateAndTime.setText(dataFile.getFileNameDate() + "_" + dataFile.getFileNameTime());
+            dateAndTime.setText(min);
             dateAndTime.setEnabled(false);
 
             final CheckBox date = view.findViewById(R.id.checkBoxDate);
 
             changeDialog.setView(view);
-            changeDialog.setTitle("Изменить имя");
+            changeDialog.setTitle("Изменить запись");
             changeDialog.setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
 
                     String nameFile = name.getText().toString();
-                    String dateAndTimeFile = dateAndTime.getText().toString();
+                    if (nameFile.equals(P.FILENAME_OTSECHKI_SEC)||
+                            nameFile.equals(P.FILENAME_OTSECHKI_TEMP)) {
+                        Toast.makeText(getContext(), "Системный файл.Изменение запрещено.",
+                                Toast.LENGTH_SHORT).show();
+                    }else {
 
-                    if(date.isChecked()){
-                        nameFile = nameFile + "_" + dateAndTimeFile;
+                        String dateAndTimeFile = dateAndTime.getText().toString();
+
+                        if (date.isChecked()) {
+                            nameFile = nameFile + "_" + dateAndTimeFile;
+                        }
+                        dataFile.setFileName(nameFile);
+
+                        SQLiteDatabase db = mTempDBHelper.getWritableDatabase();
+                        ContentValues updatedValues = new ContentValues();
+                        updatedValues.put(TabFile.COLUMN_FILE_NAME, nameFile);
+                        db.update(TabFile.TABLE_NAME, updatedValues,
+                                TabFile._ID + "=" + acmi.id, null);
+                        //принудительно прячем  клавиатуру - повторный вызов ее покажет
+                        takeOnAndOffSoftInput();
+
+                        mViewPager.getAdapter().notifyDataSetChanged();
                     }
-                    dataFile.setFileName(nameFile);
-
-                    SQLiteDatabase db = mTempDBHelper.getWritableDatabase();
-                    ContentValues updatedValues = new ContentValues();
-                    updatedValues.put(TabFile.COLUMN_FILE_NAME, nameFile);
-                    db.update(TabFile.TABLE_NAME, updatedValues,
-                            TabFile._ID + "=" + acmi.id, null);
-                    //принудительно прячем  клавиатуру - повторный вызов ее покажет
-                    takeOnAndOffSoftInput();
-
-                    mViewPager.getAdapter().notifyDataSetChanged();
-                    //onResume();
                 }
             });
             changeDialog.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {

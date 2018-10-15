@@ -61,8 +61,6 @@ public class DialogSaveTempFragment extends DialogFragment {
             finishFileName = getArguments().getString(P.ARG_NAME_OF_FILE);
 
         }else finishFileName = "";
-
-
     }
 
     @Override

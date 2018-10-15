@@ -142,7 +142,7 @@ public class TabBarSecFragment extends Fragment {
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.add(0, P.DELETE_ACTION_SEC, 0, "Удалить запись");
-        menu.add(0, P.CHANGE_ACTION_SEC, 0, "Изменить имя");
+        menu.add(0, P.CHANGE_ACTION_SEC, 0, "Изменить запись");
         menu.add(0, P.MOVE_TEMP_ACTION_SEC, 0, "Переместить в темполидер");
         menu.add(0, P.MOVE_LIKE_ACTION_SEC, 0, "Переместить в избранное");
         menu.add(0, P.CANCEL_ACTION_SEC, 0, "Отмена");
@@ -186,7 +186,7 @@ public class TabBarSecFragment extends Fragment {
                         Log.d(TAG, "PersonsListActivity удалена позиция с ID " + acmi.id);
                         //обновляем адаптер
                         mViewPager.getAdapter().notifyDataSetChanged();
-                        //onResume();
+
                     }
                 }
             });
@@ -215,34 +215,42 @@ public class TabBarSecFragment extends Fragment {
             String nameFile = dataFile.getFileName();
             name.setText(nameFile);
 
+            String min = dataFile.getFileNameDate() +
+                    getResources().getString(R.string.LowMinus)+ dataFile.getFileNameTime();
             final EditText dateAndTime =  view.findViewById(R.id.editTextDateAndTime);
-            dateAndTime.setText(dataFile.getFileNameDate() + "_" + dataFile.getFileNameTime());
+            dateAndTime.setText(min);
             dateAndTime.setEnabled(false);
 
             final CheckBox date = (CheckBox) view.findViewById(R.id.checkBoxDate);
 
             changeDialog.setView(view);
-            changeDialog.setTitle("Изменить имя");
+            changeDialog.setTitle("Изменить запись");
             changeDialog.setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
 
                     String nameFile = name.getText().toString();
-                    String dateAndTimeFile = dateAndTime.getText().toString();
+                    if (nameFile.equals(P.FILENAME_OTSECHKI_SEC)||
+                            nameFile.equals(P.FILENAME_OTSECHKI_TEMP)) {
+                        Toast.makeText(getContext(), "Системный файл.Изменение запрещено.",
+                                Toast.LENGTH_SHORT).show();
+                    }else{
 
-                    if (date.isChecked()) {
-                        nameFile = nameFile + "_" + dateAndTimeFile;
+                        String dateAndTimeFile = dateAndTime.getText().toString();
+
+                        if (date.isChecked()) {
+                            nameFile = nameFile + "_" + dateAndTimeFile;
+                        }
+                        dataFile.setFileName(nameFile);
+
+                        //изменяем имя файла
+                        mTempDBHelper.updateFileName(nameFile, acmi.id);
+
+                        //принудительно прячем  клавиатуру - повторный вызов ее покажет
+                        takeOnAndOffSoftInput();
+
+                        mViewPager.getAdapter().notifyDataSetChanged();
                     }
-                    dataFile.setFileName(nameFile);
-
-                    //изменяем имя файла
-                    mTempDBHelper.updateFileName(nameFile, acmi.id);
-
-                    //принудительно прячем  клавиатуру - повторный вызов ее покажет
-                    takeOnAndOffSoftInput();
-
-                    mViewPager.getAdapter().notifyDataSetChanged();
-                    //onResume();
                 }
             });
             changeDialog.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {

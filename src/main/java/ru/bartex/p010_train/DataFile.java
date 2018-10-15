@@ -13,7 +13,7 @@ public class DataFile implements Serializable {
     private String mKindOfSport;
     private String mDescriptionOfSport;
     private String mType_From;
-    private int mDelay = 6;
+    private int mDelay;
 
     public DataFile( ){
         //пустой конструктор

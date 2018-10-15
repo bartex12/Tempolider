@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class P {
@@ -76,7 +77,7 @@ public class P {
 
     //имя файла для записи текущей раскладки секундомера - когда не стали сохранять (или случайно)
     // перезаписывается при новой порции отсечек
-    public static final String FILENAME_TIMEMETER = "ru.bartex.p010_train.filename_timemeter";
+    public static final String TYPE_OF_FILE = "ru.bartex.p010_train.TYPE_OF_FILE";
 
     public static final String TYPE_TIMEMETER ="type_timemeter";
     public static final String TYPE_TEMPOLEADER ="type_tempoleader";
@@ -164,7 +165,7 @@ public class P {
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int min = calendar.get(Calendar.MINUTE);
         int sec = calendar.get(Calendar.SECOND);
-        return  String.format("%02d.%02d.%04d_%02d:%02d:%02d",
+        return  String.format(Locale.ENGLISH,"%02d.%02d.%04d_%02d:%02d:%02d",
                 date, month+1, year, hour, min, sec);
     }
 
@@ -177,12 +178,12 @@ public class P {
         String time;
 
         if(minut<1) {
-            time = String.format("%d.%01d", second, decim);
+            time = String.format(Locale.ENGLISH,"%d.%01d", second, decim);
         }else if (minut<60){
-            time = String.format("%d:%02d.%01d",minut,second,decim);
+            time = String.format(Locale.ENGLISH,"%d:%02d.%01d",minut,second,decim);
         }else {
             int hour = (int)((timeInMillis/3600000)%24);
-            time = String.format("%d:%02d:%02d.%01d",hour,minut,second,decim);
+            time = String.format(Locale.ENGLISH,"%d:%02d:%02d.%01d",hour,minut,second,decim);
         }
         return time;
     }
@@ -196,12 +197,12 @@ public class P {
         String time;
 
         if(minut<1) {
-            time = String.format("%d.%02d", second, decim);
+            time = String.format(Locale.ENGLISH,"%d.%02d", second, decim);
         }else if (minut<60){
-            time = String.format("%d:%02d.%02d",minut,second,decim);
+            time = String.format(Locale.ENGLISH,"%d:%02d.%02d",minut,second,decim);
         }else {
             int hour = (int)((timeInMillis/3600000)%24);
-            time = String.format("%d:%02d:%02d.%02d",hour,minut,second,decim);
+            time = String.format(Locale.ENGLISH,"%d:%02d:%02d.%02d",hour,minut,second,decim);
         }
         return time;
     }
@@ -215,12 +216,12 @@ public class P {
         String time;
 
         if(minut<1) {
-            time = String.format("%d.%03d", second, decim);
+            time = String.format(Locale.ENGLISH,"%d.%03d", second, decim);
         }else if (minut<60){
-            time = String.format("%d:%02d.%03d",minut,second,decim);
+            time = String.format(Locale.ENGLISH,"%d:%02d.%03d",minut,second,decim);
         }else {
             int hour = (int)((timeInMillis/3600000)%24);
-            time = String.format("%d:%02d:%02d.%03d",hour,minut,second,decim);
+            time = String.format(Locale.ENGLISH,"%d:%02d:%02d.%03d",hour,minut,second,decim);
         }
         return time;
     }
@@ -290,12 +291,12 @@ public class P {
         String time;
 
         if(minut<1) {
-            time = String.format("%d.%01d", second, decim);
+            time = String.format(Locale.ENGLISH,"%d.%01d", second, decim);
         }else if (minut<60){
-            time = String.format("%d:%02d.%01d",minut,second,decim);
+            time = String.format(Locale.ENGLISH,"%d:%02d.%01d",minut,second,decim);
         }else {
             int hour = (int)((timeInMillis/3600000)%24);
-            time = String.format("%d:%02d:%02d.%01d",hour,minut,second,decim);
+            time = String.format(Locale.ENGLISH,"%d:%02d:%02d.%01d",hour,minut,second,decim);
         }
         return time;
     }
@@ -311,12 +312,12 @@ public class P {
         String time;
 
         if(minut<1) {
-            time = String.format("%d.%02d", second, decim);
+            time = String.format(Locale.ENGLISH,"%d.%02d", second, decim);
         }else if (minut<60){
-            time = String.format("%d:%02d.%02d",minut,second,decim);
+            time = String.format(Locale.ENGLISH,"%d:%02d.%02d",minut,second,decim);
         }else {
             int hour = (int)((timeInMillis/3600000)%24);
-            time = String.format("%d:%02d:%02d.%02d",hour,minut,second,decim);
+            time = String.format(Locale.ENGLISH,"%d:%02d:%02d.%02d",hour,minut,second,decim);
         }
         return time;
     }
@@ -332,12 +333,12 @@ public class P {
         String time;
 
         if(minut<1) {
-            time = String.format("%d.%03d", second, decim);
+            time = String.format(Locale.ENGLISH,"%d.%03d", second, decim);
         }else if (minut<60){
-            time = String.format("%d:%02d.%03d",minut,second,decim);
+            time = String.format(Locale.ENGLISH,"%d:%02d.%03d",minut,second,decim);
         }else {
             int hour = (int)((timeInMillis/3600000)%24);
-            time = String.format("%d:%02d:%02d.%03d",hour,minut,second,decim);
+            time = String.format(Locale.ENGLISH,"%d:%02d:%02d.%03d",hour,minut,second,decim);
         }
         return time;
     }

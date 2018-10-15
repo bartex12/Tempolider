@@ -12,7 +12,7 @@
     <item
         android:title="@string/show_list_of_files"
         android:id = "@+id/show_list_of_files"
-        android:orderInCategory="150"
+        android:orderInCategory="350"
         android:icon="@drawable/ic_action_name"
         app:showAsAction="ifRoom"/>
 

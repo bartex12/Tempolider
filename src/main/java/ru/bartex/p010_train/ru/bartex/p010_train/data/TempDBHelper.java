@@ -342,6 +342,28 @@ public class TempDBHelper extends SQLiteOpenHelper {
     }
 
     /**
+     * Возвращает задержку старта файла по его ID
+     */
+    public int  getFileDelayFromTabFile( String name) throws SQLException {
+
+        long rowId = this.getIdFromFileName(name);
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor mCursor = db.query(true, TabFile.TABLE_NAME,
+                null,
+                TabFile._ID + "=" + rowId,
+                null, null, null, null, null);
+        if (mCursor != null) {
+            mCursor.moveToFirst();
+        }
+        int delay = mCursor.getInt(mCursor.getColumnIndex(TabFile.COLUMN_DELAY));
+
+        if (mCursor != null) {
+            mCursor.close();
+        }
+        return delay;
+    }
+
+    /**
      * Возвращает имя файла по его ID
      */
     public String getFileNameFromTabFile( long rowId) throws SQLException {
@@ -363,7 +385,7 @@ public class TempDBHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Возвращает имя файла по его ID
+     * Возвращает тип файла по его ID
      */
     public String getFileTypeFromTabFile( long rowId) throws SQLException {
 
@@ -382,6 +404,8 @@ public class TempDBHelper extends SQLiteOpenHelper {
 
         return fileType;
     }
+
+
 
     /**
      * Возвращает курсор с набором данных времени, количества повторений

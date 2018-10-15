@@ -94,24 +94,28 @@ public class NewExerciseActivity extends AppCompatActivity {
                 long fileId = mTempDBHelper.getIdFromFileName(fileNameStr);
                 Log.d(TAG, "fileNameStr = " +fileNameStr + "  fileId = " +fileId);
 
+                //если имя - пустая строка
                 if (fileNameStr.trim().isEmpty()){
                     Snackbar.make(v, "Введите непустое имя раскладки", Snackbar.LENGTH_LONG)
                            .setAction("Action", null).show();
                     Log.d(TAG, "Введите непустое имя раскладки ");
                     return;
 
+                    //если такое имя уже есть в базе
                 }else if (fileId != -1) {
                     Snackbar.make(v, "Такое имя уже существует. Введите другое имя.", Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                     Log.d(TAG, "Такое имя уже существует. Введите другое имя. fileId = " +fileId);
                     return;
 
+                    //если во всех фрагментах есть нулевые поля
                 }else  if (resalt == 0) {
                         Snackbar.make(v, "Заполните хотя бы один фрагмент подхода.", Snackbar.LENGTH_LONG)
                                 .setAction("Action", null).show();
                         Log.d(TAG, "Заполните хотя бы один фрагмент подхода  resalt = " + resalt);
                     return;
 
+                    //если имя не повторяется, оно не пустое и заполнен хотя бы один фрагмент
                     }else {
                          Log.d(TAG, "Такое имя отсутствует fileId = " + fileId);
                         //получаем дату и время в нужном для базы данных формате

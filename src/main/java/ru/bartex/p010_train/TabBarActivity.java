@@ -1,6 +1,7 @@
 package ru.bartex.p010_train;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.support.design.widget.TabLayout;
@@ -24,6 +25,8 @@ import android.widget.ListView;
 
 import java.util.ArrayList;
 
+import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
+
 public class TabBarActivity extends AppCompatActivity {
 
     static String TAG = "33333";
@@ -31,7 +34,6 @@ public class TabBarActivity extends AppCompatActivity {
     private String tabTitles[] = new String[] { "Сек", "Темп", "Избр" };
 
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
     //ViewPager that will host the section contents.
     public ViewPager mViewPager;
 
@@ -49,13 +51,35 @@ public class TabBarActivity extends AppCompatActivity {
         acBar.setDisplayHomeAsUpEnabled(true );
         acBar.setHomeButtonEnabled(true);
 
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
+        // Создайте адаптер, который вернет фрагмент для каждого из трех
+        //        первичных разделов активности.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
-        // Set up the ViewPager with the sections adapter.
+        // Установите ViewPager с адаптером вкладок
         mViewPager = (ViewPager) findViewById(R.id.container);
         Log.d(TAG, "TabBarActivity currentItem =  " +  mViewPager.getCurrentItem());
         mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        int currentItem;
+        Intent intent = getIntent();
+        if (intent.getExtras()!=null){
+
+            String type = intent.getStringExtra(P.TYPE_OF_FILE);
+            switch (type){
+                case P.TYPE_TIMEMETER:
+                    currentItem = 0;
+                    break;
+                case P.TYPE_TEMPOLEADER:
+                    currentItem = 1;
+                    break;
+                case P.TYPE_LIKE:
+                    currentItem = 2;
+                    break;
+                    default:
+                        currentItem = 0;
+                        break;
+            }
+            mViewPager.setCurrentItem(currentItem);
+        }
 
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
@@ -172,10 +196,10 @@ public class TabBarActivity extends AppCompatActivity {
 
             //возвращаем имя вкладки
            return tabTitles[position];
-
             //для установки иконок надо return null
             //return null;
         }
+
             //метод из PageAdapter, при return POSITION_NONE позволяет обновить адаптер с помощью
             //метода notifyDataSetChanged() из любого фрагмента
             @Override
