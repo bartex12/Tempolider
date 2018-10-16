@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="vertical"
+                xmlns:tools="http://schemas.android.com/tools"
+                android:orientation="vertical"
               android:keepScreenOn="true"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -23,12 +24,12 @@
         android:gravity="center">
 
         <TextView
+            android:id="@+id/textViewName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="New Text"
-            android:id="@+id/textViewName"
             android:gravity="center_vertical|center"
-            />
+            android:text="New Text"
+            android:textColor="@android:color/background_dark"/>
     </LinearLayout>
 
     <LinearLayout
@@ -53,7 +54,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="555"
-            android:background="@drawable/ramka"
+            android:background="@drawable/draw_delay"
             android:id="@+id/buttonDelay"
             android:layout_gravity="center_vertical"/>
 

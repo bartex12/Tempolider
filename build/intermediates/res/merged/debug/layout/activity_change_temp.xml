@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/changeTemp_name_layout"
-        android:background="@drawable/draw"
+        android:background="@drawable/rect"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
@@ -19,13 +19,14 @@
         android:paddingBottom="5dp">
 
         <TextView
+            android:id="@+id/changeTemp_textViewName"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="New Text"
-            android:id="@+id/changeTemp_textViewName"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
-            android:gravity="center_vertical|center"/>
+            android:gravity="center_vertical|center"
+            android:text="New Text"
+            android:textColor="@android:color/background_dark"/>
     </LinearLayout>
 
 

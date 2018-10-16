@@ -8,12 +8,12 @@
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\menu\\activity_help_main.xml"
     },
     {
-        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\menu\\timemeter.xml",
-        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\menu\\timemeter.xml"
-    },
-    {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\menu\\detail.xml",
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\menu\\detail.xml"
+    },
+    {
+        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\menu\\timemeter.xml",
+        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\menu\\timemeter.xml"
     },
     {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\menu\\timegraf.xml",
@@ -32,12 +32,12 @@
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\menu\\pacemaker.xml"
     },
     {
-        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\menu\\menu_set_list_frag.xml",
-        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\menu\\menu_set_list_frag.xml"
-    },
-    {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\menu\\list_of_files.xml",
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\menu\\list_of_files.xml"
+    },
+    {
+        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\menu\\menu_set_list_frag.xml",
+        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\menu\\menu_set_list_frag.xml"
     },
     {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\menu\\menu_tab_bar.xml",

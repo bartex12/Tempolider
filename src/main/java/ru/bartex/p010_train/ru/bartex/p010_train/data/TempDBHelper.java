@@ -161,7 +161,7 @@ public class TempDBHelper extends SQLiteOpenHelper {
     //получаем количество фрагментов подхода в подходе
     public int getSetFragmentsCount(long fileId) {
 
-        Log.i(TAG, "TempDBHelper.getSetFragmentsCount ... ");
+        Log.i(TAG, "TempDBHelper.getSetFragmentsCount");
         SQLiteDatabase db = this.getReadableDatabase();
 
         String query = "select " + TabSet.COLUMN_SET_TIME + " from " + TabSet.TABLE_NAME +
@@ -410,13 +410,14 @@ public class TempDBHelper extends SQLiteOpenHelper {
     /**
      * Возвращает курсор с набором данных времени, количества повторений
      * и порядкового номера фрагмента для всех фрагментов одного подхода с id = rowId
+     * отсортировано по COLUMN_SET_FRAG_NUMBER, иначе в Андроид 4 работает неправильно
      */
     public Cursor getAllSetFragments(long rowId) throws SQLException {
         SQLiteDatabase db = this.getReadableDatabase();
         Cursor mCursor = db.query(true, TabSet.TABLE_NAME,
                 new String[]{TabSet.COLUMN_SET_TIME, TabSet.COLUMN_SET_REPS, TabSet.COLUMN_SET_FRAG_NUMBER},
                 TabSet.COLUMN_SET_FILE_ID + "=" + rowId,
-                null, null, null, null, null);
+                null, null, null, TabSet.COLUMN_SET_FRAG_NUMBER, null);
         if (mCursor != null) {
             mCursor.moveToFirst();
         }

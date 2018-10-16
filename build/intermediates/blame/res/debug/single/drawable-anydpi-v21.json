@@ -1,30 +1,10 @@
 [
     {
-        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\ic_directions_walk_black_24dp.xml",
-        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\generated\\res\\pngs\\debug\\drawable-anydpi-v21\\ic_directions_walk_black_24dp.xml"
-    },
-    {
-        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\ic_panorama_black_24px.xml",
-        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\generated\\res\\pngs\\debug\\drawable-anydpi-v21\\ic_panorama_black_24px.xml"
-    },
-    {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\design_ic_visibility_off.xml",
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\design\\26.0.0-alpha1\\res\\drawable-anydpi-v21\\design_ic_visibility_off.xml"
     },
     {
-        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\ic_list_black_24dp.xml",
-        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\generated\\res\\pngs\\debug\\drawable-anydpi-v21\\ic_list_black_24dp.xml"
-    },
-    {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\design_ic_visibility.xml",
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\design\\26.0.0-alpha1\\res\\drawable-anydpi-v21\\design_ic_visibility.xml"
-    },
-    {
-        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\ic_perm_media_black_24dp.xml",
-        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\generated\\res\\pngs\\debug\\drawable-anydpi-v21\\ic_perm_media_black_24dp.xml"
-    },
-    {
-        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable-anydpi-v21\\ic_directions_run_black_24dp.xml",
-        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\generated\\res\\pngs\\debug\\drawable-anydpi-v21\\ic_directions_run_black_24dp.xml"
     }
 ]

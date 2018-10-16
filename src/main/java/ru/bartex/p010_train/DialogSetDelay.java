@@ -1,19 +1,16 @@
 package ru.bartex.p010_train;
 
-import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.DialogFragment;
+import android.support.v7.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.text.InputType;
+import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -43,10 +40,13 @@ public class DialogSetDelay extends DialogFragment {
 
     DelayListener mDelayListener;
 
+
     @Override
     public void onAttach(Context context) {
         super.onAttach(context);
         mDelayListener = (DelayListener)context;
+        Log.d(TAG, "DialogSetDelay -  onAttach mDelayListener = " + mDelayListener);
+
     }
 
     public DialogSetDelay() {
@@ -56,6 +56,7 @@ public class DialogSetDelay extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
 
+        Log.d(TAG, "DialogSetDelay -  onCreateDialog mDelayListener = " + mDelayListener);
         // в макете сделана установка фокуса, выделение цветом  и цифровая клавиатура
         //android:focusable="true"
         // android:selectAllOnFocus="true"
@@ -85,7 +86,10 @@ public class DialogSetDelay extends DialogFragment {
                     //читаем задержку в строке ввода
                     delay = Integer.parseInt(editTextDelay.getText().toString());
                     //Вызываем метод интерфейса, передаём задержку в активность SingleFragmentActivity
+                    Log.d(TAG, "DialogSetDelay -  до onDelayTransmit");
+                    if (mDelayListener==null) Log.d(TAG, "DialogSetDelay - mDelayListener==null");
                     mDelayListener.onDelayTransmit(delay);
+                    Log.d(TAG, "DialogSetDelay -  после onDelayTransmit");
                     editTextDelay.clearFocus();
 
                     //принудительно прячем  клавиатуру - повторный вызов ее покажет

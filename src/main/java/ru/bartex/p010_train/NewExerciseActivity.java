@@ -1,6 +1,7 @@
 package ru.bartex.p010_train;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
@@ -42,7 +43,10 @@ public class NewExerciseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_exercise);
+        setContentView(R.layout.activity_new_exercise_con);
+
+        //разрешить только портретную ориентацию экрана
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         ActionBar acBar = getSupportActionBar();
         acBar.setTitle(R.string.new_name);

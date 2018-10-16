@@ -1119,7 +1119,14 @@
                     "endOffset": 8606
                 },
                 "from": {
-                    "file": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\values\\colors.xml"
+                    "file": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\values\\colors.xml",
+                    "position": {
+                        "startLine": 3,
+                        "startColumn": 4,
+                        "startOffset": 105,
+                        "endColumn": 50,
+                        "endOffset": 151
+                    }
                 }
             },
             {
@@ -3963,14 +3970,7 @@
                     "endOffset": 58279
                 },
                 "from": {
-                    "file": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\values\\strings.xml",
-                    "position": {
-                        "startLine": 94,
-                        "startColumn": 4,
-                        "startOffset": 4114,
-                        "endColumn": 47,
-                        "endOffset": 4157
-                    }
+                    "file": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\values\\strings.xml"
                 }
             },
             {
@@ -4150,14 +4150,7 @@
                     "endOffset": 59028
                 },
                 "from": {
-                    "file": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\values\\strings.xml",
-                    "position": {
-                        "startLine": 95,
-                        "startColumn": 4,
-                        "startOffset": 4163,
-                        "endColumn": 38,
-                        "endOffset": 4197
-                    }
+                    "file": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\values\\strings.xml"
                 }
             },
             {

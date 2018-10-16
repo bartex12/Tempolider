@@ -49,6 +49,8 @@ public class DialogSaveTempFragment extends DialogFragment {
     public void onAttach(Context context) {
         super.onAttach(context);
         mSaverFragmentListener = (SaverFragmentListener)context;
+        Log.d(TAG, "DialogSaveTempFragment: onAttach   mSaverFragmentListener = " +
+                mSaverFragmentListener);
     }
 
     @Override

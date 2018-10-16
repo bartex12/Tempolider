@@ -200,14 +200,16 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     @Override
     public void onDelayTransmit(int delay) {
 
+        Log.d(TAG, "SingleFragmentActivity - onDelayTransmit");
         timeOfDelay = delay;
+        String DelayStr = String.valueOf(timeOfDelay);
 
         shp = getPreferences(MODE_PRIVATE);
         SharedPreferences.Editor edit = shp.edit();
         edit.putInt(P.KEY_DELAY, timeOfDelay);
         edit.apply();
 
-        mDelayButton.setText(String.valueOf(timeOfDelay));
+        mDelayButton.setText(DelayStr);
     }
 
     @Override
@@ -264,7 +266,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
             public void onClick(View view) {
                 String delay = mDelayButton.getText().toString();
                 DialogSetDelay dialogFragment = DialogSetDelay.newInstance(delay);
-                dialogFragment.show(getFragmentManager(),"delayDialog");
+                dialogFragment.show(getSupportFragmentManager(),"delayDialog");
             }
         });
 
@@ -464,6 +466,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
             fileId = mTempDBHelper.getIdFromFileName(finishFileName);
             //количество фрагментов подхода
             countOfSet =mTempDBHelper.getSetFragmentsCount(fileId);
+            Log.d(TAG, " getSetFragmentsCount =  " + countOfSet);
             //создаём и записываем в базу копию файла на случай отмены изменений
             fileIdCopy = mTempDBHelper.createFileCopy(finishFileName, fileId, endName);
 

@@ -188,7 +188,7 @@ public class SetListFragment extends Fragment {
         prefSetting = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         //получаем из файла настроек количество знаков после запятой
         accurancy = Integer.parseInt(prefSetting.getString("accurancy", "1"));
-        Log.d(TAG,"SingleFragmentActivity onResume accurancy = " + accurancy);
+        Log.d(TAG,"SetListFragment onResume accurancy = " + accurancy);
         //обновляем данные списка фрагмента активности
         //если здесь не обновлять, то список не обновляется при возврате из DetailActivity
 

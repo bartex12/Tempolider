@@ -156,8 +156,11 @@ public class TabBarActivity extends AppCompatActivity {
             onBackPressed();
             return true;
         }
-        //noinspection SimplifiableIfStatement
+
         if (id == R.id.action_settings) {
+            Log.d(TAG, "OptionsItem = action_settings");
+            Intent intentSettings = new Intent(this, PrefActivity.class);
+            startActivity(intentSettings);
             return true;
         }
         return super.onOptionsItemSelected(item);
