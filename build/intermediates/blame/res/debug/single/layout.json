@@ -12,6 +12,10 @@
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\layout\\abc_list_menu_item_radio.xml"
     },
     {
+        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\layout\\save_data_timemeter.xml",
+        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\layout\\save_data_timemeter.xml"
+    },
+    {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\layout\\content_main.xml",
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\layout\\content_main.xml"
     },

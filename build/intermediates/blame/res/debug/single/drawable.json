@@ -56,24 +56,24 @@
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\abc_ic_go_search_api_material.xml"
     },
     {
-        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\abc_tab_indicator_material.xml",
-        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\abc_tab_indicator_material.xml"
-    },
-    {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\abc_ratingbar_small_material.xml",
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\abc_ratingbar_small_material.xml"
+    },
+    {
+        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\abc_tab_indicator_material.xml",
+        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\abc_tab_indicator_material.xml"
     },
     {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\design_password_eye.xml",
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\design\\26.0.0-alpha1\\res\\drawable\\design_password_eye.xml"
     },
     {
-        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\abc_ic_menu_overflow_material.xml",
-        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\abc_ic_menu_overflow_material.xml"
-    },
-    {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\abc_ic_clear_material.xml",
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\abc_ic_clear_material.xml"
+    },
+    {
+        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\abc_ic_menu_overflow_material.xml",
+        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\abc_ic_menu_overflow_material.xml"
     },
     {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\ic_autorenew_white_24dp.xml",

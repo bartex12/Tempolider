@@ -251,12 +251,12 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 Log.d(TAG, "countMilliSecond = " + countMilliSecond +"  countReps = " + countReps);
                 //выставляем флаг нажатия на Старт = да
                 start = true;
-                //делаем имя файла недоступным для щелчка
-               // mNameLayout.setEnabled(false); //всё сделано в слушателе TextView
 
                 //делаем изменение задержки недоступным
                 mDelayButton.setEnabled(false);
 
+                //вызываем onPrepareOptionsMenu чтобы скрыть элементы тулбара пока старт
+                invalidateOptionsMenu();
             }
         });
 
@@ -275,6 +275,8 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                // mNameLayout.setEnabled(true);
                 //делаем изменение задержки доступным
                 mDelayButton.setEnabled(true);
+                //вызываем onPrepareOptionsMenu чтобы открыть элементы тулбара если стоп
+                invalidateOptionsMenu();
             }
         });
 
@@ -514,6 +516,27 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         Log.d(TAG, "onCreateOptionsMenu");
         return true;
     }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        ActionBar acBar = getSupportActionBar();
+        Log.d(TAG, "onPrepareOptionsMenu");
+    /*
+        //можно прятать всю панель
+        if (start){
+            acBar.hide();
+        }else acBar.show();
+    */
+        //отключаем видимость на время от Старт до Стоп
+        //acBar.setHomeButtonEnabled(!start);  //не работает
+        acBar.setDisplayHomeAsUpEnabled(!start );
+        //отключаем видимость на время от Старт до Стоп
+        menu.findItem(R.id.show_list_of_files).setVisible(!start);
+        menu.findItem(R.id.action_settings_temp).setVisible(!start);
+        menu.findItem(R.id.change_data).setVisible(!start);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
