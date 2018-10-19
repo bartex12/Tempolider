@@ -163,7 +163,7 @@ public class DialogSaveSecFragment extends DialogFragment {
                         Log.d(TAG, "Такое имя отсутствует fileId = " + fileId);
 
                         //Вызываем метод интерфейса, имя файла в TimeMeterActivity
-                        mSaverFragSectListener.onNameAndGrafTransmit(nameFile, false, false);
+                        mSaverFragSectListener.onNameAndGrafTransmit(nameFile, true, false);
 
                         //принудительно прячем  клавиатуру - повторный вызов ее покажет
                         takeOnAndOffSoftInput();
@@ -173,33 +173,6 @@ public class DialogSaveSecFragment extends DialogFragment {
                     }
                 }
         });
-
-/*
-        //действия при нажатии кнопки "Сохранить" в диалоге сохранения данных в базу
-        builder.setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
-        });
-
-        //действия при нажатии кнопки "Сохранить и показать" в диалоге сохранения данных в базу
-        builder.setNeutralButton("Сохранить и показать", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-
-            }
-        });
-
-        //действия при нажатии кнопки "Нет" в диалоге сохранения данных в базу
-        builder.setNegativeButton("Нет", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-            }
-        });
-        */
 
         //если не делать запрет на закрытие окна при щелчке за пределами окна, то можно так
         //return bilder.create();
