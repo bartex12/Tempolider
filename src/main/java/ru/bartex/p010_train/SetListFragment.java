@@ -64,19 +64,18 @@ public class SetListFragment extends Fragment {
     int accurancy; //точность отсечек - количество знаков после запятой - от MainActivity
     private SharedPreferences prefSetting;// предпочтения из PrefActivity
 
+    public void setFinishFileName(String finishFileName){
+        this.finishFileName =finishFileName;
+    }
 
     public interface OnShowTotalValuesListener {
         void onShowTotalValues( String time,String reps);
     }
 
-    public interface OnShowTSaveIconListener {
-        void onSaveIconState();
-    }
-
     private OnShowTotalValuesListener mShowTotalValuesListener;
-    private OnShowTSaveIconListener mOnShowTSaveIconListener;
 
     public static SetListFragment newInstance(String nameOfFile){
+        Log.d(TAG, "SetListFragment: newInstance  ");
         Bundle args = new Bundle();
         args.putString(P.ARG_NAME_OF_FILE,nameOfFile);
         SetListFragment fragment = new SetListFragment();
@@ -102,9 +101,9 @@ public class SetListFragment extends Fragment {
 
     @Override
     public void onAttach(Context context) {
+        Log.d(TAG, "SetListFragment: onAttach  ");
         super.onAttach(context);
         mShowTotalValuesListener = (OnShowTotalValuesListener)context;
-        mOnShowTSaveIconListener = (OnShowTSaveIconListener)context;
     }
 
     @Override
@@ -115,7 +114,7 @@ public class SetListFragment extends Fragment {
         //имя файла из аргументов - оно остаётся тем же после редактирования в отличие от id  файла
         //который надо вычислять снова после возврата из редактирования
         finishFileName = getArguments().getString(P.ARG_NAME_OF_FILE);
-        //для фрагментов требуется так разрешить появление меню
+        //для фрагментов требуется так разрешить появление контекстного меню
         setHasOptionsMenu(true);
     }
 
@@ -153,6 +152,7 @@ public class SetListFragment extends Fragment {
                     //если в активности нажата Стоп, то Старт = false
                 }else{
                     Log.d(TAG, "SetListFragment mListView.setOnItemClickListener");
+                    /*
                     //id файла с именем finishFileName
                     finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
 
@@ -164,6 +164,7 @@ public class SetListFragment extends Fragment {
                     Log.d(TAG, "SetListFragment mListView.setOnItemClickListener position = " +
                             i+ "  id = " + l);
                     startActivity(intent);
+                    */
                 }
             }
         });
@@ -177,6 +178,7 @@ public class SetListFragment extends Fragment {
     public void onStart() {
         super.onStart();
         Log.d(TAG, "SetListFragment: onStart  ");
+
     }
 
     @Override
@@ -205,8 +207,6 @@ public class SetListFragment extends Fragment {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, DELETE_ID, 0, "Удалить строку");
-        menu.add(0, CHANGE_ID, 0, "Изменить строку");
         menu.add(0, CHANGE_TEMP_ID, 0, "Изменить раскладку");
         menu.add(0, CANCEL_ID, 0, "Отмена");
     }
@@ -223,73 +223,8 @@ public class SetListFragment extends Fragment {
             Toast.makeText(getContext(),
                     "Сначала нажмите Стоп", Toast.LENGTH_SHORT).show();
 
-        }else {
-            //если выбран пункт Удалить запись
-            if (item.getItemId() == DELETE_ID) {
-                Log.d(TAG, "SetListFragment CM_DELETE_ID");
-
-                AlertDialog.Builder deleteDialog = new AlertDialog.Builder(getContext());
-                deleteDialog.setTitle("Удалить: Вы уверены?");
-                deleteDialog.setPositiveButton("Нет", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                    }
-                });
-
-                deleteDialog.setNegativeButton("Да", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-
-                        //id файла с именем finishFileName
-                        finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
-
-                        //удаляем строку с номером (acmi.position+1), относящуюся к файлу с id =finishFileId
-                        mTempDBHelper.deleteSet(finishFileId, (acmi.position+1));
-
-                        Log.d(TAG,"SetListFragment CM_DELETE_ID  имя =" + finishFileName +
-                                "  Id = " + finishFileId +
-                                "  acmi.position+1 = " + (acmi.position+1) +
-                                "  acmi.id = " + acmi.id);
-
-                        //пересчитывваем номера фрагментов подхода
-                        mTempDBHelper.rerangeSetFragments(finishFileId);
-
-                        //обновляем данные списка фрагмента активности
-                        updateAdapter();
-
-                        //вычисляем и показываем общее время выполнения подхода и количество повторов в подходе
-                        calculateAndShowTotalValues();
-
-                        //вызываем метод интерфейса, чтобы сообщить, что нужно показать иконку Сохранить
-                        mOnShowTSaveIconListener.onSaveIconState();
-                    }
-                });
-
-                deleteDialog.show();
-                return true;
-
-                //если выбран пункт Изменить запись
-            } else if (item.getItemId() == CHANGE_ID) {
-                Log.d(TAG, "SetListFragment CHANGE_ID");
-                //id файла с именем finishFileName
-                finishFileId = mTempDBHelper.getIdFromFileName (finishFileName);
-
-                DataSet dataSet = mTempDBHelper.getOneSetFragmentData(finishFileId, acmi.position);
-
-                Intent intent = new Intent(getContext(), DetailActivity.class);
-                intent.putExtra(P.DETAIL_DATA_SET, dataSet);
-                intent.putExtra(P.FINISH_FILE_NAME, finishFileName);
-                intent.putExtra(P.DETAIL_CHANGE_REQUEST, P.DETAIL_CHANGE_REQUEST_KODE);
-
-                Log.d(TAG, "SetListFragment CM_CHANGE_ID acmi.position = " + acmi.position+
-                                "  acmi.id = " + acmi.id);
-               startActivity(intent);
-               getActivity().finish();
-                return true;
-
-                //если выбран пункт Изменить раскладку
-            } else if (item.getItemId() == CHANGE_TEMP_ID) {
-
+            //если выбран пункт Изменить раскладку
+        }else { if (item.getItemId() == CHANGE_TEMP_ID) {
                 Log.d(TAG, "SetListFragment CHANGE_TEMP_ID");
 
                 Intent intent = new Intent(getContext(), ChangeTempActivity.class);

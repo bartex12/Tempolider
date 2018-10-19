@@ -137,7 +137,7 @@ public class TabBarSecFragment extends Fragment {
         }
     }
 
-    //создаём контекстное меню для списка (сначала регистрация нужна в onCreateView)
+    //создаём контекстное меню для списка (сначала регистрация нужна  - здесь в onResume)
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);

@@ -59,13 +59,21 @@ public class DetailActivity extends AppCompatActivity {
         //получаем extras из интента
         extras = getIntent().getExtras();
         if(extras != null) {
-
-            //если Изменить из контекстного меню темполидера
-            if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE) {
+            //если Изменить из контекстного меню редактора
+            if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_TEMP_REQUEST_CODE) {
                 act.setTitle("Изменить");
                 finishFileName = extras.getString(P.FINISH_FILE_NAME);
                 mDataSet = (DataSet) extras.getSerializable(P.DETAIL_DATA_SET);
-                Log.d(TAG, "DetailActivity onCreate mDataSet № = " + mDataSet.getNumberOfFrag());
+                Log.d(TAG, "DetailActivity DETAIL_CHANGE_TEMP_REQUEST_CODE " +
+                        "onCreate mDataSet № = " + mDataSet.getNumberOfFrag());
+
+                //если Изменить из контекстного меню темполидера
+            } else if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE) {
+                act.setTitle("Изменить");
+                finishFileName = extras.getString(P.FINISH_FILE_NAME);
+                mDataSet = (DataSet) extras.getSerializable(P.DETAIL_DATA_SET);
+                Log.d(TAG, "DetailActivity DETAIL_CHANGE_REQUEST_KODE " +
+                        "onCreate mDataSet № = " + mDataSet.getNumberOfFrag());
 
                 //если Добавить с тулбара темполидера +
             }else if (extras.getInt(P.FROM_ACTIVITY) ==P.TO_ADD_SET){
@@ -74,11 +82,17 @@ public class DetailActivity extends AppCompatActivity {
                 fragmentCount = mDBHelper.getSetFragmentsCount(fileId);
                 mDataSet = new DataSet();
                 mDataSet.setNumberOfFrag(fragmentCount + 1);
-                Log.d(TAG, "DetailActivity onCreate Добавить с тулбара темполидера  fileId= " +fileId);
-
-                //если плавающая кнопка из главного меню
-            }else if (extras.getInt(P.FROM_MAIN) ==P.TO_ADD){
-                act.setTitle("Создать");
+                Log.d(TAG, "DetailActivity TO_ADD_SET " +
+                        "onCreate Добавить с тулбара темполидера  fileId= " +fileId);
+                //если Добавить с тулбара редактора  +
+            }else if (extras.getInt(P.FROM_ACTIVITY) ==P.TO_ADD_FRAG){
+                act.setTitle("Добавить ");
+                fileId = extras.getLong(P.INTENT_TO_DETILE_FILE_ID);
+                fragmentCount = mDBHelper.getSetFragmentsCount(fileId);
+                mDataSet = new DataSet();
+                mDataSet.setNumberOfFrag(fragmentCount + 1);
+                Log.d(TAG, "DetailActivity TO_ADD_FRAG " +
+                        "onCreate Добавить с тулбара редактора  fileId= " +fileId);
             }
         }
 
@@ -87,23 +101,30 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                //если плавающая кнопка из главного меню
-                if (extras.getInt(P.FROM_MAIN) == P.TO_ADD){
-                    Log.d(TAG, "mButtonOk (P.FROM_MAIN) == P.TO_ADD ");
+                //если Добавить с тулбара редактора  +
+               if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_FRAG) {
+                   //Добавляем фрагмент подхода
+                   mDBHelper.addSet(mDataSet, fileId);
+                   Log.d(TAG, "mButtonOk (P.FROM_ACTIVITY) == P.TO_ADD_FRAG ");
 
-                    //если Добавить с тулбара темполидера +
-                }else if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_SET){
-                    //Добавляем фрагмент подхода
-                    mDBHelper.addSet(mDataSet, fileId);
-                    Log.d(TAG, "mButtonOk (P.FROM_ACTIVITY) == P.TO_ADD_SET ");
+                   Intent intentSave = new Intent();
+                   setResult(RESULT_OK, intentSave);
 
-                    Intent intentSave = new Intent();
-                    setResult(RESULT_OK,intentSave);
+                   //если Добавить с тулбара темполидера +
+               }else if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_SET){
+                       //Добавляем фрагмент подхода
+                       mDBHelper.addSet(mDataSet, fileId);
+                       Log.d(TAG, "mButtonOk (P.FROM_ACTIVITY) == P.TO_ADD_SET ");
+
+                       Intent intentSave = new Intent();
+                       setResult(RESULT_OK,intentSave);
 
                     //если Изменить из контекстного меню темполидера
                 }else if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE){
+
                     //обновляем фрагмент подхода в базе данных
                     mDBHelper.updateSetFragment(mDataSet);
+
                     Log.d(TAG, "mButtonOk (P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE ");
 
                         //посылаем интент чтобы показать иконку Сохранить как
@@ -112,6 +133,19 @@ public class DetailActivity extends AppCompatActivity {
                         intentSaveIcon.putExtra(P.FROM_ACTIVITY, P.DETAIL_ACTIVITY);
                         intentSaveIcon.putExtra(P.FINISH_FILE_NAME, finishFileName);
                         startActivity(intentSaveIcon);
+                    finish();
+
+                    //если Изменить из контекстного меню редактора
+                }else if(extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_TEMP_REQUEST_CODE){
+
+                   //обновляем фрагмент подхода в базе данных
+                   mDBHelper.updateSetFragment(mDataSet);
+
+                    Log.d(TAG, "mButtonOk (P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_TEMP_REQUEST_CODE");
+
+                    //посылаем интент чтобы показать иконку Сохранить как
+                    Intent intentSaveIcon = new Intent();
+                    setResult(RESULT_OK,intentSaveIcon);
                     finish();
                 }
 
@@ -127,35 +161,25 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(extras != null) {
-                    //если Изменить
-                    if (extras.getInt(DETAIL_REQUEST) == 111) {
-                        //прячем экранную клавиатуру
-                        takeOffSoftInput();
-                        //завершаем
-                        finish();
-                        //если Добавить
-                    } else {
-                        //int number = mSet.getNumberOfFrag();
-                        //SetLab.removeSet(number);
-                        //прячем экранную клавиатуру
-                        takeOffSoftInput();
-                        //завершаем
-                        finish();
-                    }
-                }
+                //прячем экранную клавиатуру
+                takeOffSoftInput();
+                //завершаем
+                finish();
             }
         });
 
         mTimeOfRepFrag = (EditText)findViewById(R.id.time_item_set_editText);
-        //если плавающая кнопка из главного меню
-        if (extras.getInt(P.FROM_MAIN) == P.TO_ADD){
+        //если Добавить с тулбара темполидера +
+        if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_SET) {
             mTimeOfRepFrag.setText("0");
-            //если Добавить с тулбара темполидера +
-        }else if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_SET){
+            //если Добавить с тулбара  редактора  +
+        }else if(extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_FRAG) {
             mTimeOfRepFrag.setText("0");
             //если Изменить из контекстного меню темполидера
         }else if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE){
+            mTimeOfRepFrag.setText(String.valueOf(mDataSet.getTimeOfRep()));
+            //если Изменить из контекстного меню редактора
+        }else if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_TEMP_REQUEST_CODE){
             mTimeOfRepFrag.setText(String.valueOf(mDataSet.getTimeOfRep()));
         }
         mTimeOfRepFrag.addTextChangedListener(new TextWatcher() {
@@ -165,31 +189,48 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                //если плавающая кнопка из главного меню
-                if (extras.getInt(P.FROM_MAIN) == P.TO_ADD){
+                //если Изменить из контекстного меню редактора
+            if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_TEMP_REQUEST_CODE) {
+                //получаем float секунд для времени между повторами из строчки mTimeOfRepFrag
+                float ft = getCountSecond(mTimeOfRepFrag);
+                //и присваиваем его переменной mTimeOfRep класса DataSet
+                mDataSet.setTimeOfRep(ft);
+                //доступность кнопки Ok, если оба значения ненулевые
+                mButtonOk.setEnabled(((mDataSet.getTimeOfRep()!=0))&&((mDataSet.getReps()!=0)));
+                Log.d(TAG, " DETAIL_CHANGE_TEMP_REQUEST_CODE countSecond = " + mDataSet.getTimeOfRep() +
+                        "countReps = " + mDataSet.getReps());
 
                     //если Изменить из контекстного меню темполидера
                 }else if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE) {
 
-                    //получаем float миллисекунд для времени между повторами из строчки mTimeOfRepFrag
-                    float ft = getCountMilliSecond(mTimeOfRepFrag);
-                    //и присваиваем его переменной mTimeOfRep класса Set
+                    //получаем float секунд для времени между повторами из строчки mTimeOfRepFrag
+                    float ft = getCountSecond(mTimeOfRepFrag);
+                    //и присваиваем его переменной mTimeOfRep класса DataSet
                     mDataSet.setTimeOfRep(ft);
                     //доступность кнопки Ok, если оба значения ненулевые
                     mButtonOk.setEnabled(((mDataSet.getTimeOfRep()!=0))&&((mDataSet.getReps()!=0)));
-                    Log.d(TAG, "countSecond = " + mDataSet.getTimeOfRep() +
+                    Log.d(TAG, "DETAIL_CHANGE_REQUEST_KODE countSecond = " + mDataSet.getTimeOfRep() +
                             "countReps = " + mDataSet.getReps());
-
                     //если Добавить с тулбара темполидера +
             }else if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_SET){
-                    //получаем float миллисекунд для времени между повторами из строчки mTimeOfRepFrag
-                    float ft = getCountMilliSecond(mTimeOfRepFrag);
+                    //получаем float секунд для времени между повторами из строчки mTimeOfRepFrag
+                    float ft = getCountSecond(mTimeOfRepFrag);
                     //и присваиваем его переменной mTimeOfRep класса Set
                     mDataSet.setTimeOfRep(ft);
                     //доступность кнопки Ok, если оба значения ненулевые
                     mButtonOk.setEnabled(((mDataSet.getTimeOfRep()!=0))&&((mDataSet.getReps()!=0)));
-                    Log.d(TAG, "countSecond = " + mDataSet.getTimeOfRep() +
+                    Log.d(TAG, " TO_ADD_SET countSecond = " + mDataSet.getTimeOfRep() +
                             "countReps = " + mDataSet.getReps());
+                //если Добавить с тулбара редактора  +
+            }else if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_FRAG){
+                //получаем float секунд для времени между повторами из строчки mTimeOfRepFrag
+                float ft = getCountSecond(mTimeOfRepFrag);
+                //и присваиваем его переменной mTimeOfRep класса Set
+                mDataSet.setTimeOfRep(ft);
+                //доступность кнопки Ok, если оба значения ненулевые
+                mButtonOk.setEnabled(((mDataSet.getTimeOfRep()!=0))&&((mDataSet.getReps()!=0)));
+                Log.d(TAG, " TO_ADD_FRAG countSecond = " + mDataSet.getTimeOfRep() +
+                        "countReps = " + mDataSet.getReps());
             }
             }
             @Override
@@ -197,14 +238,17 @@ public class DetailActivity extends AppCompatActivity {
         });
 
         mRepsFrag = (EditText)findViewById(R.id.reps_item_set_editText);
-        //если плавающая кнопка из главного меню
-        if (extras.getInt(P.FROM_MAIN) ==P.TO_ADD){
-            mRepsFrag.setText("0");
-            //если Добавить с тулбара темполидера +
-        }else if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_SET) {
-            mRepsFrag.setText("0");
+        //если Добавить с тулбара темполидера +
+         if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_SET) {
+             mRepsFrag.setText("0");
+             //если Добавить с тулбара редактора  +
+         }else if(extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_FRAG){
+             mRepsFrag.setText("0");
             //если Изменить из контекстного меню темполидера
         } else if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE) {
+            mRepsFrag.setText(String.valueOf(mDataSet.getReps()));
+            //если Изменить из контекстного меню редактора
+        } else if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_TEMP_REQUEST_CODE) {
             mRepsFrag.setText(String.valueOf(mDataSet.getReps()));
         }
         mRepsFrag.addTextChangedListener(new TextWatcher() {
@@ -214,8 +258,15 @@ public class DetailActivity extends AppCompatActivity {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
 
-                //если плавающая кнопка из главного меню
-                if (extras.getInt(P.FROM_MAIN) == P.TO_ADD){
+                //если Изменить из контекстного меню редактора
+                if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_TEMP_REQUEST_CODE) {
+                    //получаем int количество повторений для фрагмента из строчки mRepsFrag
+                    int ir = getCountReps(mRepsFrag);
+                    //и присваиваем его переменной mReps класса Set
+                    mDataSet.setReps(ir);
+                    //доступность кнопки Ok, если оба значения ненулевые
+                    mButtonOk.setEnabled(((mDataSet.getTimeOfRep()!=0))&&((mDataSet.getReps()!=0)));
+                    Log.d(TAG, "DETAIL_CHANGE_TEMP_REQUEST_CODE countReps = " + mDataSet.getReps());
 
                     //если Изменить из контекстного меню темполидера
                 }else if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE) {
@@ -225,7 +276,7 @@ public class DetailActivity extends AppCompatActivity {
                     mDataSet.setReps(ir);
                     //доступность кнопки Ok, если оба значения ненулевые
                     mButtonOk.setEnabled(((mDataSet.getTimeOfRep()!=0))&&((mDataSet.getReps()!=0)));
-                    Log.d(TAG, "countReps = " + mDataSet.getReps());
+                    Log.d(TAG, "DETAIL_CHANGE_REQUEST_KODE countReps = " + mDataSet.getReps());
 
                     //если Добавить с тулбара темполидера +
                 }else if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_SET){
@@ -235,7 +286,17 @@ public class DetailActivity extends AppCompatActivity {
                     mDataSet.setReps(ir);
                     //доступность кнопки Ok, если оба значения ненулевые
                     mButtonOk.setEnabled(((mDataSet.getTimeOfRep()!=0))&&((mDataSet.getReps()!=0)));
-                    Log.d(TAG, "countReps = " + mDataSet.getReps());
+                    Log.d(TAG, " TO_ADD_SET countReps = " + mDataSet.getReps());
+
+                    //если Добавить с тулбара редактора +
+                }else if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_FRAG) {
+                    //получаем int количество повторений для фрагмента из строчки mRepsFrag
+                    int ir = getCountReps(mRepsFrag);
+                    //и присваиваем его переменной mReps класса Set
+                    mDataSet.setReps(ir);
+                    //доступность кнопки Ok, если оба значения ненулевые
+                    mButtonOk.setEnabled(((mDataSet.getTimeOfRep() != 0)) && ((mDataSet.getReps() != 0)));
+                    Log.d(TAG, " TO_ADD_SET countReps = " + mDataSet.getReps());
                 }
             }
             @Override
@@ -245,18 +306,23 @@ public class DetailActivity extends AppCompatActivity {
         mNumberOfFrag = (EditText)findViewById(R.id.mark_item_set_editText);
         //записываем в поле mNumberOfFrag порядковый номер фрагмента подхода +1 (на экране - с 1)
 
-        //если плавающая кнопка из главного меню
-        if (extras.getInt(P.FROM_MAIN) ==P.TO_ADD){
-            mNumberOfFrag.setText("1");
-
-            //если Добавить с тулбара темполидера +
-        }else if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_SET){
-            mNumberOfFrag.setText(String.valueOf(fragmentCount+1));
-
+        //если Добавить с тулбара темполидера +
+       if (extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_SET) {
+           mNumberOfFrag.setText(String.valueOf(fragmentCount + 1));
+           Log.d(TAG, " TO_ADD_SET mNumberOfFrag = " + (fragmentCount + 1));
+            //если Добавить с тулбара редактора +
+       }else if(extras.getInt(P.FROM_ACTIVITY) == P.TO_ADD_FRAG){
+           mNumberOfFrag.setText(String.valueOf(fragmentCount + 1));
+           Log.d(TAG, " TO_ADD_FRAG mNumberOfFrag = " + (fragmentCount + 1));
          //если Изменить из контекстного меню темполидера
     }else if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_REQUEST_KODE){
         mNumberOfFrag.setText(String.valueOf(mDataSet.getNumberOfFrag()));
-        }
+            Log.d(TAG, " DETAIL_CHANGE_REQUEST_KODE mNumberOfFrag = " + mDataSet.getNumberOfFrag());
+            //если Изменить из контекстного меню редактора
+    }else if (extras.getInt(P.DETAIL_CHANGE_REQUEST) == P.DETAIL_CHANGE_TEMP_REQUEST_CODE){
+        mNumberOfFrag.setText(String.valueOf(mDataSet.getNumberOfFrag()));
+            Log.d(TAG, " DETAIL_CHANGE_TEMP_REQUEST_CODE mNumberOfFrag = " + mDataSet.getNumberOfFrag());
+    }
 
         //Устанавливаем фокус ввода в поле mTimeOfRepFrag
         mTimeOfRepFrag.requestFocus();
@@ -319,7 +385,7 @@ public class DetailActivity extends AppCompatActivity {
     }
 
     //перевоим текст в миллисекунды для времени между повторениями одного фрагмента
-    private float getCountMilliSecond(EditText time) {
+    private float getCountSecond(EditText time) {
         String s = time.getText().toString();
         if ((s.equals("")) ||(s.equals("."))) {
             return 0;

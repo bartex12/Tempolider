@@ -474,6 +474,9 @@
     <string name="DelayOfStart">Задержка старта, сек   </string>
     <string name="DelayOfStartInput">Введите задержку</string>
     <string name="DelayValue">6</string>
+    <string name="DeleteNo">Нет</string>
+    <string name="DeleteYes">Да</string>
+    <string name="DeleteYesNo">Удалить: Вы уверены?</string>
     <string name="FileName">Имя раскладки  </string>
     <string name="FileNameInput">Введите имя</string>
     <string name="Fragment">Фрагмент</string>
@@ -533,7 +536,7 @@
     <string name="bottom_sheet_behavior" translatable="false">android.support.design.widget.BottomSheetBehavior</string>
     <string name="cbSoundOff">Звук выключен</string>
     <string name="cbSoundOn">Звук включен</string>
-    <string name="change_data">Изменить раскладку</string>
+    <string name="change_data">Редактировать раскладку</string>
     <string name="change_name">Изменить</string>
     <string name="change_temp">Изменить темп </string>
     <string name="character_counter_pattern" translatable="false">%1$d / %2$d</string>

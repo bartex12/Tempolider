@@ -58,8 +58,7 @@ import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
  * Created by Андрей on 02.05.2018.
  */
 public abstract class SingleFragmentActivity extends AppCompatActivity implements
-        SetListFragment.OnShowTotalValuesListener, DialogSaveTempFragment.SaverFragmentListener,
-        DialogSetDelay.DelayListener, SetListFragment.OnShowTSaveIconListener {
+        SetListFragment.OnShowTotalValuesListener, DialogSetDelay.DelayListener {
 
     // Лайаут этого класса R.layout.activity_set_list
 
@@ -120,25 +119,11 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     TempDBHelper mTempDBHelper = new TempDBHelper(this);
     //имя файла с раскладкой
     private String finishFileName;
-    //имя файла с раскладкой после изменения и сохранения при щелчке по дискете в тулбаре
-    private String finishFileNameNew;
-    long fileId; //id файла, загруженного в темполидер
-    long fileIdCopy;  // id копии файла для отмены
+    //id файла, загруженного в темполидер
+    long fileId;
     //количество фрагментов подхода
     int countOfSet ;
-    //добавка к имени в копии файла
-    String endName = "new";
-    //показывать иконку Сохранить true - да false - нет
-    boolean saveVision = true;
-    boolean repeat = false; // повторно ли вызвана ChangeTempActivity
 
-    // Метод интерфейса из класса SetListFragment
-    @Override
-    public void  onSaveIconState(){
-        Log.d(TAG, "SingleFragmentActivity - onSaveIconState");
-        saveVision = true;
-        invalidateOptionsMenu();
-    }
 
     // Метод интерфейса из класса SetListFragment
     @Override
@@ -147,54 +132,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         mTimeLabel.setText(time);
         mRepsLabel.setText(reps);
     }
-
-
-    //oldNameFile - имя файла для записи в список сохранённых файлов
-    @Override
-    public void onFileNameTransmit(String oldNameFile, String newNameFile) {
-
-        //имя файла, если строка имени пуста
-        String fileNameDefoult =P.FINISH_FILE_NAME;
-
-        long oldFileId = mTempDBHelper.getIdFromFileName(oldNameFile);
-        String typeFile = mTempDBHelper.getFileTypeFromTabFile(oldFileId);
-
-        if (newNameFile.isEmpty()) {
-            switch (typeFile) {
-                case P.TYPE_TIMEMETER:
-                    fileNameDefoult = P.FILENAME_OTSECHKI_SEC;
-                    break;
-                case P.TYPE_TEMPOLEADER:
-                    fileNameDefoult = P.FILENAME_OTSECHKI_TEMP;
-                    break;
-                case P.TYPE_LIKE:
-                    fileNameDefoult = P.FILENAME_OTSECHKI_LIKE;
-                    break;
-            }
-        }
-
-        //удаляем данные старого файла
-        mTempDBHelper.deleteFileAndSets(fileId);
-        //и записываем новый файл с новым именем (переменнная для имени старая )
-        finishFileName = saveDataAndFilename(newNameFile, fileNameDefoult, typeFile);
-        //стотрим его id чтобы не было краха - ЭТОТ id используется дальше в show_list_of_files
-        fileId = mTempDBHelper.getIdFromFileName(finishFileName);
-        //выводим имя файла на экран
-        mNameOfFile.setText(finishFileName);
-
-
-        //после этого можно спросить - созданить ли старый файл из копии под старым именем
-        String oldNameOfFileCopy = mTempDBHelper.getFileNameFromTabFile(fileIdCopy);
-        String oldNameOfFile = oldNameOfFileCopy.substring(0,
-                oldNameOfFileCopy.length()-3);
-        Log.d(TAG, "SingleFragmentActivity - onFileNameTransmit oldNameOfFileCopy.length() = "+
-                oldNameOfFileCopy.length());
-        Log.d(TAG, "SingleFragmentActivity - onFileNameTransmit oldNameOfFileCopy = "+
-                oldNameOfFileCopy + "  oldNameOfFile = "+ oldNameOfFile);
-        long oldNameOfFileId = mTempDBHelper.createFileCopy(oldNameOfFile,fileIdCopy,"");
-        Log.d(TAG, "SingleFragmentActivity - onFileNameTransmit oldNameOfFileId = "+
-                oldNameOfFileId + "  oldNameOfFile = "+ oldNameOfFile);
-        }
 
     //метод интерфейса для передачи величины задержки из диалога
     @Override
@@ -230,30 +167,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         acBar.setDisplayHomeAsUpEnabled(true );
         acBar.setHomeButtonEnabled(true);
 
-        mNameLayout = (LinearLayout) findViewById(R.id.name_layout);
-        mNameLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //если в активности нажата Старт = true , ничего не делать
-                if (start){
-                    Toast.makeText(SingleFragmentActivity.this,
-                            "Сначала нажмите Стоп", Toast.LENGTH_SHORT).show();
-
-                    //если в активности нажата Стоп, то Старт = false
-                }else{
-                    //удаляем  файл - копию
-                    mTempDBHelper.deleteFileAndSets(fileIdCopy);
-
-                    //определяем тип файла
-                    String type =  mTempDBHelper.getFileTypeFromTabFile(fileId);
-                    //вызываем TabBarActivity
-                    Intent intentList = new Intent(getBaseContext(), TabBarActivity.class);
-                    intentList.putExtra(P.TYPE_OF_FILE, type);
-                    startActivity(intentList);
-                    finish(); //чтобы не включать в стек возврата,
-                }
-            }
-        });
 
         mNameOfFile = (TextView) findViewById(R.id.textViewName);
 
@@ -343,8 +256,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
                 //делаем изменение задержки недоступным
                 mDelayButton.setEnabled(false);
-                //вызываем onPrepareOptionsMenu для создания недоступномсти значков ToolBar
-                invalidateOptionsMenu();
 
             }
         });
@@ -364,8 +275,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                // mNameLayout.setEnabled(true);
                 //делаем изменение задержки доступным
                 mDelayButton.setEnabled(true);
-                //вызываем onPrepareOptionsMenu для создания доступномсти значков ToolBar
-                invalidateOptionsMenu();
             }
         });
 
@@ -440,16 +349,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
             //получаем имя файла из интента
             finishFileName = intent.getStringExtra(P.FINISH_FILE_NAME);
 
-            //если интент пришёл от DetailActivity после Изменить из контекст меню в SetListFragment
-        } else if(fromActivity == 444) {
-            //получаем обратно имя файла из интента (прогнали его по кругу, чтобы не было краха)
-            finishFileName = intent.getStringExtra(P.FINISH_FILE_NAME);
-            //показать иконку Сохранить как
-            saveVision = true;
-            Log.d(TAG, " saveVision = " + saveVision );
-            invalidateOptionsMenu();
-
-            //если интент пришёл от NewExerciseActivity после + в Главном меню
+        //если интент пришёл от NewExerciseActivity после + в Главном меню
         } else if(fromActivity == 555) {
             //получаем имя файла из интента
             finishFileName = intent.getStringExtra(P.FINISH_FILE_NAME);
@@ -460,23 +360,11 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
         Log.d(TAG, " fromActivity =  " + fromActivity +" mNameOfFile = " + finishFileName);
 
-        //=============== Создание копии файла с данными finishFileName================//
-
             //получаем id файла
             fileId = mTempDBHelper.getIdFromFileName(finishFileName);
             //количество фрагментов подхода
             countOfSet =mTempDBHelper.getSetFragmentsCount(fileId);
             Log.d(TAG, " getSetFragmentsCount =  " + countOfSet);
-            //создаём и записываем в базу копию файла на случай отмены изменений
-            fileIdCopy = mTempDBHelper.createFileCopy(finishFileName, fileId, endName);
-
-            //если не из делализации то скрываем Сохранить на тулбаре
-            if (fromActivity != 444){
-                saveVision =false;
-                invalidateOptionsMenu();
-            }
-
-        //======================================================================//
 
         //Вставляем фрагмент, реализованный в классе, наследующем SingleFragmentActivity
         //и реализующем абстрактный метод createFragment()
@@ -492,10 +380,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                     .add(R.id.fragment_container, fragment)
                     .commit();
         }
-
-       //если в списке ничего нет, делаем Старт недоступной
-       // fileId = mTempDBHelper.getIdFromFileName(finishFileName);
-        //boolean st = (fileId==-1) ? false : true;
 
         //выставляем доступность кнопок
         buttonsEnable (true,false,false);
@@ -577,8 +461,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        //удаляем  файл - копию
-        mTempDBHelper.deleteFileAndSets(fileIdCopy);
 
         //записываем последнее имя файла на экране в преференсис активности
         shp = getPreferences(MODE_PRIVATE);
@@ -592,38 +474,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         if (mTimer!=null)mTimer.cancel();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "SingleFragmentActivity - onActivityResult requestCode = " + requestCode);
-            if (resultCode == RESULT_OK) {
-                Log.d(TAG, "onActivityResult resultCode = RESULT_OK");
-                //если из плюсика  на тулбаре
-                if ((requestCode == P.SAVE_ICON_REQUEST)) {
-                    saveVision = true;
-                    invalidateOptionsMenu();
-                }else if (requestCode == P.SAVE_ICON_REQUEST_CHANGE_TEMP){
-
-                    if (repeat){
-                        saveVision = true;
-                    }else {
-                        saveVision = data.getExtras().getBoolean(P.INTENT_SAVE_VISION);
-                        repeat = data.getExtras().getBoolean(P.INTENT_SAVE_VISION_REPEAT);
-                    }
-
-                    invalidateOptionsMenu();
-                }
-                Log.d(TAG, "onActivityResult saveVision = " + saveVision);
-                //если из карандаша на тулбаре почему то resultCode != RESULT_OK ???
-            }else {Log.d(TAG, "onActivityResult resultCode != RESULT_OK");}
-        }
-
     //отслеживание нажатия кнопки HOME
     @Override
     protected void onUserLeaveHint() {
-
-        //Toast toast = Toast.makeText(getApplicationContext(), "onUserLeaveHint", Toast.LENGTH_SHORT);
-        //toast.show();
+        Log.d(TAG, "SingleFragmentActivity - onUserLeaveHint");
         //включаем звук
         AudioManager audioManager =(AudioManager)getSystemService(Context.AUDIO_SERVICE);
         audioManager.setStreamMute(AudioManager.STREAM_MUSIC, false);
@@ -632,33 +486,33 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     }
 
     @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "SingleFragmentActivity onActivityResult");
+        if (resultCode == RESULT_OK){
+            Log.d(TAG, "SingleFragmentActivity onActivityResult resultCode == RESULT_OK = "+
+                    + resultCode + "  requestCode = " + requestCode);
+            //если пришли из редактора, получаем finishFileName и отдаём его фрагменту в
+            //методе фрагмента setFinishFileName(), в котором оно присваивается переменной фрагмента
+            if (requestCode == P.REDACT_REQUEST){
+                finishFileName = data.getExtras().getString(P.FINISH_FILE_NAME);
+                 SetListFragment fragment = (SetListFragment)getSupportFragmentManager().
+                findFragmentById(R.id.fragment_container);
+                fragment.setFinishFileName(finishFileName);
+            }
+        }else {
+            Log.d(TAG, "SingleFragmentActivity onActivityResult resultCode != RESULT_OK = " +
+                    resultCode + "  requestCode = " + requestCode);
+        }
+
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         //return super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.singl_fragment_activity_menu,menu);
         Log.d(TAG, "onCreateOptionsMenu");
         return true;
-    }
-
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu) {
-        ActionBar acBar = getSupportActionBar();
-        Log.d(TAG, "onPrepareOptionsMenu");
-    /*
-        //можно прятать всю панель
-        if (start){
-            acBar.hide();
-        }else acBar.show();
-    */
-        //отключаем видимость на время от Старт до Стоп
-        //acBar.setHomeButtonEnabled(!start);  //не работает
-        acBar.setDisplayHomeAsUpEnabled(!start );
-        //отключаем видимость на время от Старт до Стоп
-        menu.findItem(R.id.menu_item_new_frag).setVisible(!start);
-        menu.findItem(R.id.save_data_in_file).setVisible((!start)&&saveVision);
-        menu.findItem(R.id.show_list_of_files).setVisible(!start);
-        menu.findItem(R.id.action_settings_temp).setVisible(!start);
-        menu.findItem(R.id.change_data).setVisible(!start);
-        return super.onPrepareOptionsMenu(menu);
     }
 
     @Override
@@ -672,31 +526,14 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 finish();
                 return true;
 
-            case R.id.menu_item_new_frag:
-                Log.d(TAG, "menu_item_new_frag");
-                //вызываем DetailActivity и передаём туда fileId
-                Intent intentDetail = new Intent(getBaseContext(), DetailActivity.class);
-                intentDetail.putExtra(P.INTENT_TO_DETILE_FILE_ID, fileId);
-                intentDetail.putExtra(P.FROM_ACTIVITY,P.TO_ADD_SET);
-                startActivityForResult(intentDetail, P.SAVE_ICON_REQUEST);
-                return true;
-
             case R.id.change_data:
                 Log.d(TAG, "change_data");
-                Intent intent = new Intent(getBaseContext(), ChangeTempActivity.class);
+                Intent intent = new Intent(this, ChangeTempActivity.class);
                 intent.putExtra(P.FINISH_FILE_NAME, finishFileName);
-                startActivityForResult(intent, P.SAVE_ICON_REQUEST_CHANGE_TEMP);
-                return true;
-
-            case R.id.save_data_in_file:
-                DialogFragment dialogFragment = DialogSaveTempFragment.newInstance(finishFileName);
-                dialogFragment.show(getSupportFragmentManager(),"SavePickerTempolider");
-                onPause();
+                startActivityForResult(intent,P.REDACT_REQUEST);
                 return true;
 
             case R.id.show_list_of_files:
-                //удаляем  файл - копию
-                mTempDBHelper.deleteFileAndSets(fileIdCopy);
                 //определяем тип файла
                 String type =  mTempDBHelper.getFileTypeFromTabFile(fileId);
                 //вызываем TabBarActivity
@@ -712,19 +549,9 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 startActivity(intentPref);
                 //finish();  //не нужно
                 return true;
-
-
         }
         return super.onOptionsItemSelected(item);
     }
-
-    /*
-    public static class SaverFragment extends DialogFragment {
-    // Не будем делать внутренний класс, сделаем отдельный, так как почему то не работает
-    // запись в файл: openFileOutput не воспринимается системой (возможно из-за того
-   // что диалог - это тоже фрагмент
-    }
-*/
 
     //состояние кнопок управления темполидером
     private void buttonsEnable(boolean start,boolean stop,boolean reset){
@@ -883,81 +710,11 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                             changeMarkColor(R.id.fragment_container, mCountFragment, end);
                             buttonsEnable(true, false, true);
                             mDelayButton.setEnabled(true);
-                            invalidateOptionsMenu();
                         }
                     });
                 }
             }
         }
-    }
-
-    //запись данных в файл и запись имени файла в список сохранённых файлов
-    //в зависимости от имени, введённого в диалоге сохранения и типа данных
-    public  String saveDataAndFilename(String nameFile, String fileNameDefoult, String typeData){
-
-        Log.d(TAG, "saveDataAndFilename nameFile = " + nameFile);
-
-        String finishFileName;
-        //получаем дату и время в нужном для базы данных формате
-        String dateFormat  = mTempDBHelper.getDateString();
-        String timeFormat  = mTempDBHelper.getTimeString();
-
-        //если строка имени пустая
-        if (nameFile.isEmpty()) {
-            //имя будет fileNameDefoult
-            finishFileName = fileNameDefoult;
-
-            //проверяем, есть ли в базе запись с таким именем
-            long repeatId = mTempDBHelper.getIdFromFileName (finishFileName);
-            Log.d(TAG,"saveDataAndFilename repeatId = " + repeatId);
-            //если есть (repeatId не равно -1), стираем её и потом пишем новые данные под таким именем
-            if (repeatId != -1){
-                mTempDBHelper.deleteFileAndSets(repeatId);
-            }
-        }else {
-            finishFileName = nameFile;
-        }
-        Log.d(TAG, "saveDataAndFilename finishFileName = " + finishFileName);
-        //======Начало добавления записей в таблицы DataFile и DataSet=========//
-        //если имя файла не пустое (может быть fileNameDefoult)
-        //создаём экземпляр класса DataFile в конструкторе
-        DataFile file1 = new DataFile(finishFileName, dateFormat, timeFormat,
-                null,null, typeData, 6);
-        //добавляем запись в таблицу TabFile, используя данные DataFile
-        long file1_id =  mTempDBHelper.addFile(file1);
-
-        //находим фрагмент по id контейнера
-        SetListFragment fr = (SetListFragment)getSupportFragmentManager().
-                findFragmentById(R.id.fragment_container);
-        ListView listviewFrag = fr.mListView;
-        //меняем задний фон строк списка
-        //listviewFrag.setBackgroundColor(Color.RED);
-
-        //получаем адаптер списка для доступа к значениям фрагментов подхода
-        ListAdapter sara = listviewFrag.getAdapter();
-
-        //готовим данные фрагментов подхода
-        // если индекс =0, то первое значение
-        for (int j = 0; j < sara.getCount(); j++ ) {
-            float time_now;
-            int reps_now;
-            int number_now;
-             HashMap<String,Object> map = (HashMap<String,Object>)sara.getItem(j);
-
-            time_now = Float.parseFloat((map.get(P.ATTR_TIME).toString()));
-            reps_now = (int)map.get(P.ATTR_REP);
-            number_now = (int)map.get(P.ATTR_NUMBER);
-
-            //создаём экземпляр класса DataSet в конструкторе
-            DataSet set = new DataSet(time_now,reps_now,number_now);
-            //добавляем запись в таблицу TabSet, используя данные DataSet
-            mTempDBHelper.addSet(set, file1_id);
-            }
-        //======Окончание добавления записей в таблицы DataFile и DataSet=========//
-        Log.d(TAG, "SingleFragmentActivity saveDataAndFilename записан файл = " +
-                finishFileName + "  Количество фрагментов = " + sara.getCount());
-
-        return finishFileName;
     }
 
 }

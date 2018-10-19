@@ -1,6 +1,7 @@
 package ru.bartex.p010_train;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -11,9 +12,11 @@ import android.preference.PreferenceManager;
 import android.support.annotation.IdRes;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -42,7 +45,7 @@ import ru.bartex.p010_train.ru.bartex.p010_train.data.TabSet;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 
 public class ChangeTempActivity extends AppCompatActivity implements
-        DialogChangeTemp.ChangeTempUpDownListener{
+        DialogChangeTemp.ChangeTempUpDownListener, DialogSaveTempFragment.SaverFragmentListener{
 
     private static final String TAG = "33333";
     public static final int  VALUE = 10;
@@ -80,7 +83,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
     Map<String,Object> m;
     SimpleAdapter sara;
     //показывать иконку Сохранить true - да false - нет
-    boolean saveVision = true;
+    boolean saveVision = false;
 
 
     int accurancy; //точность отсечек - количество знаков после запятой - от MainActivity
@@ -95,6 +98,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
     //добавка к имени в копии файла
     String endName = "copy";
 
+    //метод интерфейса для передачи величины изменения темпа
     @Override
     public void changeTempUpDown(int valueDelta, boolean up) {
 
@@ -114,7 +118,55 @@ public class ChangeTempActivity extends AppCompatActivity implements
         updateAdapter();
         calculateAndShowTotalValues();
         changeTemp_listView.setSelection(0);
+        saveVision = true;
+        invalidateOptionsMenu();
 
+    }
+
+    //метод интерфейса по передаче имени файла для сохранения в базе данных
+    @Override
+    public void onFileNameTransmit(String oldNameFile, String newNameFile) {
+        //имя файла, если строка имени пуста
+        String fileNameDefoult =P.FINISH_FILE_NAME;
+
+        long oldFileId = mDBHelper.getIdFromFileName(oldNameFile);
+        String typeFile = mDBHelper.getFileTypeFromTabFile(oldFileId);
+
+        if (newNameFile.isEmpty()) {
+            switch (typeFile) {
+                case P.TYPE_TIMEMETER:
+                    fileNameDefoult = P.FILENAME_OTSECHKI_SEC;
+                    break;
+                case P.TYPE_TEMPOLEADER:
+                    fileNameDefoult = P.FILENAME_OTSECHKI_TEMP;
+                    break;
+                case P.TYPE_LIKE:
+                    fileNameDefoult = P.FILENAME_OTSECHKI_LIKE;
+                    break;
+            }
+        }
+
+        //удаляем данные старого файла
+        mDBHelper.deleteFileAndSets(fileId);
+        //и записываем новый файл с новым именем (переменнная для имени старая )
+        finishFileName = saveDataAndFilename(newNameFile, fileNameDefoult, typeFile);
+        //стотрим его id чтобы не было краха - ЭТОТ id используется дальше в show_list_of_files
+        fileId = mDBHelper.getIdFromFileName(finishFileName);
+        //выводим имя файла на экран
+        changeTemp_textViewName.setText(finishFileName);
+
+
+        //после этого можно спросить - созданить ли старый файл из копии под старым именем
+        String oldNameOfFileCopy = mDBHelper.getFileNameFromTabFile(fileIdCopy);
+        String oldNameOfFile = oldNameOfFileCopy.substring(0,
+                oldNameOfFileCopy.length()-endName.length());
+        Log.d(TAG, "SingleFragmentActivity - onFileNameTransmit oldNameOfFileCopy.length() = "+
+                oldNameOfFileCopy.length());
+        Log.d(TAG, "SingleFragmentActivity - onFileNameTransmit oldNameOfFileCopy = "+
+                oldNameOfFileCopy + "  oldNameOfFile = "+ oldNameOfFile);
+        long oldNameOfFileId = mDBHelper.createFileCopy(oldNameOfFile,fileIdCopy,"");
+        Log.d(TAG, "SingleFragmentActivity - onFileNameTransmit oldNameOfFileId = "+
+                oldNameOfFileId + "  oldNameOfFile = "+ oldNameOfFile);
     }
 
     @Override
@@ -229,7 +281,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
         });
 
         changeTemp_textViewName =(TextView)findViewById(R.id.changeTemp_textViewName);
-        changeTemp_textViewName.setText("Имя:  " + finishFileName);
+        changeTemp_textViewName.setText(finishFileName);
 
         timeTotal = (TextView)findViewById(R.id.timeTotal);
         repsTotal = (TextView)findViewById(R.id.repsTotal);
@@ -240,11 +292,11 @@ public class ChangeTempActivity extends AppCompatActivity implements
             public void onClick(View view) {
 
                 String s = reductAction(0.95f,-5);
-                //reductAction(0.95f,-5);
                 updateAdapter();
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
                 saveVision = true;
+                invalidateOptionsMenu();
 
                 if (redactTime){
                     deltaValue.setVisibility(View.VISIBLE);
@@ -267,6 +319,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
                 saveVision = true;
+                invalidateOptionsMenu();
 
                 if (redactTime){
                     deltaValue.setVisibility(View.VISIBLE);
@@ -306,6 +359,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
                 saveVision = false;
+                invalidateOptionsMenu();
 
                 //делаем индикатор невидимым
                 deltaValue.setVisibility(View.INVISIBLE);
@@ -332,6 +386,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
                 saveVision = true;
+                invalidateOptionsMenu();
 
                 if (redactTime){
                     deltaValue.setVisibility(View.VISIBLE);
@@ -353,6 +408,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
                 calculateAndShowTotalValues();
                 changeTemp_listView.setSelectionFromTop(pos, offset);
                 saveVision = true;
+                invalidateOptionsMenu();
 
                 if (redactTime){
                     deltaValue.setVisibility(View.VISIBLE);
@@ -376,12 +432,6 @@ public class ChangeTempActivity extends AppCompatActivity implements
             changeTemp_buttonPlus1.setText("+1");
             changeTemp_buttonPlus5.setText("+5");
         }
-
-        //получаем настройки из активности настроек
-        prefSetting = PreferenceManager.getDefaultSharedPreferences(this);
-        //получаем из файла настроек количество знаков после запятой
-        accurancy = Integer.parseInt(prefSetting.getString("accurancy", "1"));
-        Log.d(TAG,"TimeMeterActivity accurancy = " + accurancy);
     }
 
     @Override
@@ -389,20 +439,28 @@ public class ChangeTempActivity extends AppCompatActivity implements
         super.onResume();
         Log.d(TAG, "ChangeTempActivity onResume");
 
+        //получаем настройки из активности настроек
+        prefSetting = PreferenceManager.getDefaultSharedPreferences(this);
+        //получаем из файла настроек количество знаков после запятой
+        accurancy = Integer.parseInt(prefSetting.getString("accurancy", "1"));
+        Log.d(TAG,"TimeMeterActivity accurancy = " + accurancy);
+
         //выводим список, суммарные время и количество, устанавливаем выделение цветом
         updateAdapter();
         calculateAndShowTotalValues();
         changeTemp_listView.setSelection(positionOfList);
+
+        //объявляем о регистрации контекстного меню
+        registerForContextMenu(changeTemp_listView);
     }
 
     @Override
     public void onBackPressed() {
         //super.onBackPressed();
 
-        Intent intentSave = new Intent();
-        intentSave.putExtra(P.INTENT_SAVE_VISION, saveVision);
-        intentSave.putExtra(P.INTENT_SAVE_VISION_REPEAT, true);
-        setResult(RESULT_OK,intentSave);
+        Intent intentBack = new Intent();
+        intentBack.putExtra(P.FINISH_FILE_NAME, finishFileName);
+        setResult(RESULT_OK,intentBack);
         finish();
     }
 
@@ -447,6 +505,16 @@ public class ChangeTempActivity extends AppCompatActivity implements
     }
 
     @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        Log.d(TAG, "onPrepareOptionsMenu");
+
+        //включаем видимость если произошли изменения данных -удаление, изменение, добавление
+        menu.findItem(R.id.save_data_in_file).setVisible(saveVision);
+
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()){
@@ -456,15 +524,142 @@ public class ChangeTempActivity extends AppCompatActivity implements
                 finish();
                 return true;
 
+            case R.id.menu_item_new_frag:
+                Log.d(TAG, "menu_item_new_frag");
+                //вызываем DetailActivity и передаём туда fileId
+                Intent intentNewFrag = new Intent(this, DetailActivity.class);
+                intentNewFrag.putExtra(P.INTENT_TO_DETILE_FILE_ID, fileId);
+                intentNewFrag.putExtra(P.FROM_ACTIVITY,P.TO_ADD_FRAG);
+                startActivityForResult(intentNewFrag, P.ADD_NEW_FRAG_REQUEST);
+                return true;
+
             case R.id.change_temp_up_down:
                 Log.d(TAG, "change_temp_up_down");
 
                 DialogFragment dialogFragmentChange = DialogChangeTemp.newInstance(VALUE);
                 dialogFragmentChange.show(getSupportFragmentManager(), "dialogFragmentChange");
+                return true;
 
+            case R.id.save_data_in_file:
+                DialogFragment dialogFragment = DialogSaveTempFragment.newInstance(finishFileName);
+                dialogFragment.show(getSupportFragmentManager(),"SavePickerTempolider");
+                onPause();
+                return true;
+
+            case R.id.action_settings_temp:
+                //вызываем ListOfFilesActivity
+                Intent intentPref = new Intent(this, PrefActivity.class);
+                startActivity(intentPref);
+                //finish();  //не нужно - всё равно нет эффекта
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    //создаём контекстное меню для списка (сначала регистрация нужна  - здесь в onResume)
+    @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        super.onCreateContextMenu(menu, v, menuInfo);
+        menu.add(0, P.DELETE_CHANGETEMP, 0, "Удалить строку");
+        menu.add(0, P.CHANGE_CHANGETEMP, 0, "Изменить строку");
+        menu.add(0, P.CANCEL_CHANGETEMP, 0, "Отмена");
+    }
+
+    @Override
+    public boolean onContextItemSelected(MenuItem item) {
+
+        final AdapterView.AdapterContextMenuInfo acmi =
+                (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+
+        //если удалить из контекстного меню
+        if (item.getItemId() == P.DELETE_CHANGETEMP){
+            Log.d(TAG, "ChangeTempActivity P.DELETE_CHANGETEMP");
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle(R.string.DeleteYesNo);
+            builder.setPositiveButton(R.string.DeleteNo, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+
+                }
+            });
+            builder.setNegativeButton(R.string.DeleteYes, new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    mDBHelper.deleteSet(fileId, (acmi.position+1));
+                    Log.d(TAG,"ChangeTempActivity P.DELETE_CHANGETEMP  имя =" + finishFileName +
+                            "  Id = " + fileId +
+                            "  acmi.position+1 = " + (acmi.position+1) +
+                            "  acmi.id = " + acmi.id);
+
+                    //пересчитываем номера фрагментов подхода
+                    mDBHelper.rerangeSetFragments(fileId);
+
+                    //обновляем данные списка фрагмента активности
+                    updateAdapter();
+
+                    //вычисляем и показываем общее время выполнения подхода и количество повторов в подходе
+                    calculateAndShowTotalValues();
+
+                    saveVision = true;
+
+                    invalidateOptionsMenu();
+                }
+            });
+            builder.show();
+            return true;
+
+            //если изменить из контекстного меню
+        }else  if(item.getItemId() == P.CHANGE_CHANGETEMP){
+            Log.d(TAG, "ChangeTempActivity P.CHANGE_CHANGETEMP");
+            Log.d(TAG, "ChangeTempActivity P.CHANGE_CHANGETEMP acmi.position = " +
+                    acmi.position + "  acmi.id = " + acmi.id);
+            //объект фрагмент данных с fileId на позиции acmi.position
+            DataSet dataSet = mDBHelper.getOneSetFragmentData(fileId, acmi.position);
+
+            Intent intent = new Intent(this, DetailActivity.class);
+            intent.putExtra(P.DETAIL_DATA_SET, dataSet);
+            intent.putExtra(P.FINISH_FILE_NAME, finishFileName);
+            intent.putExtra(P.DETAIL_CHANGE_REQUEST, P.DETAIL_CHANGE_TEMP_REQUEST_CODE);
+            startActivityForResult(intent, P.TEMP_REQUEST_CODE);
+            //finish();
+            return true;
+        }else if(item.getItemId() == P.CANCEL_CHANGETEMP){
+
+            return true;
+        }
+
+        return super.onContextItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (resultCode ==RESULT_OK){
+            //если удалить из контекстного меню
+            if (requestCode == P.TEMP_REQUEST_CODE){
+                //обновляем данные списка фрагмента активности
+                updateAdapter();
+                //вычисляем и показываем общее время выполнения подхода и количество повторов в подходе
+                calculateAndShowTotalValues();
+                //устанавливаем флаг видимости иконки сохранения - Да
+                saveVision = true;
+                //обновляем иконки тулбара, вызывая  onPrepareOptionsMenu
+                invalidateOptionsMenu();
+
+                //если изменить из контекстного меню
+            }else  if(requestCode == P.ADD_NEW_FRAG_REQUEST){
+
+                //обновляем данные списка фрагмента активности
+                updateAdapter();
+                //вычисляем и показываем общее время выполнения подхода и количество повторов в подходе
+                calculateAndShowTotalValues();
+                //устанавливаем флаг видимости иконки сохранения - Да
+                saveVision = true;
+                //обновляем иконки тулбара, вызывая  onPrepareOptionsMenu
+                invalidateOptionsMenu();
+
+            }
+        }
     }
 
     private void calculateAndShowTotalValues(){
@@ -653,4 +848,72 @@ public class ChangeTempActivity extends AppCompatActivity implements
             return false;
         }
     }
+
+    //запись данных в файл и запись имени файла в список сохранённых файлов
+    //в зависимости от имени, введённого в диалоге сохранения и типа данных
+    public  String saveDataAndFilename(String nameFile, String fileNameDefoult, String typeData){
+
+        TempDBHelper mTempDBHelper = new TempDBHelper(this);
+
+        Log.d(TAG, "saveDataAndFilename nameFile = " + nameFile);
+
+        String finishFileName;
+        //получаем дату и время в нужном для базы данных формате
+        String dateFormat  = mTempDBHelper.getDateString();
+        String timeFormat  = mTempDBHelper.getTimeString();
+
+        //если строка имени пустая
+        if (nameFile.isEmpty()) {
+            //имя будет fileNameDefoult
+            finishFileName = fileNameDefoult;
+
+            //проверяем, есть ли в базе запись с таким именем
+            long repeatId = mTempDBHelper.getIdFromFileName (finishFileName);
+            Log.d(TAG,"saveDataAndFilename repeatId = " + repeatId);
+            //если есть (repeatId не равно -1), стираем её и потом пишем новые данные под таким именем
+            if (repeatId != -1){
+                mTempDBHelper.deleteFileAndSets(repeatId);
+            }
+        }else {
+            finishFileName = nameFile;
+        }
+        Log.d(TAG, "saveDataAndFilename finishFileName = " + finishFileName);
+        //======Начало добавления записей в таблицы DataFile и DataSet=========//
+        //если имя файла не пустое (может быть fileNameDefoult)
+        //создаём экземпляр класса DataFile в конструкторе
+        DataFile file1 = new DataFile(finishFileName, dateFormat, timeFormat,
+                null,null, typeData, 6);
+        //добавляем запись в таблицу TabFile, используя данные DataFile
+        long file1_id =  mTempDBHelper.addFile(file1);
+
+        //меняем задний фон строк списка
+        //changeTemp_listView.setBackgroundColor(Color.RED);
+
+        //получаем адаптер списка для доступа к значениям фрагментов подхода
+        ListAdapter sara = changeTemp_listView.getAdapter();
+
+        //готовим данные фрагментов подхода
+        // если индекс =0, то первое значение
+        for (int j = 0; j < sara.getCount(); j++ ) {
+            float time_now;
+            int reps_now;
+            int number_now;
+            HashMap<String,Object> map = (HashMap<String,Object>)sara.getItem(j);
+
+            time_now = Float.parseFloat((map.get(P.ATTR_TIME).toString()));
+            reps_now = (int)map.get(P.ATTR_REP);
+            number_now = (int)map.get(P.ATTR_NUMBER);
+
+            //создаём экземпляр класса DataSet в конструкторе
+            DataSet set = new DataSet(time_now,reps_now,number_now);
+            //добавляем запись в таблицу TabSet, используя данные DataSet
+            mTempDBHelper.addSet(set, file1_id);
+        }
+        //======Окончание добавления записей в таблицы DataFile и DataSet=========//
+        Log.d(TAG, "SingleFragmentActivity saveDataAndFilename записан файл = " +
+                finishFileName + "  Количество фрагментов = " + sara.getCount());
+
+        return finishFileName;
+    }
+
 }

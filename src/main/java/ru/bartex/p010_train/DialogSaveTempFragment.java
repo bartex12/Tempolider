@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AlertDialog;
 import android.text.InputType;
@@ -12,14 +13,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
+import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 
 /**
  * Created by Андрей on 06.05.2018.
@@ -28,6 +32,8 @@ public class DialogSaveTempFragment extends DialogFragment {
 
     static String TAG = "33333";
     String finishFileName; //имя файла, передаваемое в аргументах фрагмента
+
+    TempDBHelper mTempDBHelper;
 
     public DialogSaveTempFragment(){}
 
@@ -51,6 +57,7 @@ public class DialogSaveTempFragment extends DialogFragment {
         mSaverFragmentListener = (SaverFragmentListener)context;
         Log.d(TAG, "DialogSaveTempFragment: onAttach   mSaverFragmentListener = " +
                 mSaverFragmentListener);
+        mTempDBHelper = new TempDBHelper(context);
     }
 
     @Override
@@ -73,7 +80,7 @@ public class DialogSaveTempFragment extends DialogFragment {
 
         AlertDialog.Builder bilder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = getActivity().getLayoutInflater();
-        View view = inflater.inflate(R.layout.save_data_in_file, null);
+        final View view = inflater.inflate(R.layout.save_data_in_file, null);
         final EditText name = view.findViewById(R.id.editTextNameOfFile);
         name.setText(finishFileName);
         final CheckBox date = view.findViewById(R.id.checkBoxDate);
@@ -81,31 +88,58 @@ public class DialogSaveTempFragment extends DialogFragment {
         name.setInputType(InputType.TYPE_CLASS_TEXT);
         bilder.setView(view);
         bilder.setTitle("Сохранить как");
-        bilder.setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
+
+        Button btnSaveYes = view.findViewById(R.id.buttonSaveYes);
+        btnSaveYes.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
+            public void onClick(View v) {
                 String nameFile = name.getText().toString();
-
                 if(date.isChecked()){
                     nameFile = nameFile + "_" + P.setDateString();
+                    name.setText(nameFile);
                     Log.d(TAG, "SaverFragment date.isChecked() Имя файла = " + nameFile);
                 }
-                //Вызываем метод интерфейса, передаем  имя файла в SingleFragmentActivity
-                mSaverFragmentListener.onFileNameTransmit(finishFileName,nameFile);
+                //++++++++++++++++++   проверяем, есть ли такое имя   +++++++++++++//
+                long fileId = mTempDBHelper.getIdFromFileName(nameFile);
+                Log.d(TAG, "nameFile = " +nameFile + "  fileId = " +fileId);
 
-                //принудительно прячем  клавиатуру - повторный вызов ее покажет
-                takeOnAndOffSoftInput();
+                //если имя - пустая строка
+                if (nameFile.trim().isEmpty()){
+                    Snackbar.make(view, "Введите непустое имя раскладки", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    Log.d(TAG, "Введите непустое имя раскладки ");
+                    return;
+
+                    //если такое имя уже есть в базе
+                }else if (fileId != -1) {
+                    Snackbar.make(view, "Такое имя уже существует. Введите другое имя.", Snackbar.LENGTH_LONG)
+                            .setAction("Action", null).show();
+                    Log.d(TAG, "Такое имя уже существует. Введите другое имя. fileId = " +fileId);
+                    return;
+
+                    //если имя не повторяется, оно не пустое то
+                }else {
+                    Log.d(TAG, "Такое имя отсутствует fileId = " + fileId);
+
+                    //Вызываем метод интерфейса, передаем  имя файла в SingleFragmentActivity
+                    mSaverFragmentListener.onFileNameTransmit(finishFileName,nameFile);
+
+                    //принудительно прячем  клавиатуру - повторный вызов ее покажет
+                    takeOnAndOffSoftInput();
+                    //getActivity().finish(); //закрывает и диалог и активность
+                    getDialog().dismiss();  //закрывает только диалог
+                }
             }
         });
-        
-        bilder.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
 
+        Button btnSaveNo = view.findViewById(R.id.buttonSaveNo);
+        btnSaveNo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
                 //принудительно прячем  клавиатуру - повторный вызов ее покажет
                 takeOnAndOffSoftInput();
-
+                //getActivity().finish(); //закрывает и диалог и активность
+                getDialog().dismiss();  //закрывает только диалог
             }
         });
         //если не делать запрет на закрытие окна при щелчке за пределами окна, то можно так

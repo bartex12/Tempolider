@@ -8,26 +8,22 @@
                 android:baselineAligned="true">
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:id="@+id/name_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/name_layout"
-        android:background="@drawable/draw"
-        android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:weightSum="1"
-        android:paddingTop="5dp"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/rect"
+        android:gravity="center"
+        android:orientation="horizontal"
         android:paddingBottom="5dp"
-        android:layout_marginBottom="5dp"
-        android:layout_marginTop="5dp"
-        android:gravity="center">
+        android:paddingTop="5dp">
 
         <TextView
             android:id="@+id/textViewName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical|center"
             android:text="New Text"
             android:textColor="@android:color/background_dark"/>
     </LinearLayout>

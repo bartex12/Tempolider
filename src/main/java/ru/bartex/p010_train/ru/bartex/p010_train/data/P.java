@@ -33,12 +33,6 @@ public class P {
     // MainActivity =111   TIME_GRAF_ACTIVITY = 222    TabBarActivity = 333 DetailActivity =444
     //NewExerciseActivity = 555
 
-    //идентификатор интента : пришёл от Main
-    public final static String FROM_MAIN = "ru.bartex.p010_train.FROM_MAIN";
-
-    public static final String DETAIL_DATA_SET = "ru.bartex.p010_train.DetailActivity.DATA_SET";
-    public static final String DETAIL_CHANGE_REQUEST = "ru.bartex.p010_train.DetailActivity.change_request";
-
     // идёт к расчёту количества прожитых дней
     public final static int TO_SEC = 1111;
     //идёт к расчёту биоритмов`
@@ -47,25 +41,25 @@ public class P {
     public final static int TO_ADD = 3333;
     //плюсик в тулбаре темполидера
     public final static int TO_ADD_SET = 4444;
+    //плюсик в тулбаре редактора
+    public final static int TO_ADD_FRAG = 5555;
+
+    //идентификатор интента : пришёл от Main
+    public final static String FROM_MAIN = "ru.bartex.p010_train.FROM_MAIN";
+
+    public static final String DETAIL_DATA_SET = "ru.bartex.p010_train.DetailActivity.DATA_SET";
+    public static final String DETAIL_CHANGE_REQUEST = "ru.bartex.p010_train.DetailActivity.change_request";
+
+
     //откуда идёт запрос на справку
     public final static String HELP_FROM = "ru.bartex.p010_train.HELP_FROM";
     //варианты запросов на справку
-    public final static int HELP_FROM_MAIN = 1;
-    public final static int HELP_FROM_LIST_PERSONS = 2;
-    public final static int HELP_FROM_BIORITM = 3;
-    public final static int HELP_FROM_TIME = 4;
-    public final static int HELP_FROM_TABLE = 5;
-    public final static int HELP_FROM_NEW_PERSON = 6;
-    public final static int HELP_FROM_JOINT = 7;
-    public final static int HELP_FROM_FIND_DATE = 8;
-    public final static int HELP_ALL = 9;
+
 
     //риквест код для startActivityForResult
     public final static String REQUEST_CODE = "ru.bartex.p010_train.REQUEST_CODE";
 
-    public final static int DETAIL_CHANGE_REQUEST_KODE = 10;
-    public final static int CHANGE_TEMP_CHANGE_REQUEST_CODE = 20;
-    public final static int CHANGE_TEMP_SET_LIST_REQUEST_CODE = 30;
+
 
     //имя файла для записи раскладки темполидера  по умолчанию - когда имя - пустая строка
     public static final String FILENAME_OTSECHKI_TEMP ="автосохранение__темполидера";
@@ -128,6 +122,20 @@ public class P {
     public static final String INTENT_SAVE_VISION_REPEAT = "ru.bartex.p010_train.INTENT_SAVE_VISION_REPEAT";
 
 
+    public final static int HELP_FROM_MAIN = 1;
+    public final static int HELP_FROM_LIST_PERSONS = 2;
+    public final static int HELP_FROM_BIORITM = 3;
+    public final static int HELP_FROM_TIME = 4;
+    public final static int HELP_FROM_TABLE = 5;
+    public final static int HELP_FROM_NEW_PERSON = 6;
+    public final static int HELP_FROM_JOINT = 7;
+    public final static int HELP_FROM_FIND_DATE = 8;
+    public final static int HELP_ALL = 9;
+
+    public final static int DETAIL_CHANGE_REQUEST_KODE = 10;
+    public final static int DETAIL_CHANGE_TEMP_REQUEST_CODE = 20;
+    public final static int TEMP_REQUEST_CODE = 30;
+
     public static final int DELETE_ACTION_SEC = 1;
     public static final int CHANGE_ACTION_SEC = 2;
     public static final int CANCEL_ACTION_SEC = 3;
@@ -154,6 +162,14 @@ public class P {
 
     public static final int SAVE_ICON_REQUEST = 28;
     public static final int SAVE_ICON_REQUEST_CHANGE_TEMP = 29;
+
+    public static final int DELETE_CHANGETEMP = 31;
+    public static final int CHANGE_CHANGETEMP = 32;
+    public static final int CANCEL_CHANGETEMP = 33;
+    public static final int CHANGE_TEMP_CHANGETEMP = 34;
+
+    public static final int ADD_NEW_FRAG_REQUEST = 35;
+    public static final int REDACT_REQUEST = 36;
 
     //====================================================================//
 
