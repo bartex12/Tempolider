@@ -13,7 +13,7 @@
         android:title="@string/change_temp"
         android:id = "@+id/change_temp_up_down"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_unfold_more_white_24dp"
+        android:icon="@drawable/ic_swap_vert_white_32dp"
         app:showAsAction="always"/>
 
     <item

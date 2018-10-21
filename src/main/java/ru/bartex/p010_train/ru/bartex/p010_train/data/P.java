@@ -62,7 +62,7 @@ public class P {
 
 
     //имя файла для записи раскладки темполидера  по умолчанию - когда имя - пустая строка
-    public static final String FILENAME_OTSECHKI_TEMP ="автосохранение__темполидера";
+    public static final String FILENAME_OTSECHKI_TEMP ="автосохранение_темполидера";
     //имя файла для записи раскладки секундомера по умолчанию - когда имя - пустая строка
     public static final String FILENAME_OTSECHKI_SEC ="автосохранение_секундомера";
     //имя файла для записи раскладки Избранное по умолчанию - когда имя - пустая строка
@@ -152,13 +152,13 @@ public class P {
     public static final int MOVE_SEC_ACTION_TEMP = 16;
     public static final int MOVE_TEMP_ACTION_TEMP = 17;
 
-    public static final int DELETE_ACTION = 21;
-    public static final int CHANGE_ACTION = 22;
-    public static final int CANCEL_ACTION = 23;
+    public static final int DELETE_ACTION_LIKE = 21;
+    public static final int CHANGE_ACTION_LIKE = 22;
+    public static final int CANCEL_ACTION_LIKE = 23;
     public static final int DETAIL_ACTION = 24;
     public static final int MOVE_LIKE_ACTION = 25;
-    public static final int MOVE_SEC_ACTION = 26;
-    public static final int MOVE_TEMP_ACTION = 27;
+    public static final int MOVE_SEC_ACTION_LIKE = 26;
+    public static final int MOVE_TEMP_ACTION_LIKE = 27;
 
     public static final int SAVE_ICON_REQUEST = 28;
     public static final int SAVE_ICON_REQUEST_CHANGE_TEMP = 29;

@@ -11,7 +11,9 @@
         android:layout_gravity="center_horizontal"
         android:layout_marginLeft="10dp"
         android:layout_marginStart="10dp"
-        android:hint="Введите имя файла"/>
+        android:layout_marginTop="10dp"
+        android:hint="Введите имя файла"
+        android:inputType="text"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -25,6 +27,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:text="Добавить дату и время"/>
 
         <CheckBox
@@ -32,37 +35,28 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
             android:checked="false"/>
 
     </LinearLayout>
-
-    <Button
-        android:id="@+id/buttonSaveYesSecShow"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:layout_marginTop="20dp"
-        android:layout_weight="1"
-        android:background="@drawable/draw"
-        android:text="Сохранить и показать"/>
 
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="30dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="20dp"
         android:orientation="horizontal">
 
         <Button
             android:id="@+id/buttonSaveNoSec"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
+            android:layout_marginLeft="20dp"
+            android:layout_marginStart="20dp"
             android:layout_weight="1"
-            android:background="@drawable/draw"
-            android:text="Отмена"/>
+            android:background="@android:color/transparent"
+            android:text="Отмена"
+            android:textColor="@android:color/holo_red_dark"/>
 
         <Button
             android:id="@+id/buttonSaveYesSec"
@@ -71,10 +65,21 @@
             android:layout_marginLeft="10dp"
             android:layout_marginRight="10dp"
             android:layout_weight="2"
-            android:background="@drawable/draw"
+            android:background="@android:color/transparent"
             android:text="Сохранить"/>
 
     </LinearLayout>
 
+
+    <Button
+        android:id="@+id/buttonSaveYesSecShow"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_weight="1"
+        android:background="@android:color/transparent"
+        android:text="Сохранить  и  показать"/>
 
 </LinearLayout>

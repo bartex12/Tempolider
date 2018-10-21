@@ -326,7 +326,6 @@ public class SetListFragment extends Fragment {
                         } else view.setBackgroundColor(Color.YELLOW);
                     }else view.setBackgroundColor(Color.YELLOW);
             }
-
             //если поставить true? почемуто работает неправильно
             return false;
         }

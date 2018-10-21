@@ -12,6 +12,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewPager;
@@ -26,6 +27,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -50,6 +52,7 @@ public class TabBarLikeFragment extends Fragment {
 
     TempDBHelper mTempDBHelper;
     SimpleCursorAdapter scAdapter;
+    Dialog dialog;
 
     public TabBarLikeFragment() {
         // Required empty public constructor
@@ -150,11 +153,11 @@ public class TabBarLikeFragment extends Fragment {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, P.DELETE_ACTION, 0, "Удалить запись");
-        menu.add(0, P.CHANGE_ACTION, 0, "Изменить запись");
-        menu.add(0, P.MOVE_SEC_ACTION, 0, "Переместить в секундомер");
-        menu.add(0, P.MOVE_TEMP_ACTION, 0, "Переместить в темполидер");
-        menu.add(0, P.CANCEL_ACTION, 0, "Отмена");
+        menu.add(0, P.DELETE_ACTION_LIKE, 0, "Удалить запись");
+        menu.add(0, P.CHANGE_ACTION_LIKE, 0, "Изменить запись");
+        menu.add(0, P.MOVE_SEC_ACTION_LIKE, 0, "Переместить в секундомер");
+        menu.add(0, P.MOVE_TEMP_ACTION_LIKE, 0, "Переместить в темполидер");
+        menu.add(0, P.CANCEL_ACTION_LIKE, 0, "Отмена");
     }
 
     @Override
@@ -170,7 +173,7 @@ public class TabBarLikeFragment extends Fragment {
         int currentItem = mViewPager.getCurrentItem();
 
         //если выбран пункт Удалить запись
-        if (item.getItemId() == P.DELETE_ACTION) {
+        if (item.getItemId() == P.DELETE_ACTION_LIKE) {
             Log.d(TAG, "TabBarLikeFragment DELETE_ACTION");
 
             AlertDialog.Builder deleteDialog = new AlertDialog.Builder(getActivity());
@@ -207,84 +210,116 @@ public class TabBarLikeFragment extends Fragment {
             return true;
 
             //если выбран пункт Изменить запись
-        } else if (item.getItemId() == P.CHANGE_ACTION) {
-
+        } else if (item.getItemId() == P.CHANGE_ACTION_LIKE) {
             //получаем объект с данными строки с id = acmi.id из  таблицы TabFile
             final DataFile dataFile = mTempDBHelper.getAllFilesData(acmi.id);
-            //принудительно вызываем клавиатуру - повторный вызов ее скроет
-            takeOnAndOffSoftInput();
+            String fn = dataFile.getFileName();
 
-            AlertDialog.Builder changeDialog = new AlertDialog.Builder(getActivity());
-            LayoutInflater inflater = getActivity().getLayoutInflater();
-            View view = inflater.inflate(R.layout.fragment_dialog_chahge_name, null);
+            //если имя системного файла
+            if (fn.equals(P.FILENAME_OTSECHKI_SEC) ||
+                    fn.equals(P.FILENAME_OTSECHKI_TEMP)){
+                Snackbar.make(getView(), "Системный файл.Изменение запрещено.", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
 
-            final EditText name = view.findViewById(R.id.editTextNameOfFile);
-            name.requestFocus();
-            name.setInputType(InputType.TYPE_CLASS_TEXT);
-            //получаем имя файла
-            String nameFile = dataFile.getFileName();
-            name.setText(nameFile);
+                //если НЕ имя системного файла
+            }else {
+                //принудительно вызываем клавиатуру - повторный вызов ее скроет
+                takeOnAndOffSoftInput();
 
-            String min = dataFile.getFileNameDate() +
-                    getResources().getString(R.string.LowMinus)+ dataFile.getFileNameTime();
-            final EditText dateAndTime = view.findViewById(R.id.editTextDateAndTime);
-            dateAndTime.setText(min);
-            dateAndTime.setEnabled(false);
+                final AlertDialog.Builder changeDialog = new AlertDialog.Builder(getActivity());
+                LayoutInflater inflater = getActivity().getLayoutInflater();
+                final View view = inflater.inflate(R.layout.fragment_dialog_chahge_name, null);
 
-            final CheckBox date = view.findViewById(R.id.checkBoxDate);
+                final EditText name = view.findViewById(R.id.editTextNameOfFile);
+                name.requestFocus();
+                name.setInputType(InputType.TYPE_CLASS_TEXT);
+                //получаем имя файла
+                String nameFile = dataFile.getFileName();
+                name.setText(nameFile);
 
-            changeDialog.setView(view);
-            changeDialog.setTitle("Изменить запись");
-            changeDialog.setPositiveButton("Сохранить", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
+                String min = dataFile.getFileNameDate() +
+                        getResources().getString(R.string.LowMinus) + dataFile.getFileNameTime();
+                final EditText dateAndTime = view.findViewById(R.id.editTextDateAndTime);
+                dateAndTime.setText(min);
+                dateAndTime.setEnabled(false);
 
-                    String nameFile = name.getText().toString();
-                    if (nameFile.equals(P.FILENAME_OTSECHKI_SEC)||
-                            nameFile.equals(P.FILENAME_OTSECHKI_TEMP)) {
-                        Toast.makeText(getContext(), "Системный файл.Изменение запрещено.",
-                                Toast.LENGTH_SHORT).show();
-                    }else {
-                        String dateAndTimeFile = dateAndTime.getText().toString();
+                final CheckBox date = view.findViewById(R.id.checkBoxDate);
 
-                        if (date.isChecked()) {
-                            nameFile = nameFile + "_" + dateAndTimeFile;
+                changeDialog.setView(view);
+                changeDialog.setTitle("Изменить имя");
+                changeDialog.setIcon(R.drawable.ic_wrap_text_black_24dp);
+
+                Button saveButYes = view.findViewById(R.id.buttonSaveYesChangeName);
+                saveButYes.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+
+                        String nameFile = name.getText().toString();
+
+                        if(date.isChecked()){
+                            nameFile = nameFile + "_" + P.setDateString();
+                            Log.d(TAG, "TabBarSecFragment date.isChecked() Имя файла = " + nameFile);
                         }
-                        dataFile.setFileName(nameFile);
 
-                        SQLiteDatabase db = mTempDBHelper.getWritableDatabase();
-                        ContentValues updatedValues = new ContentValues();
-                        updatedValues.put(TabFile.COLUMN_FILE_NAME, nameFile);
-                        db.update(TabFile.TABLE_NAME, updatedValues,
-                                TabFile._ID + "=" + acmi.id, null);
+                        //++++++++++++++++++   проверяем, есть ли такое имя   +++++++++++++//
+                        long fileId = mTempDBHelper.getIdFromFileName(nameFile);
+                        Log.d(TAG, "nameFile = " + nameFile + "  fileId = " + fileId);
+
+                        //если имя - пустая строка
+                        if (nameFile.trim().isEmpty()) {
+                            Snackbar.make(view, "Введите непустое имя раскладки", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                            Log.d(TAG, "Введите непустое имя раскладки ");
+                            return;
+
+                            //если такое имя уже есть в базе
+                        } else if (fileId != -1) {
+                            Snackbar.make(view, "Такое имя уже существует. Введите другое имя.", Snackbar.LENGTH_LONG)
+                                    .setAction("Action", null).show();
+                            Log.d(TAG, "Такое имя уже существует. Введите другое имя. fileId = " + fileId);
+                            return;
+
+                            //если имя не повторяется, оно не пустое и не системный файл то
+                        } else {
+                            Log.d(TAG, "Такое имя отсутствует fileId = " + fileId);
+
+                            //изменяем имя файла
+                            mTempDBHelper.updateFileName(nameFile, acmi.id);
+
+                            //принудительно прячем  клавиатуру - повторный вызов ее покажет
+                            takeOnAndOffSoftInput();
+
+                            mViewPager.getAdapter().notifyDataSetChanged();
+
+                            //getActivity().finish(); //закрывает и диалог и активность
+                            dialog.dismiss();  //закрывает только диалог
+                        }
+                    }
+                });
+
+                Button saveButNo = view.findViewById(R.id.buttonSaveNoChangeName);
+                saveButNo.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
                         //принудительно прячем  клавиатуру - повторный вызов ее покажет
                         takeOnAndOffSoftInput();
-
-                        mViewPager.getAdapter().notifyDataSetChanged();
+                        //getActivity().finish(); //закрывает и диалог и активность
+                        dialog.dismiss();  //закрывает только диалог
                     }
+                });
+                //если делать запрет на закрытие окна при щелчке за пределами окна,
+                // то сначала билдер создаёт диалог
+                dialog = changeDialog.create();
+                //запрет на закрытие окна при щелчке за пределами окна
+                dialog.setCanceledOnTouchOutside(false);
+                //если текущий фрагмент это открытая вкладка, то показываем диалог
+                if (currentItem == curItem) {
+                    dialog.show();
                 }
-            });
-            changeDialog.setNegativeButton("Отмена", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    //принудительно прячем  клавиатуру - повторный вызов ее покажет
-                    takeOnAndOffSoftInput();
-
-                }
-            });
-            //если делать запрет на закрытие окна при щелчке за пределами окна,
-            // то сначала билдер создаёт диалог
-            Dialog dialog = changeDialog.create();
-            //запрет на закрытие окна при щелчке за пределами окна
-            dialog.setCanceledOnTouchOutside(false);
-            //если текущий фрагмент это открытая вкладка, то показываем диалог
-            if (currentItem == curItem){
-                dialog.show();
+                return true;
             }
-            return true;
-
             //если выбран пункт Переместить в секундомер
-        } else if (item.getItemId() == P.MOVE_SEC_ACTION) {
+        } else if (item.getItemId() == P.MOVE_SEC_ACTION_LIKE) {
 
             SQLiteDatabase db = mTempDBHelper.getWritableDatabase();
             ContentValues updatedValues = new ContentValues();
@@ -297,7 +332,7 @@ public class TabBarLikeFragment extends Fragment {
             return true;
 
         //если выбран пункт Переместить в темполидер
-    } else if (item.getItemId() == P.MOVE_TEMP_ACTION) {
+    } else if (item.getItemId() == P.MOVE_TEMP_ACTION_LIKE) {
 
         SQLiteDatabase db = mTempDBHelper.getWritableDatabase();
         ContentValues updatedValues = new ContentValues();

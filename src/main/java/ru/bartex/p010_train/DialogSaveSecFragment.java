@@ -62,7 +62,8 @@ public class DialogSaveSecFragment extends DialogFragment {
         name.requestFocus();
         name.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(view);
-        builder.setTitle("Запись в файл");
+        builder.setTitle("Сохранить как");
+        builder.setIcon(R.drawable.ic_save_black_24dp);
 
         Button btnSaveYes = view.findViewById(R.id.buttonSaveYesSec);
         //действия при нажатии кнопки "Сохранить" в диалоге сохранения данных в базу

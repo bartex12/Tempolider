@@ -540,6 +540,7 @@
     <string name="change_name">Изменить</string>
     <string name="change_temp">Изменить темп </string>
     <string name="character_counter_pattern" translatable="false">%1$d / %2$d</string>
+    <string name="editor">Редактор</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="lebelCount">Кол-во</string>
     <string name="lebelCountN">раз</string>

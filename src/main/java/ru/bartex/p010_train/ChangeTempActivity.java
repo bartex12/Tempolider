@@ -179,7 +179,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
         ActionBar acBar = getSupportActionBar();
-        acBar.setTitle("Изменить");
+        acBar.setTitle(getResources().getString(R.string.change_name));
         //показать стрелку Назад
         acBar.setDisplayHomeAsUpEnabled(true );
         acBar.setHomeButtonEnabled(true);

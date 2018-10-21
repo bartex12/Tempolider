@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Toast;
@@ -83,22 +84,48 @@ public class DialogSaveTempFragment extends DialogFragment {
         final View view = inflater.inflate(R.layout.save_data_in_file, null);
         final EditText name = view.findViewById(R.id.editTextNameOfFile);
         name.setText(finishFileName);
-        final CheckBox date = view.findViewById(R.id.checkBoxDate);
         name.requestFocus();
         name.setInputType(InputType.TYPE_CLASS_TEXT);
         bilder.setView(view);
         bilder.setTitle("Сохранить как");
+        bilder.setIcon(R.drawable.ic_save_black_24dp);
+
+        final CheckBox date = view.findViewById(R.id.checkBoxDate);
+
+        /*
+        date.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            String dayTimeFile = "";
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                String nameFile = name.getText().toString();;
+                if(isChecked){
+                    dayTimeFile ="_" + P.setDateString();
+                    nameFile = nameFile  + dayTimeFile;
+                    name.setText(nameFile);
+                    Log.d(TAG, "dayTimeFile = " + dayTimeFile + "  nameFile = " + nameFile);
+                    name.setEnabled(false);
+                }else {
+                    String oldName = nameFile.replace(dayTimeFile,"");
+                    name.setText(oldName);
+                    Log.d(TAG, "nameFile = " + nameFile + "  oldName = " + oldName);
+                    name.setEnabled(true);
+                }
+
+            }
+        });
+        */
 
         Button btnSaveYes = view.findViewById(R.id.buttonSaveYes);
         btnSaveYes.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String nameFile = name.getText().toString();
+
                 if(date.isChecked()){
                     nameFile = nameFile + "_" + P.setDateString();
-                    name.setText(nameFile);
                     Log.d(TAG, "SaverFragment date.isChecked() Имя файла = " + nameFile);
                 }
+
                 //++++++++++++++++++   проверяем, есть ли такое имя   +++++++++++++//
                 long fileId = mTempDBHelper.getIdFromFileName(nameFile);
                 Log.d(TAG, "nameFile = " +nameFile + "  fileId = " +fileId);

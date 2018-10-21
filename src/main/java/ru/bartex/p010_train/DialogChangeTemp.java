@@ -84,6 +84,8 @@ public class DialogChangeTemp extends DialogFragment {
         valueChangTemp.setText(String.valueOf(valueOfDelta));
         bilder.setView(view);
         bilder.setTitle("Введите величину изменения темпа, %");
+        //bilder.setIcon(R.drawable.ic_swap_vert_black_32dp);
+
         bilder.setPositiveButton("Готово", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
