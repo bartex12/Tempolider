@@ -562,6 +562,8 @@ public class ChangeTempActivity extends AppCompatActivity implements
         super.onCreateContextMenu(menu, v, menuInfo);
         menu.add(0, P.DELETE_CHANGETEMP, 0, "Удалить строку");
         menu.add(0, P.CHANGE_CHANGETEMP, 0, "Изменить строку");
+        menu.add(0, P.INSERT_BEFORE_CHANGETEMP, 0, "Вставить строку до");
+        menu.add(0, P.INSERT_AFTER_CHANGETEMP, 0, "Вставить строку после");
         menu.add(0, P.CANCEL_CHANGETEMP, 0, "Отмена");
     }
 
@@ -609,7 +611,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
             return true;
 
             //если изменить из контекстного меню
-        }else  if(item.getItemId() == P.CHANGE_CHANGETEMP){
+        }else  if(item.getItemId() == P.CHANGE_CHANGETEMP) {
             Log.d(TAG, "ChangeTempActivity P.CHANGE_CHANGETEMP");
             Log.d(TAG, "ChangeTempActivity P.CHANGE_CHANGETEMP acmi.position = " +
                     acmi.position + "  acmi.id = " + acmi.id);
@@ -623,6 +625,34 @@ public class ChangeTempActivity extends AppCompatActivity implements
             startActivityForResult(intent, P.TEMP_REQUEST_CODE);
             //finish();
             return true;
+
+            //если вставить до из контекстного меню
+        }else if(item.getItemId() == P.INSERT_BEFORE_CHANGETEMP){
+            Log.d(TAG, "ChangeTempActivity P.INSERT_BEFORE_CHANGETEMP");
+            Log.d(TAG, "ChangeTempActivity P.INSERT_BEFORE_CHANGETEMP acmi.position = " +
+                    acmi.position + "  acmi.id = " + acmi.id);
+            //вызываем DetailActivity и передаём туда fileId
+            Intent isertAfterFrag = new Intent(this, DetailActivity.class);
+            isertAfterFrag.putExtra(P.INTENT_TO_DETILE_FILE_ID, fileId);
+            isertAfterFrag.putExtra(P.INTENT_TO_DETILE_FILE_POSITION, (acmi.position+1));
+            isertAfterFrag.putExtra(P.FROM_ACTIVITY,P.TO_INSERT_BEFORE_FRAG);
+            startActivityForResult(isertAfterFrag, P.INSERT_BEFORE_CHANGETEMP_REQUEST);
+            return true;
+
+            //если вставить после из контекстного меню
+        }else if(item.getItemId() == P.INSERT_AFTER_CHANGETEMP){
+            Log.d(TAG, "ChangeTempActivity P.INSERT_AFTER_CHANGETEMP");
+            Log.d(TAG, "ChangeTempActivity P.INSERT_AFTER_CHANGETEMP acmi.position = " +
+                    acmi.position + "  acmi.id = " + acmi.id);
+            //вызываем DetailActivity и передаём туда fileId
+            Intent isertAfterFrag = new Intent(this, DetailActivity.class);
+            isertAfterFrag.putExtra(P.INTENT_TO_DETILE_FILE_ID, fileId);
+            isertAfterFrag.putExtra(P.INTENT_TO_DETILE_FILE_POSITION, (acmi.position+1));
+            isertAfterFrag.putExtra(P.FROM_ACTIVITY,P.TO_INSERT_AFTER_FRAG);
+            startActivityForResult(isertAfterFrag, P.INSERT_AFTER_CHANGETEMP_REQUEST);
+            return true;
+
+            //если отменить
         }else if(item.getItemId() == P.CANCEL_CHANGETEMP){
 
             return true;
@@ -635,8 +665,7 @@ public class ChangeTempActivity extends AppCompatActivity implements
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode ==RESULT_OK){
-            //если удалить из контекстного меню
-            if (requestCode == P.TEMP_REQUEST_CODE){
+            Log.d(TAG, "ChangeTempActivity onActivityResult resultCode = RESULT_OK");
                 //обновляем данные списка фрагмента активности
                 updateAdapter();
                 //вычисляем и показываем общее время выполнения подхода и количество повторов в подходе
@@ -645,20 +674,8 @@ public class ChangeTempActivity extends AppCompatActivity implements
                 saveVision = true;
                 //обновляем иконки тулбара, вызывая  onPrepareOptionsMenu
                 invalidateOptionsMenu();
-
-                //если изменить из контекстного меню
-            }else  if(requestCode == P.ADD_NEW_FRAG_REQUEST){
-
-                //обновляем данные списка фрагмента активности
-                updateAdapter();
-                //вычисляем и показываем общее время выполнения подхода и количество повторов в подходе
-                calculateAndShowTotalValues();
-                //устанавливаем флаг видимости иконки сохранения - Да
-                saveVision = true;
-                //обновляем иконки тулбара, вызывая  onPrepareOptionsMenu
-                invalidateOptionsMenu();
-
-            }
+        }else{
+            Log.d(TAG, "ChangeTempActivity onActivityResult resultCode != RESULT_OK");
         }
     }
 
