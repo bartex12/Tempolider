@@ -562,7 +562,7 @@
     <string name="repsValue_item4">1</string>
     <string name="repsValue_item5">1</string>
     <string name="reset_button">сброс</string>
-    <string name="save_data_in_file">Сохранить в файл</string>
+    <string name="save_data_in_file">Сохранить раскладку как</string>
     <string name="search_menu_title">Search</string>
     <string name="section_format">Список раскладок %1$d</string>
     <string name="show_list_of_files">Список раскладок</string>
