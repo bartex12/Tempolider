@@ -12,7 +12,7 @@
     <string name="action_timing">Отсечки</string>
     <string name="action_transfer">Загрузка отсечек в темполидер</string>
     <string name="action_help_main_title">Справка</string>
-    <string name="save_data_in_file">Сохранить в файл</string>
+    <string name="save_data_in_file">Сохранить раскладку как</string>
     <string name="show_list_of_files">Список раскладок</string>
     <string name="change_data">Редактировать раскладку</string>
     <string name="change_temp">Изменить темп </string>
