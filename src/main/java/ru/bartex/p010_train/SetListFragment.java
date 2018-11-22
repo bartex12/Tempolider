@@ -207,7 +207,7 @@ public class SetListFragment extends Fragment {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, CHANGE_TEMP_ID, 0, "Изменить раскладку");
+        menu.add(0, CHANGE_TEMP_ID, 0, "Редактор раскладок");
         menu.add(0, CANCEL_ID, 0, "Отмена");
     }
 
