@@ -190,6 +190,124 @@ public class TempDBHelper extends SQLiteOpenHelper {
         db.close();
     }
 
+    //Метод для вставки нового фрагмента подхода в список ПОСЛЕ выделенного фрагмента
+    public void addSetAfter(DataSet set, long file_id, int numberOfString) {
+        Log.d(TAG, "MyDatabaseHelper.addSetAfter ... " + set.getNumberOfFrag());
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        //получаем  фрагменты подхода с ID = file_id
+        String query = "select " + TabSet._ID + " , " +  TabSet.COLUMN_SET_FRAG_NUMBER +
+                " from " + TabSet.TABLE_NAME +
+                " where " + TabSet.COLUMN_SET_FILE_ID + " = ? " +
+                " order by " + TabSet.COLUMN_SET_FRAG_NUMBER;
+        Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(file_id)});
+        mCursor.moveToPosition(numberOfString-1);
+        int fragCount = mCursor.getCount();
+        Log.d(TAG, "MyDatabaseHelper.addSetAfter mCursor.getCount()= " + fragCount +
+                " numberOfString-1 = " + (numberOfString-1));
+        try {
+                // Проходим через все строки в курсоре начиная с position
+            while (mCursor.moveToNext()){
+                    //вычисляем id текущей строки курсора
+                    long id = mCursor.getLong(mCursor.getColumnIndex(TabSet._ID));
+
+                    ContentValues updatedValues = new ContentValues();
+                    updatedValues.put(TabSet.COLUMN_SET_FRAG_NUMBER, (mCursor.getPosition() + 2));
+                    db.update(TabSet.TABLE_NAME, updatedValues,
+                            TabSet.COLUMN_SET_FILE_ID + "=" + file_id +
+                                    " AND " + TabSet._ID + "=" + id, null);
+                    Log.d(TAG, "addSetAfter mCursor.getPosition() = " +
+                            mCursor.getPosition() + " id строки =" + id);
+                }
+            //Добавляем фрагмент подхода созданный в DetailActiviti
+            this.addSet(set, file_id);
+            //пересчитывает  номера фрагментов подхода
+            //this.rerangeSetFragments(file_id);
+
+        } finally {
+            //закрываем курсор
+            mCursor.close();
+            // закрываем соединение с базой
+            db.close();
+        }
+    }
+
+    //Метод для вставки нового фрагмента подхода в список ДО  выделенного фрагмента
+    public void addSetBefore(DataSet set, long file_id, int numberOfString) {
+        Log.d(TAG, "MyDatabaseHelper.addSetBefore ... getNumberOfFrag = " + set.getNumberOfFrag());
+
+        SQLiteDatabase db = this.getWritableDatabase();
+        //получаем  фрагменты подхода с ID = file_id
+        String query = "select " + TabSet._ID + " , " +  TabSet.COLUMN_SET_FRAG_NUMBER +
+                " from " + TabSet.TABLE_NAME +
+                " where " + TabSet.COLUMN_SET_FILE_ID + " = ? " +
+                " order by " + TabSet.COLUMN_SET_FRAG_NUMBER;
+        Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(file_id)});
+        mCursor.moveToPosition(numberOfString-2);
+        Log.d(TAG, "MyDatabaseHelper.addSetBefore isBeforeFirst() =" + mCursor.isBeforeFirst());
+        int fragCount = mCursor.getCount();
+        Log.d(TAG, "MyDatabaseHelper.addSetBefore mCursor.getCount()= " + fragCount +
+                " numberOfString = " + (numberOfString-2));
+        try {
+            // Проходим через все строки в курсоре начиная с position
+            while (mCursor.moveToNext()){
+                //вычисляем id текущей строки курсора
+                long id = mCursor.getLong(mCursor.getColumnIndex(TabSet._ID));
+
+                ContentValues updatedValues = new ContentValues();
+                updatedValues.put(TabSet.COLUMN_SET_FRAG_NUMBER, (mCursor.getPosition() + 2));
+                db.update(TabSet.TABLE_NAME, updatedValues,
+                        TabSet.COLUMN_SET_FILE_ID + "=" + file_id +
+                                " AND " + TabSet._ID + "=" + id, null);
+                Log.d(TAG, "addSetBefore mCursor.getPosition() = " +
+                        mCursor.getPosition() + " id строки =" + id);
+            }
+            //Добавляем фрагмент подхода созданный в DetailActiviti
+            this.addSet(set, file_id);
+            //пересчитывает  номера фрагментов подхода
+            //this.rerangeSetFragments(file_id);
+
+        } finally {
+            //закрываем курсор
+            mCursor.close();
+            // закрываем соединение с базой
+            db.close();
+        }
+    }
+
+    /**
+     * Пересчитывает  номера фрагментов подхода после удаления какого либо фрагмента подхода
+     */
+    public void rerangeSetFragments(long fileId) throws SQLException {
+        SQLiteDatabase db = this.getWritableDatabase();
+        String query = "select " + TabSet._ID + " , " +  TabSet.COLUMN_SET_FRAG_NUMBER +
+                " from " + TabSet.TABLE_NAME +
+                " where " + TabSet.COLUMN_SET_FILE_ID + " = ? " +
+                " order by " + TabSet.COLUMN_SET_FRAG_NUMBER;
+        Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(fileId)});
+
+        try {
+            // Проходим через все строки в курсоре
+            while (mCursor.moveToNext()) {
+
+                //вычисляем id текущей строки курсора
+                long id = mCursor.getLong(mCursor.getColumnIndex(TabSet._ID));
+
+                ContentValues updatedValues = new ContentValues();
+                updatedValues.put(TabSet.COLUMN_SET_FRAG_NUMBER, (mCursor.getPosition()+1));
+                db.update(TabSet.TABLE_NAME, updatedValues,
+                        TabSet.COLUMN_SET_FILE_ID + "=" + fileId +
+                                " AND " + TabSet._ID + "=" + id, null);
+                Log.d(TAG, "rerangeSetFragments mCursor.getPosition() = " +
+                        mCursor.getPosition() + " id строки =" + id);
+            }
+        } finally {
+            // Всегда закрываем курсор после чтения
+            mCursor.close();
+        }
+    }
+
+
     //Метод для добавления нового файла с подходом в список
     public long addFile(DataFile file) {
         Log.d(TAG, "TempDBHelper.addFile ... " + file.getFileName());
@@ -279,36 +397,6 @@ public class TempDBHelper extends SQLiteOpenHelper {
             db.close();
         }
 
-    /**
-     * Пересчитывает  номера фрагментов подхода поле удаления какого либо фрагмента подхода
-     */
-    public void rerangeSetFragments(long fileId) throws SQLException {
-        SQLiteDatabase db = this.getWritableDatabase();
-        String query = "select " + TabSet._ID + " , " +  TabSet.COLUMN_SET_FRAG_NUMBER +
-                " from " + TabSet.TABLE_NAME +
-                " where " + TabSet.COLUMN_SET_FILE_ID + " = ? ";
-        Cursor mCursor = db.rawQuery(query, new String[]{String.valueOf(fileId)});
-
-        try {
-            // Проходим через все строки в курсоре
-            while (mCursor.moveToNext()) {
-
-                //вычисляем id текущей строки курсора
-                long id = mCursor.getLong(mCursor.getColumnIndex(TabSet._ID));
-
-                ContentValues updatedValues = new ContentValues();
-                updatedValues.put(TabSet.COLUMN_SET_FRAG_NUMBER, (mCursor.getPosition()+1));
-                db.update(TabSet.TABLE_NAME, updatedValues,
-                        TabSet.COLUMN_SET_FILE_ID + "=" + fileId +
-                        " AND " + TabSet._ID + "=" + id, null);
-                Log.d(TAG, "rerangeSetFragments mCursor.getPosition() = " +
-                        mCursor.getPosition() + " id строки =" + id);
-            }
-        } finally {
-            // Всегда закрываем курсор после чтения
-            mCursor.close();
-        }
-    }
 
 
     //получаем ID по имени
@@ -469,7 +557,7 @@ public class TempDBHelper extends SQLiteOpenHelper {
     }
 
     /**
-     * Возвращает один объект DataFile с данными файла из таблицы TabFile с номмером ID = rowId
+     * Возвращает DataSet с номером фрагмента подхода position из файла с номером ID = fileId
      */
     public DataSet getOneSetFragmentData(long fileId, int position) throws SQLException {
         SQLiteDatabase db = this.getReadableDatabase();
@@ -477,7 +565,7 @@ public class TempDBHelper extends SQLiteOpenHelper {
                 new String[]{TabSet._ID, TabSet.COLUMN_SET_FILE_ID, TabSet.COLUMN_SET_FRAG_NUMBER,
                         TabSet.COLUMN_SET_TIME, TabSet.COLUMN_SET_REPS},
                 TabSet.COLUMN_SET_FILE_ID + "=" + fileId,
-                null, null, null, null, null);
+                null, null, null, TabSet.COLUMN_SET_FRAG_NUMBER, null);
         if ((cursorFile != null)&& (cursorFile.getCount()>=position)) {
             cursorFile.moveToPosition(position);
         }else {
