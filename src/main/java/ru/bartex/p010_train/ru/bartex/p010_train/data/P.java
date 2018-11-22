@@ -43,6 +43,10 @@ public class P {
     public final static int TO_ADD_SET = 4444;
     //плюсик в тулбаре редактора
     public final static int TO_ADD_FRAG = 5555;
+    //контекстное меню в редакторе -вставить после
+    public final static int TO_INSERT_AFTER_FRAG = 7777;
+    //контекстное меню в редакторе -вставить до
+    public final static int TO_INSERT_BEFORE_FRAG = 8888;
 
     //идентификатор интента : пришёл от Main
     public final static String FROM_MAIN = "ru.bartex.p010_train.FROM_MAIN";
@@ -120,7 +124,7 @@ public class P {
     public static final String INTENT_TO_SINGLE_FROM_DETAIL_SAVE = "ru.bartex.p010_train.INTENT_TO_SINGLE_FROM_DETAIL_SAVE";
     public static final String INTENT_SAVE_VISION = "ru.bartex.p010_train.INTENT_SAVE_VISION";
     public static final String INTENT_SAVE_VISION_REPEAT = "ru.bartex.p010_train.INTENT_SAVE_VISION_REPEAT";
-
+    public static final String INTENT_TO_DETILE_FILE_POSITION = "ru.bartex.p010_train.INTENT_TO_DETILE_FILE_POSITION";
 
     public final static int HELP_FROM_MAIN = 1;
     public final static int HELP_FROM_LIST_PERSONS = 2;
@@ -170,6 +174,11 @@ public class P {
 
     public static final int ADD_NEW_FRAG_REQUEST = 35;
     public static final int REDACT_REQUEST = 36;
+
+    public static final int INSERT_BEFORE_CHANGETEMP = 37;
+    public static final int INSERT_AFTER_CHANGETEMP = 38;
+    public static final int INSERT_AFTER_CHANGETEMP_REQUEST = 39;
+    public static final int INSERT_BEFORE_CHANGETEMP_REQUEST = 40;
 
     //====================================================================//
 
