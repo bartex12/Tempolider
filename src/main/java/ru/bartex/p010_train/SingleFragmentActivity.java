@@ -542,10 +542,14 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     public boolean onOptionsItemSelected(MenuItem item) {
 
         switch (item.getItemId()){
+
             case android.R.id.home:
                 Log.d(TAG, "Домой");
-                Intent intentHome = new Intent(this,MainActivity.class);
-                startActivity(intentHome);
+                //так нельзя делать, иначе будет возврат к  MainActivity при выходе из программы
+                //Intent intentHome = new Intent(this,MainActivity.class);
+                //startActivity(intentHome);
+                //а так нужно, иначе не работает стрелка -
+                // (можно еще onBackPressed(), как в ChangeTempActivity но там на 1 позицию возврат)
                 finish();
                 return true;
 

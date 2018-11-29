@@ -492,9 +492,9 @@
     <string name="OfSet">подхода</string>
     <string name="PaceMaker">Темполидер</string>
     <string name="Sec">сек</string>
-    <string name="Send">Send</string>
+    <string name="Send">Оценить</string>
     <string name="Settings">Настройки</string>
-    <string name="Share">Share</string>
+    <string name="Share">Поделиться</string>
     <string name="Timemeter">Секундомер</string>
     <string name="abc_action_bar_home_description">Navigate home</string>
     <string name="abc_action_bar_home_description_format">%1$s, %2$s</string>

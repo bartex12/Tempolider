@@ -72,8 +72,6 @@
     <string name="PaceMaker">Темполидер</string>
     <string name="ListOfTimeReps">Раскладки по темпу</string>
     <string name="Settings">Настройки</string>
-    <string name="Share">Share</string>
-    <string name="Send">Send</string>
     <string name="FileName">Имя раскладки  </string>
     <string name="FileNameInput">Введите имя</string>
     <string name="DelayOfStart">Задержка старта, сек   </string>
@@ -98,10 +96,7 @@
     <string name="DeleteYesNo">Удалить: Вы уверены?</string>
     <string name="DeleteYes">Да</string>
     <string name="DeleteNo">Нет</string>
-
-
-
-
-
+    <string name="Send">Оценить</string>
+    <string name="Share">Поделиться</string>
 
 </resources>

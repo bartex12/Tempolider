@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -147,6 +148,9 @@ public class MainActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        // Задание значений по умолчанию в файле SharedPreferences
+        PreferenceManager.setDefaultValues(this, R.xml.pref_setting, false);
     }
 
     @Override
@@ -306,8 +310,29 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_share) {
 
-        } else if (id == R.id.nav_send) {
+            //поделиться - передаём ссылку на приложение в маркете
+            Intent sendIntent = new Intent();
+            sendIntent.setAction(Intent.ACTION_SEND);
+            sendIntent.putExtra(Intent.EXTRA_TEXT,
+                   "Теполидер " +
+                            "https://play.google.com/store/apps/details?id=" +
+                            getPackageName());
+            //sendIntent.putExtra(Intent.EXTRA_TEXT,
+            //       "Теполидер: " +
+            //      "https://play.google.com/store/apps/details?id=" +
+             //     "ru.bartex.jubelee_dialog_singllist");
+            sendIntent.setType("text/plain");
+            startActivity(sendIntent);
 
+        } else if (id == R.id.nav_send) {
+            //оценить- попадаем на страницу приложения в маркете
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(
+                    "http://play.google.com/store/apps/details?id=" +
+                            getPackageName()));
+            //intent.setData(Uri.parse(
+             //       "http://play.google.com/store/apps/details?id=ru.bartex.jubelee_dialog_singllist"));
+            startActivity(intent);
         }
         // Выделяем выбранный пункт меню в шторке
         item.setChecked(true);
