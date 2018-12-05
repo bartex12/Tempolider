@@ -10,6 +10,14 @@
         <item>Установка и воспроизведение темпа движений</item>
         <item>Список сохранённых раскладок</item>
     </string-array>
+    <string-array name="pause_entryValues_number">
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+    <string-array name="pause_entry_number">
+        <item>Приостановка времени </item>
+        <item>Приостановка индикации</item>
+    </string-array>
     <string-array name="аccurancy_entryValues_number">
         <item>1</item>
         <item>2</item>
@@ -467,8 +475,10 @@
     <integer name="show_password_duration">200</integer>
     <integer name="status_bar_notification_info_maxnum">999</integer>
     <string name="Accurancy">Количество знаков после запятой</string>
-    <string name="Communicate">Communicate</string>
+    <string name="CancelEdit">Отмена</string>
+    <string name="Communicate">Дополнительно</string>
     <string name="Count">Количество:  </string>
+    <string name="Count1">Количество</string>
     <string name="CountZeroTime">00:00</string>
     <string name="CreateFileSet">Создать раскладку</string>
     <string name="DelayOfStart">Задержка старта, сек   </string>
@@ -477,8 +487,12 @@
     <string name="DeleteNo">Нет</string>
     <string name="DeleteYes">Да</string>
     <string name="DeleteYesNo">Удалить: Вы уверены?</string>
+    <string name="DurationLap">Длительность круга</string>
+    <string name="EditorLaps">Редактор раскладок</string>
+    <string name="ExitYesNo">Выход: Вы уверены?</string>
     <string name="FileName">Имя раскладки  </string>
     <string name="FileNameInput">Введите имя</string>
+    <string name="FillOneFrag">Заполните хотя бы один фрагмент подхода.</string>
     <string name="Fragment">Фрагмент</string>
     <string name="FragmentOfSet1">1</string>
     <string name="FragmentOfSet2">2</string>
@@ -486,11 +500,15 @@
     <string name="FragmentOfSet4">4</string>
     <string name="FragmentOfSet5">5</string>
     <string name="Help">Справка</string>
+    <string name="InputAnotherName">Такое имя уже существует. Введите другое имя.</string>
+    <string name="InputNameOfSchelule">Введите непустое имя раскладки</string>
     <string name="ListOfTimeReps">Раскладки по темпу</string>
     <string name="LowMinus">_</string>
     <string name="Name">Имя:  </string>
+    <string name="NumberLap">Номер цикла</string>
     <string name="OfSet">подхода</string>
     <string name="PaceMaker">Темполидер</string>
+    <string name="PressStopBefore">Сначала нажмите Стоп</string>
     <string name="Sec">сек</string>
     <string name="Send">Оценить</string>
     <string name="Settings">Настройки</string>
@@ -534,19 +552,29 @@
     <string name="app_name">p010_Train</string>
     <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
     <string name="bottom_sheet_behavior" translatable="false">android.support.design.widget.BottomSheetBehavior</string>
+    <string name="button_lap">Круг</string>
+    <string name="button_pause">Пауза</string>
+    <string name="button_start">Старт</string>
+    <string name="button_stop">Стоп</string>
     <string name="cbSoundOff">Звук выключен</string>
     <string name="cbSoundOn">Звук включен</string>
     <string name="change_data">Редактировать раскладку</string>
     <string name="change_name">Изменить</string>
     <string name="change_temp">Изменить темп </string>
     <string name="character_counter_pattern" translatable="false">%1$d / %2$d</string>
+    <string name="continue_task">Продолжить</string>
     <string name="editor">Редактор</string>
+    <string name="graph">График</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="label_N">№</string>
+    <string name="label_lap">Круг, с</string>
+    <string name="label_time">Время, с</string>
     <string name="lebelCount">Кол-во</string>
     <string name="lebelCountN">раз</string>
     <string name="lebelTime">Время</string>
     <string name="list_empty_tempolider">Данные отсутствуют либо удалены пользователем.
         Создайте новую или загрузите другую раскладку подхода.</string>
+    <string name="main_menu">Главное меню</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="new_frag">Новый фрагмент</string>

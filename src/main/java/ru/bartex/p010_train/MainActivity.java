@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity
         //и тогда можно установить заголовок так
         //toolbar.setTitle("Yes");
         //или заголовок в Toolbar устанавливается так
-        getSupportActionBar().setTitle("Главное меню");
+        getSupportActionBar().setTitle(R.string.main_menu);
 
         //установить портретную ориентацию экрана
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -238,15 +238,15 @@ public class MainActivity extends AppCompatActivity
 
     private void openQuitDialog() {
         AlertDialog.Builder quitDialog = new AlertDialog.Builder(this);
-        quitDialog.setTitle("Выход: Вы уверены?");
+        quitDialog.setTitle(R.string.ExitYesNo);
 
-        quitDialog.setPositiveButton("Нет", new DialogInterface.OnClickListener() {
+        quitDialog.setPositiveButton(R.string.DeleteNo, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
             }
         });
 
-        quitDialog.setNegativeButton("Да", new DialogInterface.OnClickListener() {
+        quitDialog.setNegativeButton(R.string.DeleteYes, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 finish();
@@ -314,7 +314,7 @@ public class MainActivity extends AppCompatActivity
             Intent sendIntent = new Intent();
             sendIntent.setAction(Intent.ACTION_SEND);
             sendIntent.putExtra(Intent.EXTRA_TEXT,
-                   "Теполидер " +
+                   R.string.PaceMaker +
                             "https://play.google.com/store/apps/details?id=" +
                             getPackageName());
             //sendIntent.putExtra(Intent.EXTRA_TEXT,

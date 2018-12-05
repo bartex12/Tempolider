@@ -147,7 +147,7 @@ public class SetListFragment extends Fragment {
                 if (SingleFragmentActivity.start){
                     Log.d(TAG, "SetListFragment onItemClick  start = " + SingleFragmentActivity.start);
                     Toast.makeText(getContext(),
-                            "Сначала нажмите Стоп", Toast.LENGTH_SHORT).show();
+                            R.string.PressStopBefore, Toast.LENGTH_SHORT).show();
 
                     //если в активности нажата Стоп, то Старт = false
                 }else{
@@ -207,8 +207,8 @@ public class SetListFragment extends Fragment {
     @Override
     public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
         super.onCreateContextMenu(menu, v, menuInfo);
-        menu.add(0, CHANGE_TEMP_ID, 0, "Редактор раскладок");
-        menu.add(0, CANCEL_ID, 0, "Отмена");
+        menu.add(0, CHANGE_TEMP_ID, 0, R.string.EditorLaps);
+        menu.add(0, CANCEL_ID, 0, R.string.CancelEdit);
     }
 
     @Override
@@ -221,7 +221,7 @@ public class SetListFragment extends Fragment {
         if (SingleFragmentActivity.start) {
             Log.d(TAG, "SetListFragment onItemClick  start = " + SingleFragmentActivity.start);
             Toast.makeText(getContext(),
-                    "Сначала нажмите Стоп", Toast.LENGTH_SHORT).show();
+                    R.string.PressStopBefore, Toast.LENGTH_SHORT).show();
 
             //если выбран пункт Изменить раскладку
         }else { if (item.getItemId() == CHANGE_TEMP_ID) {

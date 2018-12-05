@@ -18,4 +18,13 @@
         android:defaultValue="@string/cbSoundOff">
     </CheckBoxPreference>
 
+    <ListPreference
+        android:entries="@array/pause_entry_number"
+        android:entryValues="@array/pause_entryValues_number"
+        android:key="pause_type"
+        android:defaultValue="1"
+        android:title="Пауза секундомера"
+        android:summary="Варианты работы секундомера в режиме паузы">
+    </ListPreference>
+
 </PreferenceScreen>

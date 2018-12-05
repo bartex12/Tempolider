@@ -30,7 +30,7 @@
     <string name="repsValue_item3">1</string>
     <string name="repsValue_item4">1</string>
     <string name="repsValue_item5">1</string>
-    <string name="Communicate">Communicate</string>
+    <string name="Communicate">Дополнительно</string>
 
     <string name="new_frag">Новый фрагмент</string>
     <string name="list_empty_tempolider">Данные отсутствуют либо удалены пользователем.
@@ -46,6 +46,17 @@
         <item>1</item>
         <item>2</item>
         <item>3</item>
+    </string-array>
+
+
+    <string-array name="pause_entry_number">
+        <item>Приостановка времени </item>
+        <item>Приостановка индикации</item>
+    </string-array>
+
+    <string-array name="pause_entryValues_number">
+        <item>1</item>
+        <item>2</item>
     </string-array>
 
     <string-array name="MenuMain">
@@ -98,5 +109,26 @@
     <string name="DeleteNo">Нет</string>
     <string name="Send">Оценить</string>
     <string name="Share">Поделиться</string>
+    <string name="main_menu">Главное меню</string>
+    <string name="ExitYesNo">Выход: Вы уверены?</string>
+    <string name="continue_task">Продолжить</string>
+    <string name="PressStopBefore">Сначала нажмите Стоп</string>
+    <string name="graph">График</string>
+    <string name="DurationLap">Длительность круга</string>
+    <string name="NumberLap">Номер цикла</string>
+    <string name="InputNameOfSchelule">Введите непустое имя раскладки</string>
+    <string name="InputAnotherName">Такое имя уже существует. Введите другое имя.</string>
+    <string name="FillOneFrag">Заполните хотя бы один фрагмент подхода.</string>
+    <string name="EditorLaps">Редактор раскладок</string>
+    <string name="CancelEdit">Отмена</string>
+    <string name="Count1">Количество</string>
+    <string name="button_lap">Круг</string>
+    <string name="button_start">Старт</string>
+    <string name="button_pause">Пауза</string>
+    <string name="button_stop">Стоп</string>
+    <string name="label_N">№</string>
+    <string name="label_time">Время, с</string>
+    <string name="label_lap">Круг, с</string>
+
 
 </resources>

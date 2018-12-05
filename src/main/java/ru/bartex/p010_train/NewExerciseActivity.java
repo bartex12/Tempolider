@@ -100,14 +100,14 @@ public class NewExerciseActivity extends AppCompatActivity {
 
                 //если имя - пустая строка
                 if (fileNameStr.trim().isEmpty()){
-                    Snackbar.make(v, "Введите непустое имя раскладки", Snackbar.LENGTH_LONG)
+                    Snackbar.make(v, R.string.InputNameOfSchelule, Snackbar.LENGTH_LONG)
                            .setAction("Action", null).show();
                     Log.d(TAG, "Введите непустое имя раскладки ");
                     return;
 
                     //если такое имя уже есть в базе
                 }else if (fileId != -1) {
-                    Snackbar.make(v, "Такое имя уже существует. Введите другое имя.", Snackbar.LENGTH_LONG)
+                    Snackbar.make(v, R.string.InputAnotherName, Snackbar.LENGTH_LONG)
                             .setAction("Action", null).show();
                     Log.d(TAG, "Такое имя уже существует. Введите другое имя. fileId = " +fileId);
                     return;

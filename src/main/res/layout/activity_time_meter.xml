@@ -8,18 +8,30 @@
     android:baselineAligned="true">
 
     <TextView
+        android:id="@+id/textViewTime"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="00:00"
-        android:id="@+id/textViewTime"
-        android:keepScreenOn="true"
-        android:textSize="40dp"
-        android:textColor="#1909f7"
-        android:layout_gravity="center_horizontal"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="10dp"
         android:layout_marginTop="10dp"
-        android:layout_marginBottom="10dp"/>
+        android:keepScreenOn="true"
+        android:text="@string/CountZeroTime"
+        android:textColor="#1909f7"
+        android:textSize="40dp"/>
+
+    <TextView
+        android:id="@+id/textViewTimePause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/textViewTime"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginEnd="42dp"
+        android:layout_marginRight="42dp"
+        android:text="@string/CountZeroTime"
+        android:visibility="gone"/>
 
     <LinearLayout
         android:orientation="horizontal"
@@ -56,21 +68,21 @@
                 android:layout_marginLeft="5dp"/>
 
             <TextView
+                android:id="@+id/time_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Время, с"
-                android:id="@+id/time_list"
-                android:textSize="20dp"
                 android:layout_column="5"
+                android:text="@string/label_time"
+                android:textSize="20dp"
                 android:textStyle="bold"/>
 
             <TextView
+                android:id="@+id/delta_time_list"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Круг, с"
-                android:id="@+id/delta_time_list"
-                android:textSize="20dp"
                 android:layout_column="9"
+                android:text="@string/label_lap"
+                android:textSize="20dp"
                 android:textStyle="bold"/>
 
         </TableRow>
@@ -110,45 +122,45 @@
             android:layout_marginBottom="15dp">
 
             <Button
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:text="круг"
                 android:id="@+id/buttonNext"
-                android:layout_marginLeft="8dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:background="@drawable/draw"/>
-
-            <Button
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Пауза"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/draw"
+                android:gravity="center"
+                android:text="@string/button_lap"/>
+
+            <Button
                 android:id="@+id/buttonStop"
-                android:layout_weight="1"
-                android:layout_marginLeft="8dp"
-                android:gravity="center"
-                android:background="@drawable/draw"/>
-
-            <Button
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Стоп"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/draw"
+                android:gravity="center"
+                android:text="@string/button_pause"/>
+
+            <Button
                 android:id="@+id/buttonReset"
-                android:layout_marginLeft="8dp"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:background="@drawable/draw"/>
-
-            <Button
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Старт"
-                android:id="@+id/buttonStart"
-                android:layout_weight="1"
-                android:layout_marginRight="8dp"
                 android:layout_marginLeft="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/draw"
                 android:gravity="center"
-                android:background="@drawable/draw"/>
+                android:text="@string/button_stop"/>
+
+            <Button
+                android:id="@+id/buttonStart"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/draw"
+                android:gravity="center"
+                android:text="@string/button_start"/>
 
         </LinearLayout>
     </RelativeLayout>

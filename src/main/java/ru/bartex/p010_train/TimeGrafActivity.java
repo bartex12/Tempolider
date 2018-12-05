@@ -63,7 +63,7 @@ public class TimeGrafActivity extends AppCompatActivity {
         setContentView(R.layout.activity_timegraf);
 
         ActionBar act = getSupportActionBar();
-        act.setTitle("График");
+        act.setTitle(R.string.graph);
         act.setDisplayHomeAsUpEnabled(true );
         act.setHomeButtonEnabled(true);
 
