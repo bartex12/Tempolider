@@ -87,4 +87,7 @@
     <string name="label_N">#</string>
     <string name="label_time">Time, s</string>
     <string name="label_lap">Lap, s</string>
+    <string name="textViewelay">Задержка, сек</string>
+    <string name="textViewDelay">Delay, sec</string>
+    <string name="textViewRestTime">Time Of Rest, sec</string>
 </resources>

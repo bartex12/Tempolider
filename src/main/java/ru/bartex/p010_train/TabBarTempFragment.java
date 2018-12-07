@@ -166,36 +166,37 @@ public class TabBarTempFragment extends Fragment {
         if (item.getItemId() == P.DELETE_ACTION_TEMP) {
             Log.d(TAG, "PersonsListActivity CM_DELETE_ID");
 
-            AlertDialog.Builder deleteDialog = new AlertDialog.Builder(getActivity());
-            deleteDialog.setTitle("Удалить: Вы уверены?");
-            deleteDialog.setPositiveButton("Нет", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                }
-            });
+            String fileName = mTempDBHelper.getFileNameFromTabFile(acmi.id);
+            if (fileName.equals(P.FILENAME_OTSECHKI_SEC)||
+                    fileName.equals(P.FILENAME_OTSECHKI_TEMP)) {
+                Snackbar.make(getView(), "Системный файл. Удаление запрещено.", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }else {
 
-            deleteDialog.setNegativeButton("Да", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-
-                    String fileName = mTempDBHelper.getFileNameFromTabFile(acmi.id);
-                    if (fileName.equals(P.FILENAME_OTSECHKI_SEC)||
-                            fileName.equals(P.FILENAME_OTSECHKI_TEMP)){
-                        Toast.makeText(getContext(), "Системный файл. Удаление запрещено.",
-                                Toast.LENGTH_SHORT).show();
-                    }else {
-                        //Удаление записи из базы данных
-                        mTempDBHelper.deleteFileAndSets(acmi.id);
-                        Log.d(TAG, "PersonsListActivity удалена позиция с ID " + acmi.id);
-                        //обновляем адаптер
-                        mViewPager.getAdapter().notifyDataSetChanged();
-                        //onResume();
+                AlertDialog.Builder deleteDialog = new AlertDialog.Builder(getActivity());
+                deleteDialog.setTitle("Удалить: Вы уверены?");
+                deleteDialog.setPositiveButton("Нет", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
                     }
+                });
+
+                deleteDialog.setNegativeButton("Да", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+
+                            //Удаление записи из базы данных
+                            mTempDBHelper.deleteFileAndSets(acmi.id);
+                            Log.d(TAG, "PersonsListActivity удалена позиция с ID " + acmi.id);
+                            //обновляем адаптер
+                            mViewPager.getAdapter().notifyDataSetChanged();
+                            //onResume();
+                    }
+                });
+                //если текущий фрагмент это открытая вкладка, то показываем диалог
+                if (currentItem == curItem) {
+                    deleteDialog.show();
                 }
-            });
-            //если текущий фрагмент это открытая вкладка, то показываем диалог
-            if (currentItem == curItem){
-                deleteDialog.show();
             }
             return true;
 
@@ -311,27 +312,41 @@ public class TabBarTempFragment extends Fragment {
             //если выбран пункт Переместить в секундомер
         } else if (item.getItemId() == P.MOVE_SEC_ACTION_TEMP) {
 
-            SQLiteDatabase db = mTempDBHelper.getWritableDatabase();
-            ContentValues updatedValues = new ContentValues();
-            updatedValues.put(TabFile.COLUMN_TYPE_FROM, P.TYPE_TIMEMETER);
-            db.update(TabFile.TABLE_NAME, updatedValues,
-                    TabFile._ID + "=" + acmi.id, null);
-            //обновляем адаптер вкладок
-            mViewPager.getAdapter().notifyDataSetChanged();
+            String fileName = mTempDBHelper.getFileNameFromTabFile(acmi.id);
+            if (fileName.equals(P.FILENAME_OTSECHKI_SEC)||
+                    fileName.equals(P.FILENAME_OTSECHKI_TEMP)) {
+                Snackbar.make(getView(), "Системный файл.Перемещение запрещено.", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }else {
 
+                SQLiteDatabase db = mTempDBHelper.getWritableDatabase();
+                ContentValues updatedValues = new ContentValues();
+                updatedValues.put(TabFile.COLUMN_TYPE_FROM, P.TYPE_TIMEMETER);
+                db.update(TabFile.TABLE_NAME, updatedValues,
+                        TabFile._ID + "=" + acmi.id, null);
+                //обновляем адаптер вкладок
+                mViewPager.getAdapter().notifyDataSetChanged();
+            }
             return true;
 
             //если выбран пункт Переместить в избранное
         } else if (item.getItemId() == P.MOVE_LIKE_ACTION_TEMP) {
 
-            SQLiteDatabase db = mTempDBHelper.getWritableDatabase();
-            ContentValues updatedValues = new ContentValues();
-            updatedValues.put(TabFile.COLUMN_TYPE_FROM, P.TYPE_LIKE);
-            db.update(TabFile.TABLE_NAME, updatedValues,
-                    TabFile._ID + "=" + acmi.id, null);
-            //обновляем адаптер вкладок
-            mViewPager.getAdapter().notifyDataSetChanged();
+            String fileName = mTempDBHelper.getFileNameFromTabFile(acmi.id);
+            if (fileName.equals(P.FILENAME_OTSECHKI_SEC)||
+                    fileName.equals(P.FILENAME_OTSECHKI_TEMP)) {
+                Snackbar.make(getView(), "Системный файл.Перемещение запрещено.", Snackbar.LENGTH_LONG)
+                        .setAction("Action", null).show();
+            }else {
 
+                SQLiteDatabase db = mTempDBHelper.getWritableDatabase();
+                ContentValues updatedValues = new ContentValues();
+                updatedValues.put(TabFile.COLUMN_TYPE_FROM, P.TYPE_LIKE);
+                db.update(TabFile.TABLE_NAME, updatedValues,
+                        TabFile._ID + "=" + acmi.id, null);
+                //обновляем адаптер вкладок
+                mViewPager.getAdapter().notifyDataSetChanged();
+            }
             return true;
         }
         //если ничего не выбрано

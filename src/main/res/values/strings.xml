@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">p010_Train</string>
+    <string name="app_name">Темполидер</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -129,6 +129,8 @@
     <string name="label_N">№</string>
     <string name="label_time">Время, с</string>
     <string name="label_lap">Круг, с</string>
-
+    <string name="textViewDelay">Задержка, сек</string>
+    <string name="textViewRestTime">Время отдыха</string>
+    <string name="textViewTimeRemain">До старта, сек</string>
 
 </resources>

@@ -45,6 +45,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -77,12 +78,15 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     private ProgressBar mProgressBarTime;
     private TextView mCurrentTime;
     private TextView mCurrentReps;
+    private TextView mTextViewDelay;
+    private TextView mTextViewRest;
     private TextView mTimeLabel;
     private TextView mRepsLabel;
     private TextView mtextViewCountDown;
     private TextView mNameOfFile;
 
     private Timer mTimer;
+    private Timer mTimerRest;
     private TimerTask mTimerTask;
     private ToneGenerator mToneGenerator;
 
@@ -95,6 +99,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     private long mTotalKvant = 0;//текущее суммарное время для фрагмента подхода
     private long mTotalTime = 0; //текущее суммарное время для подхода
     private long mCurrentDelay = 0; //текущее время для задержки
+
+    private long mTimeRestStart = 0; //начальное время отдыха
+    private long mTimeRestCurrent = 0; //текущее время отдыха
+
     private int mCurrentRep = 0; //счётчик повторений
     private int mTotalReps = 0;  //общее количество повторений в подходе
     private int mCurrentTotalReps = 0; //суммарное текущее количество повторений
@@ -102,6 +110,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
     private int mTotalCountFragment = 0;  //количество фрагментов в подходе
 
     private boolean workOn = false; //признак начала работы
+    private boolean restOn = false; //признак начала отдыха
     private boolean end = false; //признак окончания подхода
     public static boolean start = false;//признак нажатия на старт: public static для доступа из фрагмента
 
@@ -147,6 +156,9 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         edit.apply();
 
         mDelayButton.setText(DelayStr);
+        if (!restOn){
+            mtextViewCountDown.setText(String.valueOf(timeOfDelay));
+        }
     }
 
     @Override
@@ -170,6 +182,13 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
         mNameOfFile = (TextView) findViewById(R.id.textViewName);
 
+        //текстовая метка Задержка, сек
+        mTextViewDelay = (TextView) findViewById(R.id.textViewDelay);
+
+        //Текстовая метка До старта, сек и Время отдыха, сек в зависимости от состояния
+        mTextViewRest = (TextView) findViewById(R.id.textViewRest);
+        mTextViewRest.setText(R.string.textViewTimeRemain);
+
         mDelayButton = (Button) findViewById(R.id.buttonDelay);
         shp = getPreferences(MODE_PRIVATE);
         timeOfDelay = shp.getInt(P.KEY_DELAY, 6);
@@ -191,7 +210,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         mCurrentReps = (TextView)findViewById(R.id.current_reps);
         mTimeLabel = (TextView)findViewById(R.id.time_item1_label);
         mRepsLabel = (TextView)findViewById(R.id.reps_item1_label);
+
+        //счётчик времени задержки и времени отдыха
         mtextViewCountDown = (TextView)findViewById(R.id.textViewCountDown);
+        mtextViewCountDown.setText(String.valueOf(timeOfDelay));
 
         mStartButton = (Button) findViewById(R.id.start_button);
         mStartButton.setOnClickListener(new View.OnClickListener() {
@@ -240,11 +262,14 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 //Выставляем флаг конец работы - нет
                 end = false;
 
-                //запускаем TimerTask на выполнение с периодом mKvant
-                mTimer.scheduleAtFixedRate(mTimerTask,mKvant,mKvant);
+                restOn = false; //признак начала отдыха
+                mTimeRestCurrent = 0; //текущее время отдыха
 
                 //играем мелодию начала подхода  с задержкой
                 mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 200);
+
+                //запускаем TimerTask на выполнение с периодом mKvant
+                mTimer.scheduleAtFixedRate(mTimerTask,mKvant,mKvant);
 
                 //выставляем доступность кнопок
                 buttonsEnable (false,true,false);
@@ -254,6 +279,9 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
                 //делаем изменение задержки недоступным
                 mDelayButton.setEnabled(false);
+
+                mTextViewDelay.setText(R.string.textViewDelay); //Задержка, сек
+                mTextViewRest.setText(R.string.textViewTimeRemain); //До старта, сек
 
                 //вызываем onPrepareOptionsMenu чтобы скрыть элементы тулбара пока старт
                 invalidateOptionsMenu();
@@ -265,18 +293,24 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "Pressed StopButton");
-                if (mTimer!=null)mTimer.cancel();
+                //if (mTimer!=null)mTimer.cancel();
                 //выставляем доступность кнопок
                 buttonsEnable (true,false,true);
                 mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 500);
                 //выставляем флаг нажатия на Старт = нет
                 start = false;
+                restOn = true; //признак начала отдыха
+                mTimeRestCurrent = 0; //обнуляем текущее время отдыха
+                //фиксируем момент начала отдыха
+                mTimeRestStart = System.currentTimeMillis();
                 //делаем имя файла доступным для щелчка
                // mNameLayout.setEnabled(true);
                 //делаем изменение задержки доступным
                 mDelayButton.setEnabled(true);
+                mTextViewRest.setText(R.string.textViewRestTime);  //Время отдыха, сек
+
                 //вызываем onPrepareOptionsMenu чтобы открыть элементы тулбара если стоп
-                invalidateOptionsMenu();
+                //invalidateOptionsMenu();
             }
         });
 
@@ -304,8 +338,17 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 workOn = false;
                 //признак окончания подхода в Нет
                 end = false;
+                restOn = false; //признак начала отдыха
+                mTimeRestCurrent = 0; //текущее время отдыха
+                mTextViewDelay.setText(R.string.textViewDelay); //задержка,сек
+                mTextViewRest.setText(R.string.textViewTimeRemain); //До старта, сек
+                mtextViewCountDown.setText(String.valueOf(timeOfDelay));// величина задержки из поля timeOfDelay
+
                 //устанавливаем цвет маркера фрагмента подхода в исходный цвет, обновляя адаптер
                 changeMarkColor(R.id.fragment_container, mCountFragment, end);
+                start = false;
+                //вызываем onPrepareOptionsMenu чтобы открыть элементы тулбара
+                invalidateOptionsMenu();
             }
         });
 
@@ -614,24 +657,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                //формируем формат строки показа времени
-                int minut = ((int)mTotalTime/60000)%60;
-                int second = ((int)mTotalTime/1000)%60;
-                int decim = (int)((mTotalTime%1000)/mKvant);
-                int hour = (int)((mTotalTime/3600000)%24);
-
-                // общее время подхода
-                String time = "";
-                if (hour<1){
-                    if(minut<10) {
-                        time = String.format("%d:%02d.%d",minut, second, decim);
-                    }else if (minut<60){
-                        time = String.format("%02d:%02d.%d",minut,second,decim);
-                    }
-                }else {
-                    time = String.format("%d:%02d:%02d.%d",hour,minut,second,decim);
-                }
-
+                String time = showFormatString(mTotalTime, mKvant);
                 //показ текущ времени
                 mCurrentTime.setText(time);
 
@@ -642,7 +668,18 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 float f =(countMillisDelay - mCurrentDelay)/1000;
                 if (f>=0) {
                     mtextViewCountDown.setText(Float.toString((f)));
-                }else mtextViewCountDown.setText("");
+                }else{
+                    //если работа а не отдых
+                    if (workOn&&!restOn){
+                        mtextViewCountDown.setText("--");
+                    }
+                    //если отдых
+                    if (restOn) {
+                        mTextViewRest.setText(R.string.textViewRestTime);  //Время отдыха, сек
+                        String timeRest = showFormatString(mTimeRestCurrent, mKvant);
+                        mtextViewCountDown.setText(timeRest);
+                    }
+                }
 
                 //при переходе к следующему фрагменту подхода меняем цвет маркера,
                 // затем текущий фрагмент подхода обозначаем как предыдущий
@@ -672,6 +709,27 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
         fr.changeBackColor(countFrag, endOfWork );
     }
 
+    private String showFormatString (long total, long kvant) {
+        //формируем формат строки показа времени
+        int minut = ((int)total/60000)%60;
+        int second = ((int)total/1000)%60;
+        int decim = (int)((total%1000)/kvant);
+        int hour = (int)((total/3600000)%24);
+
+        // общее время подхода
+        String time = "";
+        if (hour<1){
+            if(minut<10) {
+                time = String.format(Locale.ENGLISH,"%d:%02d.%d",minut, second, decim);
+            }else if (minut<60){
+                time = String.format(Locale.ENGLISH,"%02d:%02d.%d",minut,second,decim);
+            }
+        }else {
+            time = String.format(Locale.ENGLISH,"%d:%02d:%02d.%d",hour,minut,second,decim);
+        }
+        return time;
+    }
+
     //======================class MyTimerTask=================================//
 
     public class MyTimerTask extends TimerTask{
@@ -693,7 +751,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 workOn = true;
             }
 
-            if (workOn) {
+            if (workOn&&!restOn) {
 
                 mTotalKvant += mKvant;  // добавляем 100мс пока не будет больше времени между повторами
                 mTotalTime += mKvant;  //добавляем 100мс к текущему времени подхода
@@ -715,7 +773,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 }
                 //если в последнем фрагменте - прекращаем выполнение
                 if ((mCurrentRep >= countReps) && (mCountFragment >= mTotalCountFragment - 1)) {
-                    if (mTimer != null) mTimer.cancel();
+                    //if (mTimer != null) mTimer.cancel();
                     Log.d(TAG, "mTimer.cancel");
                     mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 500);
                     //выставляем начальные значения - для повторного старта
@@ -727,6 +785,10 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                     mCountFragment = 0;
                     end = true;
                     start = false; //это для разблокировки кнопки BACK
+                    workOn = false;  //признак начала работы
+                    restOn = true; //признак начала отдыха
+                    //фиксируем момент начала отдыха
+                    mTimeRestStart = System.currentTimeMillis();
 
                     //изменяем свойство кнопок и сбрасываем цвет, восстанавливаем меню
                     // в пользовательском потоке
@@ -741,6 +803,14 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                     });
                 }
             }
+
+            if (restOn){
+                mTimeRestCurrent = System.currentTimeMillis() - mTimeRestStart;
+                Log.d(TAG, "mTimeRestCurrent = " + mTimeRestCurrent);
+                //фиксируем изменения на экране (в пользовательском потоке)
+                doChangeOnViThread();
+            }
+
         }
     }
 

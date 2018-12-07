@@ -549,7 +549,7 @@
     <string name="action_settings">Установки</string>
     <string name="action_timing">Отсечки</string>
     <string name="action_transfer">Загрузка отсечек в темполидер</string>
-    <string name="app_name">p010_Train</string>
+    <string name="app_name">Темполидер</string>
     <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
     <string name="bottom_sheet_behavior" translatable="false">android.support.design.widget.BottomSheetBehavior</string>
     <string name="button_lap">Круг</string>
@@ -597,6 +597,9 @@
     <string name="start_button">старт</string>
     <string name="status_bar_notification_info_overflow">999+</string>
     <string name="stop_button">стоп</string>
+    <string name="textViewDelay">Задержка, сек</string>
+    <string name="textViewRestTime">Время отдыха</string>
+    <string name="textViewTimeRemain">До старта, сек</string>
     <string name="timeValue_item1">0</string>
     <string name="timeValue_item2">0</string>
     <string name="timeValue_item3">0</string>
