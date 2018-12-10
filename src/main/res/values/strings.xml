@@ -132,5 +132,6 @@
     <string name="textViewDelay">Задержка, сек</string>
     <string name="textViewRestTime">Время отдыха</string>
     <string name="textViewTimeRemain">До старта, сек</string>
+    <string name="textViewelay">Задержка, сек</string>
 
 </resources>
