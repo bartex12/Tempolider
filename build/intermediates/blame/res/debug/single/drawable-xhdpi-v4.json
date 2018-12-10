@@ -132,6 +132,10 @@
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\drawable-xhdpi\\ic_thumb_up_black_24dp.xml"
     },
     {
+        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\pacemaker83color.png",
+        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\drawable-xhdpi\\pacemaker83color.png"
+    },
+    {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable-xhdpi-v4\\abc_textfield_default_mtrl_alpha.9.png",
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable-xhdpi-v4\\abc_textfield_default_mtrl_alpha.9.png"
     },

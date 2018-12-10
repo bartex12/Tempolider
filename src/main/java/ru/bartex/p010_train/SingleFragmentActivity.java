@@ -342,6 +342,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 mTimeRestCurrent = 0; //текущее время отдыха
                 mTextViewDelay.setText(R.string.textViewDelay); //задержка,сек
                 mTextViewRest.setText(R.string.textViewTimeRemain); //До старта, сек
+                mtextViewCountDown.setTextColor(Color.RED);
                 mtextViewCountDown.setText(String.valueOf(timeOfDelay));// величина задержки из поля timeOfDelay
 
                 //устанавливаем цвет маркера фрагмента подхода в исходный цвет, обновляя адаптер
@@ -667,16 +668,29 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                 //показываем текущую задержку
                 float f =(countMillisDelay - mCurrentDelay)/1000;
                 if (f>=0) {
-                    mtextViewCountDown.setText(Float.toString((f)));
+                    if (!restOn){
+                        mTextViewRest.setText(R.string.textViewTimeRemain); //До старта, сек
+                        mtextViewCountDown.setTextColor(Color.RED);
+                        mtextViewCountDown.setText(Float.toString((f)));
+                    }else {
+                        mTextViewRest.setText(R.string.textViewRestTime);  //Время отдыха, сек
+                        String timeRest = showFormatString(mTimeRestCurrent, mKvant);
+                        mtextViewCountDown.setTextColor(Color.BLUE);
+                        mtextViewCountDown.setText(timeRest);
+                    }
                 }else{
                     //если работа а не отдых
                     if (workOn&&!restOn){
-                        mtextViewCountDown.setText("--");
+                        mTextViewRest.setText(""); //До старта, сек
+                        mtextViewCountDown.setTextColor(Color.RED);
+                        mtextViewCountDown.setText("СТАРТ");
+
                     }
                     //если отдых
                     if (restOn) {
                         mTextViewRest.setText(R.string.textViewRestTime);  //Время отдыха, сек
                         String timeRest = showFormatString(mTimeRestCurrent, mKvant);
+                        mtextViewCountDown.setTextColor(Color.BLUE);
                         mtextViewCountDown.setText(timeRest);
                     }
                 }
@@ -741,14 +755,25 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
 
             mCurrentDelay += mKvant;
 
-            if ((mCurrentDelay>=countMillisDelay-600)&&(mCurrentDelay<countMillisDelay-500)){
-                //играем мелодию начала подхода
-                mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 150);
-                SystemClock.sleep(250);
-                mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 300);
-            }
-            if (mCurrentDelay>=countMillisDelay){
-                workOn = true;
+            //если не отдых
+            if (!restOn){
+
+                if ((mCurrentDelay<=countMillisDelay-500)&&(mCurrentDelay>countMillisDelay-600)){
+                    //играем мелодию начала подхода
+                    mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 150);
+                    SystemClock.sleep(250);
+                    mToneGenerator.startTone(ToneGenerator.TONE_DTMF_0, 300);
+                }
+                if (mCurrentDelay>=countMillisDelay){
+                    workOn = true;
+                }
+                // если отдых
+            }else {
+                mTimeRestCurrent = System.currentTimeMillis() - mTimeRestStart;
+                Log.d(TAG, "mTimeRestCurrent = " + mTimeRestCurrent);
+
+                //фиксируем изменения на экране (в пользовательском потоке)
+                doChangeOnViThread();
             }
 
             if (workOn&&!restOn) {
@@ -803,14 +828,6 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                     });
                 }
             }
-
-            if (restOn){
-                mTimeRestCurrent = System.currentTimeMillis() - mTimeRestStart;
-                Log.d(TAG, "mTimeRestCurrent = " + mTimeRestCurrent);
-                //фиксируем изменения на экране (в пользовательском потоке)
-                doChangeOnViThread();
-            }
-
         }
     }
 

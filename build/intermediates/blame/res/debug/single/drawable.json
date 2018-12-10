@@ -12,6 +12,10 @@
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\abc_ic_search_api_material.xml"
     },
     {
+        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\ic_launcher_background.xml",
+        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\drawable\\ic_launcher_background.xml"
+    },
+    {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\design_snackbar_background.xml",
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\design\\26.0.0-alpha1\\res\\drawable\\design_snackbar_background.xml"
     },
@@ -40,12 +44,12 @@
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\abc_seekbar_thumb_material.xml"
     },
     {
-        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\notification_tile_bg.xml",
-        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\notification_tile_bg.xml"
-    },
-    {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\ic_panorama_black_24px.xml",
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\drawable\\ic_panorama_black_24px.xml"
+    },
+    {
+        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\notification_tile_bg.xml",
+        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\notification_tile_bg.xml"
     },
     {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\ic_compare_arrows_white_24dp.xml",
@@ -64,12 +68,12 @@
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\drawable\\ic_swap_vert_white_32dp.xml"
     },
     {
-        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\abc_ratingbar_small_material.xml",
-        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\abc_ratingbar_small_material.xml"
-    },
-    {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\abc_tab_indicator_material.xml",
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\abc_tab_indicator_material.xml"
+    },
+    {
+        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\abc_ratingbar_small_material.xml",
+        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\exploded-aar\\com.android.support\\appcompat-v7\\26.0.0-alpha1\\res\\drawable\\abc_ratingbar_small_material.xml"
     },
     {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\drawable\\design_password_eye.xml",

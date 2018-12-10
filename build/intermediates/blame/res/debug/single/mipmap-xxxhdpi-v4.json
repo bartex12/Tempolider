@@ -2,5 +2,17 @@
     {
         "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\mipmap-xxxhdpi-v4\\ic_launcher.png",
         "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher.png"
+    },
+    {
+        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\mipmap-xxxhdpi-v4\\ic_launcher_foreground.png",
+        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher_foreground.png"
+    },
+    {
+        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\mipmap-xxxhdpi-v4\\ic_launcher1_round.png",
+        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher1_round.png"
+    },
+    {
+        "merged": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\build\\intermediates\\res\\merged\\debug\\mipmap-xxxhdpi-v4\\ic_launcher1.png",
+        "source": "D:\\003 ANDROID Projects\\Sensors\\p010_train\\src\\main\\res\\mipmap-xxxhdpi\\ic_launcher1.png"
     }
 ]
