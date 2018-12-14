@@ -4,7 +4,7 @@
 
     <item android:id="@+id/action_timing"
           android:title="@string/action_timing"
-          android:icon="@drawable/ic_timeline_white_32dp"
+          android:icon="@drawable/ic_action_graf"
           android:orderInCategory="1"
           app:showAsAction="always" />
 

@@ -110,7 +110,7 @@ MERGED from [com.android.support:support-compat:26.0.0-alpha1] D:\003 ANDROID Pr
 	android:allowBackup
 		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:6:9-35
 	android:icon
-		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:7:9-44
+		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:7:9-43
 	android:theme
 		ADDED from D:\003 ANDROID Projects\Sensors\p010_train\src\main\AndroidManifest.xml:10:9-40
 activity#ru.bartex.p010_train.MainActivity

@@ -133,5 +133,6 @@
     <string name="textViewRestTime">Время отдыха</string>
     <string name="textViewTimeRemain">До старта, сек</string>
     <string name="textViewelay">Задержка, сек</string>
+    <string name="appDescription">Задаёт темп выполнения циклических упражнений</string>
 
 </resources>

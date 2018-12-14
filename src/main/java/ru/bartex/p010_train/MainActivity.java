@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity
     String[] stringListMain;
     String[] stringListSubMain;
     int array_size; //размер массива строк для списка в MainActivity
-    int[] idPicture = {R.drawable.sec1,R.drawable.metronome,R.drawable.my_logo1};
+    int[] idPicture = {R.drawable.sec1,R.drawable.metronome,R.drawable.list80x100};
 
     final String ATTR_PICTURE = "time";
     final String ATTR_BASE_TEXT = "fraction_time";

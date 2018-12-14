@@ -181,8 +181,9 @@
     <color name="button_material_dark">#ff5a595b</color>
     <color name="button_material_light">#ffd6d7d7</color>
     <color name="colorAccent">#FF4081</color>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#75f2a4</color>
+    <color name="colorFab">#72f5a4</color>
+    <color name="colorPrimary">#2196f3</color>
+    <color name="colorPrimaryDark">#1976d2</color>
     <color name="design_bottom_navigation_shadow_color">#14000000</color>
     <color name="design_fab_shadow_end_color">@android:color/transparent</color>
     <color name="design_fab_shadow_mid_color">#14000000</color>
@@ -411,7 +412,7 @@
     <dimen name="design_tab_text_size_2line">12sp</dimen>
     <item format="float" name="disabled_alpha_material_dark" type="dimen">0.30</item>
     <item format="float" name="disabled_alpha_material_light" type="dimen">0.26</item>
-    <dimen name="fab_margin">5dp</dimen>
+    <dimen name="fab_margin">10dp</dimen>
     <dimen name="fastscroll_default_thickness">8dp</dimen>
     <dimen name="fastscroll_margin">0dp</dimen>
     <dimen name="fastscroll_minimum_range">50dp</dimen>
@@ -550,6 +551,7 @@
     <string name="action_settings">Установки</string>
     <string name="action_timing">Отсечки</string>
     <string name="action_transfer">Загрузка отсечек в темполидер</string>
+    <string name="appDescription">Задаёт темп выполнения циклических упражнений</string>
     <string name="app_name">Темполидер</string>
     <string name="appbar_scrolling_view_behavior" translatable="false">android.support.design.widget.AppBarLayout$ScrollingViewBehavior</string>
     <string name="bottom_sheet_behavior" translatable="false">android.support.design.widget.BottomSheetBehavior</string>
@@ -601,6 +603,7 @@
     <string name="textViewDelay">Задержка, сек</string>
     <string name="textViewRestTime">Время отдыха</string>
     <string name="textViewTimeRemain">До старта, сек</string>
+    <string name="textViewelay">Задержка, сек</string>
     <string name="timeValue_item1">0</string>
     <string name="timeValue_item2">0</string>
     <string name="timeValue_item3">0</string>
