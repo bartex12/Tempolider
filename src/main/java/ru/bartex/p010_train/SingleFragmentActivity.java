@@ -683,7 +683,7 @@ public abstract class SingleFragmentActivity extends AppCompatActivity implement
                     if (workOn&&!restOn){
                         mTextViewRest.setText(""); //До старта, сек
                         mtextViewCountDown.setTextColor(Color.RED);
-                        mtextViewCountDown.setText("СТАРТ");
+                        mtextViewCountDown.setText("РАБОТА");
 
                     }
                     //если отдых

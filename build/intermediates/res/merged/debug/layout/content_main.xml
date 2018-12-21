@@ -18,8 +18,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/listView"
-        android:choiceMode="singleChoice"/>
-
+        android:choiceMode="singleChoice">
+    </ListView>
         <!--android:divider="@drawable/divider"-->
         <!--android:listSelector="@drawable/textured"-->
 
