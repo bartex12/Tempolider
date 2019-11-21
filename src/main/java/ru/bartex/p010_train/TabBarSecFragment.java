@@ -11,11 +11,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.Fragment;
-import android.support.v4.view.ViewPager;
-import android.support.v4.widget.SimpleCursorAdapter;
+import androidx.annotation.Nullable;
+
 import android.text.InputType;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -29,8 +26,12 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.Toast;
 
+import com.google.android.material.snackbar.Snackbar;
+
+import androidx.cursoradapter.widget.SimpleCursorAdapter;
+import androidx.fragment.app.Fragment;
+import androidx.viewpager.widget.ViewPager;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;

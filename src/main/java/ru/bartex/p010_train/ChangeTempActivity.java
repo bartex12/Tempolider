@@ -9,11 +9,10 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.preference.PreferenceManager;
-import android.support.annotation.IdRes;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -31,15 +30,13 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.UUID;
 
+import androidx.fragment.app.DialogFragment;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TabSet;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;

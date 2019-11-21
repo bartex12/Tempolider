@@ -3,8 +3,8 @@ package ru.bartex.p010_train;
 import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -15,8 +15,6 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-
-import java.util.UUID;
 
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;

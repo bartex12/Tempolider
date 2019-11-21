@@ -7,9 +7,8 @@ import android.content.pm.ActivityInfo;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.preference.PreferenceManager;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -26,6 +25,7 @@ import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import androidx.fragment.app.DialogFragment;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 

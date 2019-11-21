@@ -7,13 +7,12 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.preference.PreferenceManager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -22,16 +21,11 @@ import com.jjoe64.graphview.GraphView;
 import com.jjoe64.graphview.series.DataPoint;
 import com.jjoe64.graphview.series.LineGraphSeries;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
-import ru.bartex.p010_train.ru.bartex.p010_train.data.TabFile;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TabSet;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 

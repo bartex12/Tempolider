@@ -3,7 +3,6 @@ package ru.bartex.p010_train;
 import android.content.Context;
 import android.media.AudioManager;
 import android.preference.PreferenceActivity;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
 public class PrefActivity extends PreferenceActivity {

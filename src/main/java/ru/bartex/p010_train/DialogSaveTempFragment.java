@@ -2,12 +2,9 @@ package ru.bartex.p010_train;
 
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.design.widget.Snackbar;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import android.text.InputType;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,14 +12,11 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
 import android.widget.EditText;
-import android.widget.FrameLayout;
-import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.google.android.material.snackbar.Snackbar;
 
+import androidx.fragment.app.DialogFragment;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.TempDBHelper;
 

@@ -1,11 +1,10 @@
 package ru.bartex.p010_train;
 
 import android.app.Dialog;
-import android.support.v7.app.AlertDialog;
+import androidx.appcompat.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -14,6 +13,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.fragment.app.DialogFragment;
 import ru.bartex.p010_train.ru.bartex.p010_train.data.P;
 
 /**

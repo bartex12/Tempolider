@@ -1,7 +1,5 @@
 package ru.bartex.p010_train;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -10,10 +8,7 @@ import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -29,6 +24,9 @@ import android.widget.Toast;
 
 import java.util.Timer;
 import java.util.TimerTask;
+
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 
 public class PaceMakerActivity extends AppCompatActivity implements TextWatcher {
 
